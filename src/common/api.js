@@ -43,11 +43,13 @@ export class JetsApiService {
   };
 
   _getRequestOptions = async () => {
-    const token = await this._getToken();
+    // const token = await this._getToken();
+    const token = localStorage.getItem('jwtToken');
     return {
       headers: {
         'content-type': 'application/json',
-        authorization: `${this._apiAuthorizationScheme} ${token}`,
+        authorization: token,
+        // authorization: `${this._apiAuthorizationScheme} ${token}`,
       },
     };
   };
