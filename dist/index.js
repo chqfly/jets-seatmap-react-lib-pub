@@ -3596,7 +3596,7 @@ class hr extends Le {
       l(this, 'getPlaneFeatures', async (e, t = z, r = S) => {
         const l = { flight: e, lang: dr.includes(t) ? t : z, units: r },
           i = 'availabilityData',
-          o = await this.postData('flight/features/plane/seatmap', l),
+          o = await this.postData('api/v1/seatmap', l),
           s = { seatDetails: null },
           a = ['F', 'B', 'P', 'E'];
         for (const t of o)

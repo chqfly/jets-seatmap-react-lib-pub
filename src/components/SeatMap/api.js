@@ -41,7 +41,7 @@ export class JetsSeatMapApiService extends JetsApiService {
 
     const data = { flight, lang: language, units };
 
-    const path = 'flight/features/plane/seatmap';
+    const path = 'api/v1/seatmap';
     const availabilityDataKey = 'availabilityData';
     const responseItems = await this.postData(path, data);
 
