@@ -35,11 +35,11 @@ export class JetsApiService {
     const response = await fetch(path, params);
     const responseData = await response.json();
 
-    if (!response.ok) {
+    if (response.status !== 200) {
       throw new Error(`postData: ${response.status} - ${responseData.message}`);
     }
 
-    return responseData;
+    return responseData.data;
   };
 
   _getRequestOptions = async () => {
