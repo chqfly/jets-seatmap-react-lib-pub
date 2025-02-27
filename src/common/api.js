@@ -4,12 +4,13 @@ const JWT_TOKEN = 'jetsJwtToken';
 const TOKEN_EXPIRATION_BUFFER_IN_MS = 300000;
 
 export class JetsApiService {
-  constructor(appId, key, url, localStorage, apiAuthorizationScheme = DEFAULT_AUTHORIZATION_SCHEME) {
+  constructor(appId, key, url, localStorage, apiAuthorizationScheme = DEFAULT_AUTHORIZATION_SCHEME, request) {
     this._appId = appId;
     this._apiKey = key;
     this._apiUrl = url;
     this._localStorage = localStorage;
     this._apiAuthorizationScheme = apiAuthorizationScheme;
+    this._request = request;
   }
 
   getData = async (url, options = {}) => {
@@ -19,7 +20,7 @@ export class JetsApiService {
     }
 
     const reqOptions = { ...options, ...basicOptions };
-    const response = await fetch(`${this._apiUrl}/${url}`, reqOptions);
+    const response = await this._request.get(`${this._apiUrl}/${url}`, reqOptions);
     const responseData = await response.json();
     if (!response.ok) {
       throw new Error(`getData: ${response.status} - ${responseData.message}`);
@@ -29,17 +30,13 @@ export class JetsApiService {
   };
 
   postData = async (url, body, options = {}) => {
-    const basicOptions = await this._getRequestOptions();
-    const params = { ...options, method: 'post', body: JSON.stringify(body), ...basicOptions };
     const path = `${this._apiUrl}/${url}`;
-    const response = await fetch(path, params);
-    const responseData = await response.json();
-
+    const response = await this._request.post(path, body);
     if (response.status !== 200) {
-      throw new Error(`postData: ${response.status} - ${responseData.message}`);
+      throw new Error(`postData: ${response.status} - ${response.message}`);
     }
 
-    return responseData.data;
+    return response.data;
   };
 
   _getRequestOptions = async () => {

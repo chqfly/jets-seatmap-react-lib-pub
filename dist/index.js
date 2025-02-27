@@ -805,7 +805,7 @@ const o = {
     exitRow: 'Çıkış sırası',
   },
   w = { ZOOM: 'zoom', SCALE: 'scale' },
-  b = {
+  L = {
     available: 'available',
     unavailable: 'unavailable',
     selected: 'selected',
@@ -813,26 +813,26 @@ const o = {
     extra: 'extra',
     disabled: 'disabled',
   },
-  L = { seat: 'seat', aisle: 'aisle', empty: 'empty', index: 'index' },
+  b = { seat: 'seat', aisle: 'aisle', empty: 'empty', index: 'index' },
   x = { seat: 'S', empty: 'E', aisle: '-' },
   M = { f: 'First', b: 'Business', p: 'Premium economy', e: 'Economy' },
-  y = { CN: c, DE: a, EN: n, ES: s, PL: o, RU: d, AR: h, CS: g, FR: p, PT: m, UK: u, IT: C, JA: f, KO: k, TR: v },
-  z = 'EN',
+  z = { CN: c, DE: a, EN: n, ES: s, PL: o, RU: d, AR: h, CS: g, FR: p, PT: m, UK: u, IT: C, JA: f, KO: k, TR: v },
+  y = 'EN',
   S = 'metric',
   T = w.SCALE,
   E = 'Bearer',
   H = !1,
-  A = !1,
   _ = !1,
   $ = !1,
+  A = !1,
   V = !0,
   O = !1,
-  I = !0,
   B = !0,
-  N = !1,
+  I = !0,
   W = !1,
-  P = ['ADT', 'CHD', 'INF'],
-  D = [
+  P = !1,
+  R = ['ADT', 'CHD', 'INF'],
+  N = [
     [100, 100],
     [122, 218],
     [150, 170],
@@ -880,16 +880,16 @@ const o = {
     [550, 325],
     [550, 325],
   ],
-  R = { left: 'left', right: 'right', center: 'center' },
-  j = 'auto',
-  F = 'rgb(30,60,90)',
+  D = { left: 'left', right: 'right', center: 'center' },
+  F = 'auto',
+  j = 'rgb(30,60,90)',
   Z = 'rgb(255,255,255)',
   U = 'rgb(255,255,255)',
   G = 'rgb(255,255,255)',
   K = 'rgb(185,186,186)',
-  J = 'rgb(237, 237, 237)',
-  q = 'dimgrey',
-  Y = 'rgb(186, 199, 213)',
+  q = 'rgb(237, 237, 237)',
+  Y = 'dimgrey',
+  J = 'rgb(186, 199, 213)',
   X = 'rgb(148, 168, 190)',
   Q = 'rgb(70, 81, 94)',
   ee = 'lightgray',
@@ -913,35 +913,32 @@ const o = {
   ke = 'rgba(50, 50, 50, 0.5)',
   ve = '#00BFFF',
   we = { F: '#BDB76B', B: '#FF8C00', P: '#8FBC8F', E: '#1E90FF' },
-  be = 'jetsJwtToken';
-class Le {
-  constructor(e, t, r, i, o = E) {
+  Le = 'jetsJwtToken';
+class be {
+  constructor(e, t, r, i, o = E, s) {
     l(this, 'getData', async (e, t = {}) => {
       var r;
       let l = {};
       (null != t && null !== (r = t.headers) && void 0 !== r && r.authorization) ||
         (l = await this._getRequestOptions());
       const i = { ...t, ...l },
-        o = await fetch(`${this._apiUrl}/${e}`, i),
+        o = await this._request.get(`${this._apiUrl}/${e}`, i),
         s = await o.json();
       if (!o.ok) throw new Error(`getData: ${o.status} - ${s.message}`);
       return await s;
     }),
       l(this, 'postData', async (e, t, r = {}) => {
-        const l = await this._getRequestOptions(),
-          i = { ...r, method: 'post', body: JSON.stringify(t), ...l },
-          o = `${this._apiUrl}/${e}`,
-          s = await fetch(o, i),
-          a = await s.json();
-        if (!s.ok) throw new Error(`postData: ${s.status} - ${a.message}`);
-        return a;
+        const l = `${this._apiUrl}/${e}`,
+          i = await this._request.post(l, t);
+        if (200 !== i.status) throw new Error(`postData: ${i.status} - ${i.message}`);
+        return i.data;
       }),
       l(this, '_getRequestOptions', async () => ({
         headers: { 'content-type': 'application/json', authorization: localStorage.getItem('jwtToken') },
       })),
       l(this, '_getAuthRequestOptions', e => ({ headers: { authorization: `${this._apiAuthorizationScheme} ${e}` } })),
       l(this, '_getToken', async () => {
-        const e = this._localStorage ? this._localStorage.getData(be) : null;
+        const e = this._localStorage ? this._localStorage.getData(Le) : null;
         if (e) return e;
         const t = `auth?appId=${this._appId}`,
           { accessToken: r } = await this.getData(t, this._getAuthRequestOptions(this._apiKey));
@@ -952,13 +949,14 @@ class Le {
         if (!e || !this._localStorage) return;
         const { exp: t } = this._parseJwt(e),
           r = this._getTokenTTL(t);
-        this._localStorage.setData(be, e, r);
+        this._localStorage.setData(Le, e, r);
       }),
       (this._appId = e),
       (this._apiKey = t),
       (this._apiUrl = r),
       (this._localStorage = i),
-      (this._apiAuthorizationScheme = o);
+      (this._apiAuthorizationScheme = o),
+      (this._request = s);
   }
   _getTokenTTL(e) {
     return 1e3 * e - Date.now() - 3e5;
@@ -978,7 +976,7 @@ class Le {
 }
 const xe = r.default.createContext();
 var Me;
-class ye {
+class ze {
   constructor() {
     l(this, 'getSeatMapParams', (e, t) => {
       var r, l, i;
@@ -1047,7 +1045,7 @@ class ye {
         return r;
       }),
       l(this, 'rowLetters', e => {
-        const t = { [L.aisle]: '-', [L.empty]: ' ' };
+        const t = { [b.aisle]: '-', [b.empty]: ' ' };
         return e.seats.map(e => t[e.type] || e.letter).join();
       }),
       l(this, 'getDefaultSeatSizeByClass', e =>
@@ -1133,18 +1131,18 @@ class ye {
     );
   }
 }
-(Me = ye),
-  l(ye, 'validateLanguage', e => {
-    if (!e) return z;
+(Me = ze),
+  l(ze, 'validateLanguage', e => {
+    if (!e) return y;
     const t = e.toUpperCase();
-    return y[t] ? t : z;
+    return z[t] ? t : y;
   }),
-  l(ye, 'mergeColorThemeWithConstraints', (e, t) => {
+  l(ze, 'mergeColorThemeWithConstraints', (e, t) => {
     let r = { ...e, ...Me._filterInvalidColors(t) };
-    for (let e in ze) r[e] = ze[e](r[e]);
+    for (let e in ye) r[e] = ye[e](r[e]);
     return r;
   });
-const ze = { fuselageStrokeWidth: e => Math.min(Math.max(10, e), 18) };
+const ye = { fuselageStrokeWidth: e => Math.min(Math.max(10, e), 18) };
 class Se {
   static generateId() {
     return '_' + Math.random().toString(36).substring(2, 9);
@@ -1224,7 +1222,7 @@ class He {
         let c = 0;
         if (l) {
           var d, h;
-          const [e] = D[s],
+          const [e] = N[s],
             t =
               (l - (null === (d = i.match(/S|E/g)) || void 0 === d ? void 0 : d.length) * e) /
               ((null === (h = i.match(/-/g)) || void 0 === h ? void 0 : h.length) || 0);
@@ -1246,9 +1244,9 @@ class He {
       l(this, '_prepareIndexRow', e => {
         const t = e.seats.map(
           t => (
-            (t.letter = t.type === L.aisle ? '' : t.letter),
-            (t.type = t.type === L.aisle ? L.empty : L.index),
-            (t.status = b.disabled),
+            (t.letter = t.type === b.aisle ? '' : t.letter),
+            (t.type = t.type === b.aisle ? b.empty : b.index),
+            (t.status = L.disabled),
             (t.topOffset = t.topOffset - t.size.height / 2),
             (t.number = ''),
             (t.size = { width: t.size.width, height: 50 }),
@@ -1266,12 +1264,12 @@ class He {
           d = n.measurements,
           h = M[o.toLowerCase()] || '',
           g = i + (null == e ? void 0 : e.letter) || '',
-          p = L.seat,
-          m = b.available,
+          p = b.seat,
+          m = L.available,
           C = e.seatType || a,
           u = `${o}-${C}`,
-          [f, k] = D[a],
-          [v, w] = D[C];
+          [f, k] = N[a],
+          [v, w] = N[C];
         return {
           uniqId: Se.generateId(),
           ...e,
@@ -1291,17 +1289,17 @@ class He {
       }),
       l(this, '_prepareAisle', (e, t = 0) => {
         const { number: r, seatType: l } = e,
-          [i, o] = D[l],
+          [i, o] = N[l],
           s = { width: t || i, height: o },
-          a = L.aisle,
-          n = b.disabled;
+          a = b.aisle,
+          n = L.disabled;
         return { uniqId: Se.generateId(), letter: r, type: a, status: n, size: s };
       }),
       l(this, '_prepareEmpty', e => {
-        const [t, r] = D[e.seatType],
+        const [t, r] = N[e.seatType],
           l = { width: t, height: r },
-          i = L.empty,
-          o = b.disabled;
+          i = b.empty,
+          o = L.disabled;
         return { uniqId: Se.generateId(), letter: '', status: o, type: i, size: l };
       }),
       l(this, '_prepareSeatFeatures', (e, t, r) => {
@@ -1318,14 +1316,14 @@ class He {
             .filter(([e, t]) => !!t && !u[e])
             .map(([e, t]) => {
               const l = Se.generateId(),
-                i = y[r][e] || e;
+                i = z[r][e] || e;
               if (f.includes(t)) {
                 return { uniqId: l, title: null, icon: Te[t] || '', value: i, key: e };
               }
               return { uniqId: l, title: i, icon: Te[e] || '', value: t, key: e };
             }),
           measurements: Object.entries(u).map(([e, t]) => {
-            const l = y[r][e] || e,
+            const l = z[r][e] || e,
               i = Ee[e] || '';
             return { uniqId: Se.generateId(), title: l, icon: i, value: t, key: e };
           }),
@@ -1343,7 +1341,7 @@ class He {
               cssClass: null == e ? void 0 : e.cssClass,
             }));
       }),
-      (this._dataHelper = new ye());
+      (this._dataHelper = new ze());
   }
   _mergeCabinFeatures(e, t, r, l) {
     const i = { ...e };
@@ -1441,9 +1439,9 @@ class He {
     );
   }
 }
-const Ae = 'Error saving data to local storage. Message:',
-  _e = 'Error getting data from local storage. Message:';
-class $e {
+const _e = 'Error saving data to local storage. Message:',
+  $e = 'Error getting data from local storage. Message:';
+class Ae {
   getData(e) {
     try {
       const t = localStorage.getItem(e);
@@ -1452,7 +1450,7 @@ class $e {
         i = new Date().getTime();
       return !r || l < i ? (this.removeData(e), null) : r;
     } catch (e) {
-      return console.log(_e, e), null;
+      return console.log($e, e), null;
     }
   }
   setData(e, t, r) {
@@ -1460,7 +1458,7 @@ class $e {
       const l = { value: t };
       return r && (l.expiry = new Date().getTime() + r), localStorage.setItem(e, JSON.stringify(l)), !0;
     } catch (e) {
-      return console.log(Ae, e), !1;
+      return console.log(_e, e), !1;
     }
   }
   removeData(e) {
@@ -1475,239 +1473,239 @@ const Ve = 'chrome',
     }, []);
     return { isFirefox: t, isChrome: r, isSafari: l, isEdge: i };
   },
-  Ie = new Map();
-Ie.set('0', '\n  <svg id="bulk-0" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">\n  </svg>\n'),
-  Ie.set(
+  Be = new Map();
+Be.set('0', '\n  <svg id="bulk-0" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">\n  </svg>\n'),
+  Be.set(
     '1',
     '\n  <svg\n    id="bulk-1"\n    viewBox="0 0 420 119"\n    xmlns="http://www.w3.org/2000/svg"\n  >\n    <path\n      class="bulk-base"\n      fill="$baseColor"\n      d="M0,4V108.6A10.42,10.42,0,0,0,10.44,119H409.56A10.42,10.42,0,0,0,420,108.6V4Z"\n    />\n    <path\n      class="bulk-cut" fill="$cutColor"\n      d="M416.06,0H3.94A4,4,0,0,0,0,4,4,4,0,0,0,3.94,8H416.06A4,4,0,0,0,420,4,4,4,0,0,0,416.06,0Z"\n    />\n  </svg>\n'
   ),
-  Ie.set(
+  Be.set(
     '2',
     '\n  <svg id="bulk-2" viewBox="0 0 420 93" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="bulk-base"\n      fill="$baseColor"\n      d="M0,4.5V82.8A10.2,10.2,0,0,0,10.2,93H409.8A10.2,10.2,0,0,0,420,82.8V4.5Z"\n    />\n    <path\n      class="bulk-cut" fill="$cutColor"\n      d="M415.52,0H4.48A4.49,4.49,0,0,0,0,4.5C0,8,3,9,5.48,9h409C417,9,420,8.17,420,4.5A4.49,4.49,0,0,0,415.52,0Z"\n    />\n  </svg>\n'
   ),
-  Ie.set(
+  Be.set(
     '3',
     '\n  <svg id="bulk-3" viewBox="0 0 420 133" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="bulk-base"\n      fill="$baseColor"\n      d="M0,13.5v97.88A21.64,21.64,0,0,0,21.67,133H398.33A21.64,21.64,0,0,0,420,111.38V13.5Z"\n    />\n    <path\n      class="bulk-cut" fill="$cutColor"\n      d="M407.29,0H12.71C5.69,0,0,6,0,13.5,0,21.2,6.17,27,12.71,27H407.29C413.83,27,420,20.08,420,13.5,420,6,414.31,0,407.29,0Z"\n    />\n  </svg>\n'
   ),
-  Ie.set(
+  Be.set(
     '4',
     '\n  <svg id="bulk-4" viewBox="0 0 265 116" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="bulk-base"\n      fill="$baseColor"\n      d="M0,4.5V106.38A9.61,9.61,0,0,0,9.61,116H255.39a9.61,9.61,0,0,0,9.61-9.62V4.5Z"\n    />\n    <path\n      class="bulk-cut" fill="$cutColor"\n      d="M260.65,0H4.35A4.52,4.52,0,0,0,0,4.5,4.43,4.43,0,0,0,4.35,9h256.3A4.43,4.43,0,0,0,265,4.5,4.69,4.69,0,0,0,260.65,0Z"\n    />\n  </svg>\n'
   ),
-  Ie.set(
+  Be.set(
     '5',
     '\n  <svg id="bulk-5" viewBox="0 0 424 210" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="bulk-base"\n      fill="$baseColor"\n      d="M0,86V194.86A15.11,15.11,0,0,0,15.07,210H408.93A15.11,15.11,0,0,0,424,194.86V86Z"\n    />\n    <path\n      class="bulk-cut" fill="$cutColor"\n      d="M407.22,0H16.78A16.8,16.8,0,0,0,0,16.82V86a17.06,17.06,0,0,0,16.78,17.12H407.22A17.06,17.06,0,0,0,424,86V16.82A16.8,16.8,0,0,0,407.22,0Z"\n    />\n  </svg>\n'
   ),
-  Ie.set(
+  Be.set(
     '6',
     '\n  <svg id="bulk-6" viewBox="0 0 424 255" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="bulk-base"\n      fill="$baseColor"\n      d="M0,131V239.85A15.11,15.11,0,0,0,15.07,255H408.93A15.11,15.11,0,0,0,424,239.85V131Z"\n    />\n    <path\n      class="bulk-cut" fill="$cutColor"\n      d="M407.22,0H16.78A16.8,16.8,0,0,0,0,16.82V131c0,9.29,7.51,17.28,16.78,17.28H407.22c9.27,0,16.78-8,16.78-17.28V16.82A16.8,16.8,0,0,0,407.22,0Z"\n    />\n  </svg>\n'
   ),
-  Ie.set(
+  Be.set(
     '7',
     '\n  <svg id="bulk-7" viewBox="0 0 280 254" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="bulk-base"\n      fill="$baseColor"\n      d="M0,131V239a15,15,0,0,0,15,15H265a15,15,0,0,0,15-15V131Z"\n    />\n    <path\n      class="bulk-cut" fill="$cutColor"\n      d="M263.26,0H16.74A16.76,16.76,0,0,0,0,16.79V131a16.94,16.94,0,0,0,16.74,17H263.26A16.94,16.94,0,0,0,280,131V16.79A16.76,16.76,0,0,0,263.26,0Z"\n    />\n  </svg>\n'
   ),
-  Ie.set(
+  Be.set(
     '8',
     '\n  <svg id="bulk-8" viewBox="0 0 424 290" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="bulk-base" \n      fill="$baseColor"\n      d="M0,166V275a15,15,0,0,0,15.07,15H408.93A15,15,0,0,0,424,275V166Z"\n    />\n    <path\n      class="bulk-cut" fill="$cutColor"\n      d="M407.22,0H16.78A16.79,16.79,0,0,0,0,16.8V166a17,17,0,0,0,16.78,\n      \n      17H407.22A17,17,0,0,0,424,166V16.8A16.79,16.79,0,0,0,407.22,0Z"\n    />\n  </svg>\n'
   ),
-  Ie.set(
+  Be.set(
     '9',
     '\n  <svg id="bulk-9" viewBox="0 0 352 328" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="bulk-base"\n      fill="$baseColor"\n      d="M0,205V313a15,15,0,0,0,15,15H337a15,15,0,0,0,15-15V205Z"\n    />\n    <path\n      class="bulk-cut" fill="$cutColor"\n      d="M335.25,0H16.75A16.75,16.75,0,0,0,0,16.75V205a17,17,0,0,0,16.75,17H335.25A17,17,0,0,0,352,205V16.75A16.75,16.75,0,0,0,335.25,0Z"\n    />\n  </svg>\n'
   ),
-  Ie.set(
+  Be.set(
     '10',
     '\n  <svg id="bulk-10" viewBox="0 0 424 329" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="bulk-base"\n      fill="$baseColor"\n      d="M0,205V314a15,15,0,0,0,15.07,15H408.93A15,15,0,0,0,424,314V205Z"\n    />\n    <path\n      class="bulk-cut" fill="$cutColor"\n      d="M407.22,0H16.78A16.77,16.77,0,0,0,0,16.75V205a17,17,0,0,0,16.78,17H407.22A17,17,0,0,0,424,205V16.75A16.77,16.77,0,0,0,407.22,0Z"\n    />\n  </svg>\n'
   ),
-  Ie.set(
+  Be.set(
     '11',
     '\n  <svg id="bulk-11" viewBox="0 0 282 329" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="bulk-base"\n      fill="$baseColor"\n      d="M0,205V314a15,15,0,0,0,15.08,15H266.92A15,15,0,0,0,282,314V205Z"\n    />\n    <path\n      class="bulk-cut" fill="$cutColor"\n      d="M265.21,0H16.79A16.77,16.77,0,0,0,0,16.75V205a17,17,0,0,0,16.79,17H265.21A17,17,0,0,0,282,205V16.75A16.77,16.77,0,0,0,265.21,0Z"\n    />\n  </svg>\n'
   ),
-  Ie.set(
+  Be.set(
     '12',
     '\n  <svg id="bulk-12" viewBox="0 0 424 371" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="bulk-base"\n      fill="$baseColor"\n      d="M0,247V356a15,15,0,0,0,15.07,15H408.93A15,15,0,0,0,424,356V247Z"\n    />\n    <path\n      class="bulk-cut" fill="$cutColor"\n      d="M407.22,0H16.78A16.78,16.78,0,0,0,0,16.77V247a17,17,0,0,0,16.78,17H407.22A17,17,0,0,0,424,247V16.77A16.78,16.78,0,0,0,407.22,0Z"\n    />\n  </svg>\n'
   ),
-  Ie.set(
+  Be.set(
     '13',
     '\n  <svg id="bulk-13" viewBox="0 0 352 371" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="bulk-base"\n      fill="$baseColor"\n      d="M0,247V356a15,15,0,0,0,15,15H337a15,15,0,0,0,15-15V247Z"\n    />\n    <path\n      class="bulk-cut" fill="$cutColor"\n      d="M335.25,0H16.75A16.73,16.73,0,0,0,0,16.72V247a17,17,0,0,0,16.75,17H335.25A17,17,0,0,0,352,247V16.72A16.73,16.73,0,0,0,335.25,0Z"\n    />\n  </svg>\n'
   ),
-  Ie.set(
+  Be.set(
     '14',
     '\n  <svg id="bulk-14" viewBox="0 0 424 450" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="bulk-base"\n      fill="$baseColor"\n      d="M0,328V435a15,15,0,0,0,15.07,15H408.93A15,15,0,0,0,424,435V328Z"\n    />\n    <path\n      class="bulk-cut" fill="$cutColor"\n      d="M407.22,0H16.78A16.79,16.79,0,0,0,0,16.8V328a17,17,0,0,0,16.78,17H407.22A17,17,0,0,0,424,328V16.8A16.79,16.79,0,0,0,407.22,0Z"\n    />\n  </svg>\n'
   ),
-  Ie.set(
+  Be.set(
     '15',
     '\n  <svg id="bulk-15" viewBox="0 0 424 527" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="bulk-base"\n      fill="$baseColor"\n      d="M0,403V512a15,15,0,0,0,15.07,15H408.93A15,15,0,0,0,424,512V403Z"\n    />\n    <path\n      class="bulk-cut" fill="$cutColor"\n      d="M407.22,0H16.78A16.77,16.77,0,0,0,0,16.76V403a17,17,0,0,0,16.78,17H407.22A17,17,0,0,0,424,403V16.76A16.77,16.77,0,0,0,407.22,0Z"\n    />\n  </svg>\n'
   ),
-  Ie.set(
+  Be.set(
     '16',
     '\n  <svg id="bulk-16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 313 106">\n    <path\n      class="bulk-base"\n      fill="$baseColor"\n      d="M10.6,66.1C6,79.1,2.4,92.4,0,106h306.5c5,0,6.5-3.6,6.5-6.1V5C103.8,22.3,39.2-2.7,10.6,66.1z"\n    />\n    <path\n      class="bulk-cut" fill="$cutColor"\n      d="M307.7,0L70.6,13.5c-45.5,3.5-60,52.6-60,52.6c22.5-33.3,36.2-41.4,60.6-42.7L308.3,9.9c2.6,0,4.7-2.1,4.7-4.7\n    c0-0.1,0-0.2,0-0.2C313.1,2.6,310.2-0.1,307.7,0z"\n    />\n  </svg>\n'
   ),
-  Ie.set(
+  Be.set(
     '17',
     '\n  <svg\n    version="1.1"\n    id="bulk-17"\n    xmlns="http://www.w3.org/2000/svg"\n    xmlns:xlink="http://www.w3.org/1999/xlink"\n    x="0px"\n    y="0px"\n    viewBox="0 0 313 91"\n    style="enable-background:new 0 0 313 91;"\n    xml:space="preserve"\n  >\n    <path\n      class="bulk-base"\n      fill="$baseColor"\n      d="M10.6,44.8C4.6,57,0,69.9,0,91h307c3.3,0,6-2.7,6-6V4C33.7-1,37.9-4.8,10.6,44.8z"\n    />\n    <path\n      class="bulk-cut" fill="$cutColor"\n      d="M308.5,0H58.4C28.6,0,13.5,39.4,11.1,43.9c0,0,20.4-34.9,46.3-34.9h251.1c2.5,0,4.5-2.5,4.5-4.9S311,0,308.5,0z"\n    />\n  </svg>\n'
   ),
-  Ie.set(
+  Be.set(
     '18',
     '\n  <svg\n    version="1.1"\n    id="bulk-18"\n    xmlns="http://www.w3.org/2000/svg"\n    xmlns:xlink="http://www.w3.org/1999/xlink"\n    x="0px"\n    y="0px"\n    viewBox="0 0 289 126"\n    style="enable-background:new 0 0 289 126;"\n    xml:space="preserve"\n  >\n    <path\n      class="bulk-base"\n      fill="$baseColor"\n      d="M0,126h276c7.3,0,13-4,13-9.6V12C31.7,18.9,10.4,28.2,0,126z"\n    />\n    <path\n      class="bulk-cut" fill="$cutColor"\n      d="M277.2,0C45.5,19.8,8.2-4.5,0,126C9.7,23.2,127.6,42.7,275.1,26c10.2-0.9,13.9-7.6,13.9-14\n    C289,5.3,284.2,0,277.2,0z"\n    />\n  </svg>\n'
   ),
-  Ie.set(
+  Be.set(
     '19',
     '\n  <svg\n    id="bulk-19"\n    version="1.1"\n    viewBox="0 0 268 172"\n    xmlns="http://www.w3.org/2000/svg"\n  >\n    <path\n      class="bulk-cut" fill="$cutColor"\n      d="M21,23.6C13.9,33.5,4.6,60.1,0,96.1c0,0,242.7,71.6,252.7,74.9c10,3.3,15.3-2,15.3-8.6V54\n    C268,54,54.7,5.7,45.7,6C35.1,6.3,25.7,17.8,21,23.6z"\n    />\n    <path\n      class="bulk-base"\n      fill="$baseColor"\n      d="M258.1,45.3c-7.3-2-139-33.6-184.7-44.3C60.5-1.8,38.6-0.1,21,23.6c2-2.5,10.4-11.6,21.1-9\n    c12.3,3,190.6,49.1,190.6,49.1C240,66,259.1,71,265.4,61c1.8-2.8,2.5-5.1,2.6-7C268.1,49.1,263.4,46.7,258.1,45.3z"\n    />\n  </svg>\n'
   ),
-  Ie.set(
+  Be.set(
     '20',
     '\n  <svg\n    id="bulk-20"\n    version="1.1"\n    viewBox="0 0 286 197"\n    xmlns="http://www.w3.org/2000/svg"\n  >\n    <path \n      class="bulk-base" \n      fill="$baseColor"\n      d="M8,88L0,197h270c8.5,0,16-5.5,16-14V88H8z" />\n    <path\n      class="bulk-cut" fill="$cutColor"\n      d="M285.5,13c-0.8-7.7-4.2-13-14.5-13C258.7,0,115.7,11.8,90,14C19,20.1,0,69.8,0,111v86\n    c6.2-42.3,25.1-76.5,82-81.8c33.7-3.5,184-14.2,184-14.2c11.2,0,20-4.5,20-15C286,56.2,285.9,20.4,285.5,13z"\n    />\n  </svg>\n'
   ),
-  Ie.set(
+  Be.set(
     '21',
     '\n  <svg\n    id="bulk-21"\n    version="1.1"\n    viewBox="0 0 287 235"\n    xmlns="http://www.w3.org/2000/svg"\n    icon-transform="scale(0.66) rotate(-4.5) translate(170 38)"\n  >\n    <path\n      class="bulk-base"\n      fill="$baseColor"\n      fill-opacity="1"\n      stroke-width="3"\n      d="M0,235h271c10,0,16-5.7,16-14V113H0V235z"\n    />\n    <path\n      class="bulk-cut" fill="$cutColor"\n      fill-opacity="1"\n      stroke-width="1"\n      d="M270,0C260.4,0,95.2,11.3,62,17S0,49,0,104v131c0,0,9.9-74.3,66-79s199-15,199-15c10.3,0,22-3.7,22-16V20\n      C287,6.2,278.3,0,270,0z"\n    />\n  </svg>\n'
   ),
-  Ie.set(
+  Be.set(
     '22',
     '\n  <svg\n    id="bulk-22"\n    version="1.1"\n    viewBox="0 0 287 322"\n    xmlns="http://www.w3.org/2000/svg"\n  >\n    <path class="bulk-base" \n      d="M0,145v177h271c10,0,16-5.7,16-14V145H0z" \n      fill="$baseColor"/>\n    <path\n      class="bulk-cut" fill="$cutColor"\n      d="M270,0C260.4,0,95.2,10.3,62,16S0,47,0,102v215c0,0,9.9-74.3,66-79s199-15,199-15c10.3,0,22-3.7,22-16V19\n    C287,6.9,278.8,0,270,0z"\n    />\n  </svg>\n'
   ),
-  Ie.set(
+  Be.set(
     '23',
     '\n  <svg\n    version="1.1"\n    id="bulk-23"\n    xmlns="http://www.w3.org/2000/svg"\n    xmlns:xlink="http://www.w3.org/1999/xlink"\n    x="0px"\n    y="0px"\n    viewBox="0 0 287 357"\n    style="enable-background:new 0 0 287 357;"\n    xml:space="preserve"\n  >\n    <path \n      class="bulk-base" \n      d="M0,200l0.1,157H271c10,0,16-5.7,16-14V200H0z" \n      fill="$baseColor"/>\n    <path\n      class="bulk-cut" fill="$cutColor"\n      d="M270,0C260.4,0,94.6,7.6,62,16C17.4,27.5,0,47.1,0,118v239c0,0,9.9-74.3,66-79s199-15,199-15\n    c10.3,0,22-3.7,22-16V19C287,7.6,279.6,0,270,0z"\n    />\n    <rect\n      x="36"\n      y="48"\n      transform="matrix(0.9989 -4.616482e-02 4.616482e-02 0.9989 -6.312 7.1897)"\n      class="st1"\n      width="233"\n      height="184.5"\n      fill-opacity="0"\n    />\n  </svg>\n'
   ),
-  Ie.set(
+  Be.set(
     '24',
     '\n  <svg\n    id="bulk-24"\n    version="1.1"\n    viewBox="0 0 287 437"\n    xmlns="http://www.w3.org/2000/svg"\n  >\n    <path class="bulk-base" d="M0,300v137h271c10,0,16-5.7,16-14V300H0z" fill="$baseColor"/>\n    <path\n      class="bulk-cut" fill="$cutColor"\n      d="M270,0C260.4,0,95.2,10.3,62,16S0,47,0,102v335c0,0,9.9-74.3,66-79s199-15,199-15c10.3,0,22-3.7,22-16V19\n    C287,7.1,279.1,0,270,0z"\n    />\n  </svg>\n'
   ),
-  Ie.set(
+  Be.set(
     '25',
     '\n  <svg id="bulk-25" viewBox="0 0 286 512" xmlns="http://www.w3.org/2000/svg">\n    <path class="bulk-base" d="M0,350V512H271c10,0,15-4.67,15-13V350Z" fill="$baseColor"/>\n    <path\n      class="bulk-cut" fill="$cutColor"\n      d="M267,0C257.42,0,94.18,10.33,61,16S0,45,0,102V512s8.9-73.33,65-78,200-15,200-15c10.26,0,21-3.67,21-16V19C286,3.63,278.19,0,267,0Z"\n    />\n  </svg>\n'
   ),
-  Ie.set(
+  Be.set(
     '26',
     '\n  <svg id="bulk-26" viewBox="0 0 45 44" xmlns="http://www.w3.org/2000/svg">\n    <g transform="translate(0.0,44.00) scale(0.1,-0.1)" >\n      <path class="icon bulk" fill="$stickerColor" d="M181 414 c-25 -32 -26 -43 -5 -72 19 -27 64 -29 87 -4 24 26 21 68 -5 86 -32 23 -54 20 -77 -10z"/>\n      <path class="icon bulk" fill="$stickerColor" d="M105 254 c-29 -35 -35 -48 -25 -57 9 -9 19 -3 46 28 l34 40 0 -37 0 -38 65 0 65 0 0 33 1 32 28 -32 c28 -34 51 -43 51 -20 0 7 -16 32 -36 55 l-36 42 -78 0 -78 0 -37 -46z"/>\n      <path class="icon bulk" fill="$stickerColor" d="M125 130 c-18 -19 -25 -34 -21 -47 8 -26 74 -89 83 -79 6 6 2 21 -22 78 -5 12 1 21 21 31 l28 15 -31 15 c-29 16 -31 15 -58 -13z"/>\n      <path class="icon bulk" fill="$stickerColor" d="M270 148 c-36 -13 -37 -18 -12 -37 23 -17 23 -18 6 -54 -27 -57 -6 -68 40 -20 41 44 45 71 14 100 -18 17 -28 19 -48 11z"/>\n    </g>\n  </svg>\n  '
   ),
-  Ie.set(
+  Be.set(
     '27',
     '\n  <svg id="bulk-27" viewBox="0 0 114 115" xmlns="http://www.w3.org/2000/svg">\n    <g clip-path="url(#clip0_1014_1377)">\n      <path class="icon bulk" fill="$stickerColor" d="M101.283 0.919922H12.7167C5.7 0.931322 0.0114 6.61992 0 13.6366V102.203C0.0114 109.22 5.7 114.909 12.7167 114.92H101.283C108.3 114.909 113.989 109.22 114 102.203V13.6366C113.989 6.61992 108.3 0.931322 101.283 0.919922ZM111.15 102.203C111.133 107.647 106.727 112.053 101.283 112.07H12.7167C7.2732 112.053 2.8671 107.647 2.85 102.203V13.6366C2.8671 8.19312 7.2732 3.78702 12.7167 3.76992H101.283C106.727 3.78702 111.133 8.19312 111.15 13.6366V102.203ZM70.9137 96.3037C63.6519 97.9738 48.1365 99.319 39.9798 95.4487C35.5053 93.3283 34.0347 88.8823 33.63 85.3027C33.2823 82.3615 31.4982 69.2059 33.003 56.8597C34.5135 44.485 41.7639 36.0889 41.7639 36.0889L42.6759 36.4537C43.0464 35.4391 43.4568 34.1566 43.662 32.9596C43.662 32.9596 42.1458 30.9532 40.413 28.2058C39.3072 26.4502 39.3072 22.882 40.641 20.716C42.978 16.9312 47.8116 15.6715 50.8725 17.2504C52.4628 18.0712 55.2729 19.1086 57.1083 24.6718C58.1172 27.727 58.6986 33.1762 57.0285 37.531C56.5098 38.8762 53.5971 38.1067 52.2405 37.0636C51.9327 37.0636 51.6762 37.0921 51.4881 37.1605C50.7186 37.4398 50.2626 38.557 50.0175 39.412L50.8896 39.7654L51.3285 42.6154C51.3285 42.6154 54.2469 48.0988 55.1532 54.5854C55.1988 54.9046 55.2444 55.2637 55.3014 55.6399C57.2736 58.0852 59.3313 59.8294 61.104 59.6698C63.5094 59.4532 70.4634 48.3097 70.4634 48.3097L70.9194 48.5947C71.0676 48.2185 71.3925 47.4889 71.9625 46.8277C72.7662 45.8929 75.3198 44.3026 75.9069 44.5534C76.494 44.8042 74.6301 46.537 74.6301 46.537C74.6301 46.537 76.6764 45.9613 77.1153 45.1291C77.5542 44.2969 77.4459 43.1455 77.9532 43.2538C78.4662 43.3621 78.4662 45.0835 78.2439 46.0468C78.0273 47.0044 77.5143 47.221 77.5143 47.221C77.5143 47.221 77.4402 47.6884 77.0754 48.1957C76.7106 48.703 74.4078 49.6606 73.9518 50.4757L74.6301 50.8975C74.6301 50.8975 68.8845 71.1268 59.1318 70.8019C58.539 70.7848 57.9405 70.6708 57.342 70.4941C57.6384 72.6544 58.5846 79.5571 58.6245 79.8706C58.6245 79.8706 83.1915 78.0922 84.7818 85.1374C84.7818 85.1488 84.7818 85.1545 84.7818 85.1659C86.4177 92.5303 78.1527 94.6165 70.9023 96.2866L70.9137 96.3037Z" />\n    </g>\n    <defs>\n      <clipPath id="clip0_1014_1377">\n        <rect width="114" height="114" transform="translate(0 0.919922)"/>\n      </clipPath>\n    </defs>\n  </svg>\n  '
   ),
-  Ie.set(
+  Be.set(
     '28',
     '\n  <svg id="bulk-28" viewBox="0 0 114 115" xmlns="http://www.w3.org/2000/svg">\n    <g clip-path="url(#clip0_1014_1379)">\n      <path class="icon bulk" fill="$stickerColor" d="M101.283 0.0800781H12.7167C5.7 0.0914781 0.0114 5.78008 0 12.7968V101.363C0.0114 108.38 5.7 114.069 12.7167 114.08H101.283C108.3 114.069 113.989 108.38 114 101.363V12.7968C113.989 5.78008 108.3 0.0914781 101.283 0.0800781ZM111.15 101.363C111.133 106.807 106.727 111.213 101.283 111.23H12.7167C7.2732 111.213 2.8671 106.807 2.85 101.363V12.7968C2.8671 7.35328 7.2732 2.94718 12.7167 2.93008H101.283C106.727 2.94718 111.133 7.35328 111.15 12.7968V101.363ZM90.7782 29.2299L91.4508 26.8131L70.5717 21.1302L70.3836 21.0789L67.488 31.2306H35.4939L39.7803 84.5598C39.8145 87.1647 41.9577 89.2737 44.5911 89.2737H69.4602C72.0879 89.2737 74.2311 87.1704 74.271 84.5712L79.3041 31.2306H70.1214L72.1392 24.1569L90.7839 29.2356L90.7782 29.2299ZM38.4522 43.8789L37.6599 33.6702H66.7926L63.8856 43.8789H38.4579H38.4522ZM55.8828 57.6159L53.8593 63.3729L48.051 61.3665L50.0745 55.6095L55.8828 57.6159ZM50.8611 82.4337L44.6538 75.132L52.0182 68.976L58.2255 76.2777L50.8611 82.4337ZM67.146 73.7127L58.0488 70.572L61.2123 61.5546L70.3095 64.6953L67.146 73.7127ZM77.1381 33.6702L76.209 43.8789H66.5133L69.4203 33.6702H77.1381Z"/>\n    </g>\n    <defs>\n      <clipPath id="clip0_1014_1379">\n        <rect width="114" height="114" transform="translate(0 0.0800781)"/>\n      </clipPath>\n    </defs>\n  </svg>\n  '
   );
-const Be = new Map();
-Be.set(
+const Ie = new Map();
+Ie.set(
   'd',
   '\n  <svg>\n    <symbol\n      id="icon-d"\n    >{{!--\n      viewBox="0 0 200 200"\n    --}}<path\n        class="icon bulk" fill="$stickerColor"\n        d="M177.69,0H22.31A22.34,22.34,0,0,0,0,22.31V177.69A22.34,22.34,0,0,0,22.31,200H177.69A22.34,22.34,0,0,0,200,177.69V22.31A22.34,22.34,0,0,0,177.69,0ZM195,177.69A17.37,17.37,0,0,1,177.69,195H22.31A17.37,17.37,0,0,1,5,177.69V22.31A17.37,17.37,0,0,1,22.31,5H177.69A17.37,17.37,0,0,1,195,22.31ZM145.32,67.74h30.89V173H21.77V151.25H52.66V129.51H83.55V110.07h29.74V89.48h32ZM28.21,36.85h14.3V56.3H53.09L35.36,82.61,17.63,56.3H28.21ZM178.5,34.28a4.57,4.57,0,0,1-4.58,4.58H160.48c-6,0-8.72,1.22-14,4.89-5.6,3.92-117.45,86.89-118.58,87.72-1.39.9-5,.85-6.4-.95a4.57,4.57,0,0,1,.95-6.4c4.61-3.42,113.08-83.88,118.79-87.88,6.2-4.34,10.88-6.55,19.21-6.55h13.44A4.57,4.57,0,0,1,178.5,34.28Z"\n      />\n    </symbol>\n  </svg>\n'
 ),
-  Be.set(
+  Ie.set(
     'e',
     '\n  <svg>\n    <symbol\n    id="icon-empty"\n  >{{!--\n    viewBox="0 0 200 200"\n  --}}</symbol>\n  </svg>\n'
   ),
-  Be.set(
+  Ie.set(
     'f',
     '\n  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="icon bulk" fill="$stickerColor"\n      d="M177.7,0H22.3C10,0,0,10,0,22.3v155.4C0,190,10,200,22.3,200h155.4c12.3,0,22.3-10,22.3-22.3V22.3C200,10,190,0,177.7,0z M195,177.7c0,9.5-7.8,17.3-17.3,17.3H22.3C12.8,195,5,187.2,5,177.7V22.3C5,12.8,12.8,5,22.3,5h155.4c9.5,0,17.3,7.8,17.3,17.3 V177.7z"\n    />\n  </svg>\n'
   ),
-  Be.set(
+  Ie.set(
     'g,g',
     '\n  <svg viewBox="0 0 200 402" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="icon bulk" fill="$stickerColor"\n      d="m 138.5,238 c -33.7,-5.3 -66.3,8 -74.6,21.7 H 48.8 c 0,-4.3 -3.1,-7.7 -6.8,-7.7 -3.7,0 -6.8,3.4 -6.8,7.7 -0.1,2.9 1.5,5.6 4,7 -2.5,1.2 -4,3.8 -4,6.6 -0.2,3.8 2.7,7 6.5,7.2 3.8,0.2 7,-2.7 7.2,-6.5 0,-0.2 0,-0.5 0,-0.7 h 15 c 7.1,13.3 33.6,25.4 74.7,21.1 6.7,-0.7 12.2,-12.6 12.2,-28.2 -0.1,-15.6 -5.6,-27.2 -12.3,-28.2 z m 0,52.2 c -5.7,0 -10.3,-10.7 -10.3,-24 0,-13.3 4.6,-24 10.3,-24 5.7,0 10.3,10.7 10.3,24 0,13.3 -4.6,23.9 -10.3,24 z m 3.7,-24 c 0,4.8 -1.7,8.6 -3.7,8.6 -2,0 -3.7,-3.9 -3.7,-8.6 0,-4.8 1.7,-8.6 3.7,-8.6 2,0 3.7,3.8 3.7,8.6 z m 9.7,79.8 c -2.4,-2.4 -4.9,-4.6 -7.6,-6.8 2.6,-2.1 5.2,-4.4 7.6,-6.8 5,-4.8 3.7,-15.6 3.7,-15.6 l -20.2,17.9 c -9.6,-5.9 -39.6,-23.4 -61.2,-23.2 -26,0.3 -40.5,26.8 -40.5,26.8 0,0 15.1,28.6 39.9,28.6 26.6,0 49.5,-16.7 59.5,-25.2 l 22.5,20 c 0,0 1.3,-10.9 -3.7,-15.7 z m -96.2,-7.1 c -2.2,0 -3.9,-2.2 -3.9,-5 0,-2.8 1.8,-5 3.9,-5 2.1,0 3.9,2.2 3.9,5 0,2.8 -1.8,5 -3.9,5 z M 66.6,358 c 4.2,-5.9 6.6,-13 6.8,-20.3 0.3,-12.1 -6.8,-17.8 -6.8,-17.8 0,0 11.4,-0.1 11.8,18 0.4,18.1 -11.8,20.2 -11.8,20.1 z m 111.1,44 H 22.3 C 10,402 0,392 0,379.7 V 224.3 C 0,212 10,202 22.3,202 h 155.4 c 12.3,0 22.3,10 22.3,22.3 V 379.7 C 200,392 190,402 177.7,402 Z M 22.3,207 C 12.8,207 5,214.8 5,224.3 v 155.4 c 0,9.5 7.8,17.3 17.3,17.3 h 155.4 c 9.5,0 17.3,-7.8 17.3,-17.3 V 224.3 C 195,214.8 187.2,207 177.7,207 Z M 138.5,36 C 104.8,30.7 72.2,44 63.9,57.7 H 48.8 C 48.8,53.4 45.7,50 42,50 c -3.7,0 -6.8,3.4 -6.8,7.7 -0.1,2.9 1.5,5.6 4,7 -2.5,1.2 -4,3.8 -4,6.6 -0.2,3.8 2.7,7 6.5,7.2 3.8,0.2 7,-2.7 7.2,-6.5 0,-0.2 0,-0.5 0,-0.7 h 15 c 7.1,13.3 33.6,25.4 74.7,21.1 6.7,-0.7 12.2,-12.6 12.2,-28.2 0,-15.6 -5.6,-27.2 -12.3,-28.2 z m 0,52.2 c -5.7,0 -10.3,-10.7 -10.3,-24 0,-13.3 4.6,-24 10.3,-24 5.7,0 10.3,10.7 10.3,24 0,13.3 -4.6,23.9 -10.3,24 z m 3.7,-24 c 0,4.8 -1.7,8.6 -3.7,8.6 -2,0 -3.7,-3.9 -3.7,-8.6 0,-4.7 1.7,-8.6 3.7,-8.6 2,0 3.7,3.8 3.7,8.6 z m 9.7,79.8 c -2.4,-2.4 -4.9,-4.6 -7.6,-6.8 2.6,-2.1 5.2,-4.4 7.6,-6.8 5,-4.8 3.7,-15.6 3.7,-15.6 l -20.2,17.9 c -9.6,-5.9 -39.6,-23.4 -61.2,-23.2 -26,0.3 -40.5,26.8 -40.5,26.8 0,0 15.1,28.6 39.9,28.6 26.6,0 49.5,-16.7 59.5,-25.2 l 22.5,20 c 0,0 1.3,-10.9 -3.7,-15.7 z m -96.2,-7.1 c -2.2,0 -3.9,-2.2 -3.9,-5 0,-2.8 1.8,-5 3.9,-5 2.1,0 3.9,2.2 3.9,5 0,2.8 -1.8,5 -3.9,5 z m 10.9,19.2 c 4.2,-5.9 6.6,-13 6.8,-20.3 0.3,-12.1 -6.8,-17.8 -6.8,-17.8 0,0 11.4,-0.1 11.8,18 0.4,18.1 -11.8,20.1 -11.8,20.1 z M 177.7,200 H 22.3 C 10,200 0,190 0,177.7 V 22.3 C 0,10 10,0 22.3,0 H 177.7 C 190,0 200,10 200,22.3 V 177.7 C 200,190 190,200 177.7,200 Z M 22.3,5 C 12.8,5 5,12.8 5,22.3 v 155.4 c 0,9.5 7.8,17.3 17.3,17.3 h 155.4 c 9.5,0 17.3,-7.8 17.3,-17.3 V 22.3 C 195,12.8 187.2,5 177.7,5 Z"\n    />\n  </svg>\n'
   ),
-  Be.set(
+  Ie.set(
     'g,l',
     '\n  <svg viewBox="0 0 200 402" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="icon bulk" fill="$stickerColor"\n      d="m 145.2,255.4 c -6.3,0 -11.3,-5.1 -11.3,-11.3 0,-6.3 5.1,-11.3 11.3,-11.3 6.2,0 11.3,5.1 11.3,11.3 0,6.3 -5,11.4 -11.3,11.3 z m -26.7,17.1 v 34.8 c 0,6.8 9.1,6.8 9.1,0 l 0.8,-31.8 h 2.3 v 87.2 c 0,9 12.4,8.8 12.4,0 l 0.8,-50.6 h 2.5 l 0.8,50.6 c 0,8.8 12.4,9 12.4,0 v -87.2 h 2.4 l 0.8,31.8 c 0,6.8 9.1,6.8 9.1,0 v -34.8 c 0,-11.9 -3.6,-14.7 -14.5,-14.7 H 133 c -10.9,-0.1 -14.5,2.7 -14.5,14.7 z m -48,-28.3 c 0,-6.3 -5,-11.4 -11.3,-11.4 -6.3,0 -11.4,5 -11.4,11.3 0,6.3 5,11.4 11.3,11.4 h 0.1 c 6.3,0 11.3,-5.1 11.3,-11.3 0.1,-0.1 0.1,-0.1 0,0 z m -34,58.5 10.3,-29.3 H 48 c 0,0 -13.5,52.4 -14.1,54.4 -0.3,1 0.1,1.7 1.2,1.7 H 46.8 V 364 c 0,7 10.5,7 10.5,0 v -34.7 h 4 V 364 c 0,7 10.5,7 10.5,0 v -34.5 h 11.7 c 1,0 1.4,-0.7 1.2,-1.7 -0.6,-2 -14.1,-54.4 -14.1,-54.4 h 1.2 l 10.3,29.3 c 2.1,6.4 10,4 8,-2.9 l -9.7,-32 C 78.5,262.2 72.9,257.7 64.6,257.7 H 54 c -8.2,0 -13.9,4.5 -15.8,10.1 l -9.7,32 c -2.1,6.9 5.9,9.4 8,2.9 z m 61.7,61 c 0,3 2.4,5.5 5.5,5.5 v 0 0 c 3,0 5.5,-2.5 5.5,-5.5 v 0 -125.4 c 0,-3 -2.4,-5.5 -5.5,-5.5 v 0 0 c -3,0 -5.5,2.4 -5.5,5.5 v 0 z m 101.8,16 V 224.3 C 200,212 190,202 177.7,202 H 22.3 C 10,202 0,212 0,224.3 V 379.7 C 0,392 10,402 22.3,402 H 177.7 C 190,402 200,392 200,379.7 Z M 177.7,207 c 9.5,0 17.3,7.8 17.3,17.3 v 155.4 c 0,9.5 -7.8,17.3 -17.3,17.3 H 22.3 C 12.8,397 5,389.2 5,379.7 V 224.3 C 5,214.8 12.8,207 22.3,207 Z M 138.5,36 C 104.8,30.7 72.2,44 63.9,57.7 H 48.8 C 48.8,53.4 45.7,50 42,50 c -3.7,0 -6.8,3.4 -6.8,7.7 -0.1,2.9 1.5,5.6 4,7 -2.5,1.2 -4,3.8 -4,6.6 -0.2,3.8 2.7,7 6.5,7.2 3.8,0.2 7,-2.7 7.2,-6.5 0,-0.2 0,-0.5 0,-0.7 h 15 c 7.1,13.3 33.6,25.4 74.7,21.1 6.7,-0.7 12.2,-12.6 12.2,-28.2 0,-15.6 -5.6,-27.2 -12.3,-28.2 z m 0,52.2 c -5.7,0 -10.3,-10.7 -10.3,-24 0,-13.3 4.6,-24 10.3,-24 5.7,0 10.3,10.7 10.3,24 0,13.3 -4.6,23.9 -10.3,24 z m 3.7,-24 c 0,4.8 -1.7,8.6 -3.7,8.6 -2,0 -3.7,-3.9 -3.7,-8.6 0,-4.7 1.7,-8.6 3.7,-8.6 2,0 3.7,3.8 3.7,8.6 z m 9.7,79.8 c -2.4,-2.4 -4.9,-4.6 -7.6,-6.8 2.6,-2.1 5.2,-4.4 7.6,-6.8 5,-4.8 3.7,-15.6 3.7,-15.6 l -20.2,17.9 c -9.6,-5.9 -39.6,-23.4 -61.2,-23.2 -26,0.3 -40.5,26.8 -40.5,26.8 0,0 15.1,28.6 39.9,28.6 26.6,0 49.5,-16.7 59.5,-25.2 l 22.5,20 c 0,0 1.3,-10.9 -3.7,-15.7 z m -96.2,-7.1 c -2.2,0 -3.9,-2.2 -3.9,-5 0,-2.8 1.8,-5 3.9,-5 2.1,0 3.9,2.2 3.9,5 0,2.8 -1.8,5 -3.9,5 z m 10.9,19.2 c 4.2,-5.9 6.6,-13 6.8,-20.3 0.3,-12.1 -6.8,-17.8 -6.8,-17.8 0,0 11.4,-0.1 11.8,18 0.4,18.1 -11.8,20.1 -11.8,20.1 z M 177.7,200 H 22.3 C 10,200 0,190 0,177.7 V 22.3 C 0,10 10,0 22.3,0 H 177.7 C 190,0 200,10 200,22.3 V 177.7 C 200,190 190,200 177.7,200 Z M 22.3,5 C 12.8,5 5,12.8 5,22.3 v 155.4 c 0,9.5 7.8,17.3 17.3,17.3 h 155.4 c 9.5,0 17.3,-7.8 17.3,-17.3 V 22.3 C 195,12.8 187.2,5 177.7,5 Z"\n    />\n  </svg>\n'
   ),
-  Be.set(
+  Ie.set(
     'g',
     '\n  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="icon bulk" fill="$stickerColor"\n      d="M138.49,36c-33.72-5.26-66.31,8-74.58,21.72H48.83C48.83,53.44,45.78,50,42,50s-6.82,3.44-6.82,7.69a7.77,7.77,0,0,0,4,7,7.24,7.24,0,0,0-4,6.57,6.83,6.83,0,1,0,13.64,0h15c7.07,13.29,33.64,25.4,74.71,21.12,6.69-.7,12.16-12.63,12.16-28.21S145.16,37,138.49,36Zm0,52.18c-5.71,0-10.33-10.73-10.33-24s4.62-24,10.33-24,10.33,10.73,10.33,24S144.2,88.13,138.49,88.13Zm3.72-24c0,4.77-1.66,8.63-3.72,8.63s-3.72-3.86-3.72-8.63,1.66-8.63,3.72-8.63S142.21,59.4,142.21,64.16ZM151.92,144a98.3,98.3,0,0,0-7.58-6.75,98.3,98.3,0,0,0,7.58-6.75c5-4.77,3.72-15.63,3.72-15.63l-20.22,17.91c-9.56-5.94-39.56-23.43-61.18-23.21-26,.26-40.49,26.75-40.49,26.75s15.08,28.6,39.87,28.6c26.58,0,49.49-16.69,59.5-25.25l22.52,20S156.88,148.78,151.92,144Zm-96.27-7.15c-2.17,0-3.93-2.25-3.93-5s1.76-5,3.93-5,3.93,2.25,3.93,5S57.82,136.87,55.65,136.87Zm10.95,19.2a36.83,36.83,0,0,0,6.82-20.26c.31-12.05-6.82-17.75-6.82-17.75s11.36-.13,11.78,18S66.6,156.07,66.6,156.07ZM177.69,200H22.31A22.34,22.34,0,0,1,0,177.69V22.31A22.34,22.34,0,0,1,22.31,0H177.69A22.34,22.34,0,0,1,200,22.31V177.69A22.34,22.34,0,0,1,177.69,200ZM22.31,5A17.37,17.37,0,0,0,5,22.31V177.69A17.37,17.37,0,0,0,22.31,195H177.69A17.37,17.37,0,0,0,195,177.69V22.31A17.37,17.37,0,0,0,177.69,5Z"\n    />\n  </svg>\n'
   ),
-  Be.set(
+  Ie.set(
     'gg',
     '\n  <svg viewBox="0 0 402 200" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="icon bulk" fill="$stickerColor"\n      d="m 340.5,36 c -33.7,-5.3 -66.3,8 -74.6,21.7 h -15.1 c 0,-4.3 -3.1,-7.7 -6.8,-7.7 -3.7,0 -6.8,3.4 -6.8,7.7 -0.1,2.9 1.5,5.6 4,7 -2.5,1.2 -4,3.8 -4,6.6 -0.2,3.8 2.7,7 6.5,7.2 3.8,0.2 7,-2.7 7.2,-6.5 0,-0.2 0,-0.5 0,-0.7 h 15 c 7.1,13.3 33.6,25.4 74.7,21.1 6.7,-0.7 12.2,-12.6 12.2,-28.2 0,-15.6 -5.6,-27.2 -12.3,-28.2 z m 0,52.2 c -5.7,0 -10.3,-10.7 -10.3,-24 0,-13.3 4.6,-24 10.3,-24 5.7,0 10.3,10.7 10.3,24 0,13.3 -4.6,23.9 -10.3,24 z m 3.7,-24 c 0,4.8 -1.7,8.6 -3.7,8.6 -2,0 -3.7,-3.9 -3.7,-8.6 0,-4.7 1.7,-8.6 3.7,-8.6 2,0 3.7,3.8 3.7,8.6 z m 9.7,79.8 c -2.4,-2.4 -4.9,-4.6 -7.6,-6.8 2.6,-2.1 5.2,-4.4 7.6,-6.8 5,-4.8 3.7,-15.6 3.7,-15.6 l -20.2,17.9 c -9.6,-5.9 -39.6,-23.4 -61.2,-23.2 -26,0.3 -40.5,26.8 -40.5,26.8 0,0 15.1,28.6 39.9,28.6 26.6,0 49.5,-16.7 59.5,-25.2 l 22.5,20 c 0,0 1.3,-10.9 -3.7,-15.7 z m -96.3,-7.1 c -2.2,0 -3.9,-2.2 -3.9,-5 0,-2.8 1.8,-5 3.9,-5 2.2,0 3.9,2.2 3.9,5 0,2.8 -1.7,5 -3.9,5 z m 11,19.2 c 4.2,-5.9 6.6,-13 6.8,-20.3 0.3,-12.1 -6.8,-17.8 -6.8,-17.8 0,0 11.4,-0.1 11.8,18 0.4,18.2 -11.8,20.1 -11.8,20.1 z M 379.7,200 H 224.3 C 212,200 202,190 202,177.7 V 22.3 C 202,10 212,0 224.3,0 H 379.7 C 392,0 402,10 402,22.3 V 177.7 C 402,190 392,200 379.7,200 Z M 224.3,5 C 214.8,5 207,12.8 207,22.3 v 155.4 c 0,9.5 7.8,17.3 17.3,17.3 h 155.4 c 9.5,0 17.3,-7.8 17.3,-17.3 V 22.3 C 397,12.8 389.2,5 379.7,5 Z M 138.5,36 C 104.8,30.7 72.2,44 63.9,57.7 H 48.8 C 48.8,53.4 45.7,50 42,50 c -3.7,0 -6.8,3.4 -6.8,7.7 -0.1,2.9 1.5,5.6 4,7 -2.5,1.2 -4,3.8 -4,6.6 -0.2,3.8 2.7,7 6.5,7.2 3.8,0.2 7,-2.7 7.2,-6.5 0,-0.2 0,-0.5 0,-0.7 h 15 c 7.1,13.3 33.6,25.4 74.7,21.1 6.7,-0.7 12.2,-12.6 12.2,-28.2 0,-15.6 -5.6,-27.2 -12.3,-28.2 z m 0,52.2 c -5.7,0 -10.3,-10.7 -10.3,-24 0,-13.3 4.6,-24 10.3,-24 5.7,0 10.3,10.7 10.3,24 0,13.3 -4.6,23.9 -10.3,24 z m 3.7,-24 c 0,4.8 -1.7,8.6 -3.7,8.6 -2,0 -3.7,-3.9 -3.7,-8.6 0,-4.7 1.7,-8.6 3.7,-8.6 2,0 3.7,3.8 3.7,8.6 z m 9.7,79.8 c -2.4,-2.4 -4.9,-4.6 -7.6,-6.8 2.6,-2.1 5.2,-4.4 7.6,-6.8 5,-4.8 3.7,-15.6 3.7,-15.6 l -20.2,17.9 c -9.6,-5.9 -39.6,-23.4 -61.2,-23.2 -26,0.3 -40.5,26.8 -40.5,26.8 0,0 15.1,28.6 39.9,28.6 26.6,0 49.5,-16.7 59.5,-25.2 l 22.5,20 c 0,0 1.3,-10.9 -3.7,-15.7 z m -96.2,-7.1 c -2.2,0 -3.9,-2.2 -3.9,-5 0,-2.8 1.8,-5 3.9,-5 2.1,0 3.9,2.2 3.9,5 0,2.8 -1.8,5 -3.9,5 z m 10.9,19.2 c 4.2,-5.9 6.6,-13 6.8,-20.3 0.3,-12.1 -6.8,-17.8 -6.8,-17.8 0,0 11.4,-0.1 11.8,18 0.4,18.1 -11.8,20.1 -11.8,20.1 z M 177.7,200 H 22.3 C 10,200 0,190 0,177.7 V 22.3 C 0,10 10,0 22.3,0 H 177.7 C 190,0 200,10 200,22.3 V 177.7 C 200,190 190,200 177.7,200 Z M 22.3,5 C 12.8,5 5,12.8 5,22.3 v 155.4 c 0,9.5 7.8,17.3 17.3,17.3 h 155.4 c 9.5,0 17.3,-7.8 17.3,-17.3 V 22.3 C 195,12.8 187.2,5 177.7,5 Z"\n    />\n  </svg>\n'
   ),
-  Be.set(
+  Ie.set(
     'gl',
     '\n  <svg viewBox="0 0 402 200" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="icon bulk" fill="$stickerColor"\n      d="m 347.2,53.5 c -6.3,0 -11.3,-5.1 -11.3,-11.3 0,-6.3 5.1,-11.3 11.4,-11.3 6.2,0 11.3,5.1 11.3,11.3 -0.1,6.2 -5.2,11.3 -11.4,11.3 z m -26.7,16.9 v 34.8 c 0,6.8 9.1,6.8 9.1,0 l 0.8,-31.8 h 2.3 v 87.2 c 0,9 12.4,8.8 12.4,0 l 0.8,-50.6 h 2.5 l 0.8,50.6 c 0,8.8 12.4,9 12.4,0 V 73.4 h 2.4 l 0.8,31.8 c 0,6.8 9.1,6.8 9.1,0 V 70.4 c 0,-11.9 -3.6,-14.7 -14.5,-14.7 H 335 c -10.9,0 -14.5,2.8 -14.5,14.7 z m -48,-28.2 c 0,-6.3 -5,-11.4 -11.3,-11.4 -6.3,0 -11.4,5 -11.4,11.3 0,6.3 5,11.4 11.3,11.4 0,0 0.1,0 0.1,0 6.3,0 11.3,-5.1 11.3,-11.3 0,-0.1 0,-0.1 0,0 z m -34,58.5 10.3,-29.3 h 1.2 c 0,0 -13.5,52.4 -14.1,54.4 -0.3,1 0.1,1.7 1.2,1.7 h 11.7 V 162 c 0,7 10.5,7 10.5,0 v -34.7 h 4 V 162 c 0,7 10.5,7 10.5,0 v -34.5 h 11.7 c 1,0 1.4,-0.7 1.2,-1.7 -0.6,-2 -14.1,-54.4 -14.1,-54.4 h 1.2 l 10.3,29.3 c 2.1,6.4 10,4 8,-2.9 l -9.7,-32 C 280.5,60.1 274.9,55.7 266.6,55.7 H 256 c -8.2,0 -13.9,4.5 -15.8,10.1 l -9.7,32 c -2.1,6.9 5.9,9.4 8,2.9 z m 61.6,61 c 0,3 2.4,5.5 5.5,5.5 0,0 0,0 0,0 v 0 c 3,0 5.5,-2.5 5.5,-5.5 0,0 0,0 0,0 V 36.3 c 0,-3 -2.4,-5.5 -5.5,-5.5 v 0 0 c -3,0 -5.5,2.4 -5.5,5.5 0,0 0,0 0,0 z m 101.9,16 V 22.3 C 402,10 392,0 379.7,0 H 224.3 C 212,0 202,10 202,22.3 v 155.4 c 0,12.3 10,22.3 22.3,22.3 H 379.7 C 392,200 402,190 402,177.7 Z M 379.7,5 c 9.5,0 17.3,7.8 17.3,17.3 v 155.4 c 0,9.5 -7.8,17.3 -17.3,17.3 H 224.3 C 214.8,195 207,187.2 207,177.7 V 22.3 C 207,12.8 214.8,5 224.3,5 Z M 138.5,36 C 104.8,30.7 72.2,44 63.9,57.7 H 48.8 C 48.8,53.4 45.7,50 42,50 c -3.7,0 -6.8,3.4 -6.8,7.7 -0.1,2.9 1.5,5.6 4,7 -2.5,1.2 -4,3.8 -4,6.6 -0.2,3.8 2.7,7 6.5,7.2 3.8,0.2 7,-2.7 7.2,-6.5 0,-0.2 0,-0.5 0,-0.7 h 15 c 7.1,13.3 33.6,25.4 74.7,21.1 6.7,-0.7 12.2,-12.6 12.2,-28.2 0,-15.6 -5.6,-27.2 -12.3,-28.2 z m 0,52.2 c -5.7,0 -10.3,-10.7 -10.3,-24 0,-13.3 4.6,-24 10.3,-24 5.7,0 10.3,10.7 10.3,24 0,13.3 -4.6,23.9 -10.3,24 z m 3.7,-24 c 0,4.8 -1.7,8.6 -3.7,8.6 -2,0 -3.7,-3.9 -3.7,-8.6 0,-4.7 1.7,-8.6 3.7,-8.6 2,0 3.7,3.8 3.7,8.6 z m 9.7,79.8 c -2.4,-2.4 -4.9,-4.6 -7.6,-6.8 2.6,-2.1 5.2,-4.4 7.6,-6.8 5,-4.8 3.7,-15.6 3.7,-15.6 l -20.2,17.9 c -9.6,-5.9 -39.6,-23.4 -61.2,-23.2 -26,0.3 -40.5,26.8 -40.5,26.8 0,0 15.1,28.6 39.9,28.6 26.6,0 49.5,-16.7 59.5,-25.2 l 22.5,20 c 0,0 1.3,-10.9 -3.7,-15.7 z m -96.2,-7.1 c -2.2,0 -3.9,-2.2 -3.9,-5 0,-2.8 1.8,-5 3.9,-5 2.1,0 3.9,2.2 3.9,5 0,2.8 -1.8,5 -3.9,5 z m 10.9,19.2 c 4.2,-5.9 6.6,-13 6.8,-20.3 0.3,-12.1 -6.8,-17.8 -6.8,-17.8 0,0 11.4,-0.1 11.8,18 0.4,18.1 -11.8,20.1 -11.8,20.1 z M 177.7,200 H 22.3 C 10,200 0,190 0,177.7 V 22.3 C 0,10 10,0 22.3,0 H 177.7 C 190,0 200,10 200,22.3 V 177.7 C 200,190 190,200 177.7,200 Z M 22.3,5 C 12.8,5 5,12.8 5,22.3 v 155.4 c 0,9.5 7.8,17.3 17.3,17.3 h 155.4 c 9.5,0 17.3,-7.8 17.3,-17.3 V 22.3 C 195,12.8 187.2,5 177.7,5 Z"\n    />\n  </svg>\n'
   ),
-  Be.set(
+  Ie.set(
     'gs',
     '\n  <svg viewBox="0 0 402 200" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="icon bulk" fill="$stickerColor"\n      d="M 22.300781 0 C 10.000781 2.3684758e-15 0 10.000781 0 22.300781 L 0 177.69922 C 2.3684758e-15 189.99922 10.000781 200 22.300781 200 L 177.69922 200 C 189.99922 200 200 189.99922 200 177.69922 L 200 22.300781 C 200 10.000781 189.99922 0 177.69922 0 L 22.300781 0 z M 223.30078 0 C 211.00078 0 201 10.000781 201 22.300781 L 201 177.69922 C 201 189.99922 211.00078 200 223.30078 200 L 378.69922 200 C 390.99922 200 401 189.99922 401 177.69922 L 401 22.300781 C 401 10.000781 390.99922 2.3684758e-15 378.69922 0 L 223.30078 0 z M 22.300781 5 L 177.69922 5 C 187.19922 5 195 12.800781 195 22.300781 L 195 177.69922 C 195 187.19922 187.19922 195 177.69922 195 L 22.300781 195 C 12.800781 195 5 187.19922 5 177.69922 L 5 22.300781 C 5 12.800781 12.800781 5 22.300781 5 z M 223.30078 5 L 378.69922 5 C 388.19922 5 396 12.800781 396 22.300781 L 396 177.69922 C 396 187.19922 388.19922 195 378.69922 195 L 223.30078 195 C 213.80078 195 206 187.19922 206 177.69922 L 206 22.300781 C 206 12.800781 213.80078 5 223.30078 5 z M 361.40039 29.800781 C 353.10039 29.800781 348.39922 32.000781 342.19922 36.300781 C 336.49922 40.300781 228.00039 120.79922 223.40039 124.19922 C 221.40039 125.69922 221 128.59961 222.5 130.59961 C 224 132.59961 226.90039 133 228.90039 131.5 C 230.10039 130.7 341.9 47.700781 347.5 43.800781 C 352.8 40.100781 355.5 38.900391 361.5 38.900391 L 374.90039 38.900391 C 377.50039 38.900391 379.5 36.800781 379.5 34.300781 C 379.5 31.700781 377.40078 29.700781 374.80078 29.800781 L 361.40039 29.800781 z M 122.87305 34.808594 C 95.206616 34.866107 70.903516 46.139844 63.900391 57.699219 L 48.800781 57.699219 C 48.800781 53.399219 45.7 50 42 50 C 38.3 50 35.199219 53.399219 35.199219 57.699219 C 35.099219 60.599219 36.699219 63.299219 39.199219 64.699219 C 36.699219 65.899219 35.199219 68.500781 35.199219 71.300781 C 34.999219 75.100781 37.899219 78.3 41.699219 78.5 C 45.499219 78.7 48.700391 75.8 48.900391 72 L 48.900391 71.300781 L 63.900391 71.300781 C 71.000391 84.600781 97.499609 96.700391 138.59961 92.400391 C 145.29961 91.700391 150.80078 79.799219 150.80078 64.199219 C 150.80078 48.599219 145.2 37 138.5 36 C 133.23438 35.171875 127.99646 34.797943 122.87305 34.808594 z M 138.5 40.199219 C 144.2 40.199219 148.80078 50.899219 148.80078 64.199219 C 148.80078 77.499219 144.2 88.099219 138.5 88.199219 C 132.8 88.199219 128.19922 77.499219 128.19922 64.199219 C 128.19922 50.899219 132.8 40.199219 138.5 40.199219 z M 138.5 55.599609 C 136.5 55.599609 134.80078 59.499219 134.80078 64.199219 C 134.80078 68.899219 136.5 72.800781 138.5 72.800781 C 140.5 72.800781 142.19922 68.999219 142.19922 64.199219 C 142.19922 59.399219 140.5 55.599609 138.5 55.599609 z M 346.30078 67.699219 L 346.30078 89.5 L 314.30078 89.5 L 314.30078 110.09961 L 284.59961 110.09961 L 284.59961 129.5 L 253.69922 129.5 L 253.69922 151.19922 L 222.80078 151.19922 L 222.80078 173 L 377.19922 173 L 377.19922 67.699219 L 346.30078 67.699219 z M 74.199219 109.5 C 48.199219 109.8 33.699219 136.30078 33.699219 136.30078 C 33.699219 136.30078 48.799609 164.90039 73.599609 164.90039 C 100.19961 164.90039 123.09961 148.19922 133.09961 139.69922 L 155.59961 159.69922 C 155.59961 159.69922 156.90039 148.8 151.90039 144 C 149.50039 141.6 147.00078 139.39922 144.30078 137.19922 C 146.90078 135.09922 149.50039 132.80039 151.90039 130.40039 C 156.90039 125.60039 155.59961 114.80078 155.59961 114.80078 L 135.40039 132.69922 C 125.80039 126.79922 95.799219 109.3 74.199219 109.5 z M 66.599609 118 C 66.599609 118 78.000391 117.9 78.400391 136 C 78.800391 154.1 66.599609 156.09961 66.599609 156.09961 C 70.799609 150.19961 73.200391 143.10078 73.400391 135.80078 C 73.700391 123.70078 66.599609 118 66.599609 118 z M 55.699219 126.90039 C 57.799219 126.90039 59.599609 129.10039 59.599609 131.90039 C 59.599609 134.70039 57.799219 136.90039 55.699219 136.90039 C 53.499219 136.90039 51.800781 134.70039 51.800781 131.90039 C 51.800781 129.10039 53.599219 126.90039 55.699219 126.90039 z"\n    />\n  </svg>\n'
   ),
-  Be.set(
+  Ie.set(
     'l,g',
     '\n  <svg viewBox="0 0 200 402" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="icon bulk" fill="$stickerColor"\n      d="m 138.5,238 c -33.7,-5.3 -66.3,8 -74.6,21.7 H 48.8 c 0,-4.3 -3.1,-7.7 -6.8,-7.7 -3.7,0 -6.8,3.4 -6.8,7.7 -0.1,2.9 1.5,5.6 4,7 -2.5,1.2 -4,3.8 -4,6.6 -0.2,3.8 2.7,7 6.5,7.2 3.8,0.2 7,-2.7 7.2,-6.5 0,-0.2 0,-0.5 0,-0.7 h 15 c 7.1,13.3 33.6,25.4 74.7,21.1 6.7,-0.7 12.2,-12.6 12.2,-28.2 -0.1,-15.6 -5.6,-27.2 -12.3,-28.2 z m 0,52.2 c -5.7,0 -10.3,-10.7 -10.3,-24 0,-13.3 4.6,-24 10.3,-24 5.7,0 10.3,10.7 10.3,24 0,13.3 -4.6,23.9 -10.3,24 z m 3.7,-24 c 0,4.8 -1.7,8.6 -3.7,8.6 -2,0 -3.7,-3.9 -3.7,-8.6 0,-4.8 1.7,-8.6 3.7,-8.6 2,0 3.7,3.8 3.7,8.6 z m 9.7,79.8 c -2.4,-2.4 -4.9,-4.6 -7.6,-6.8 2.6,-2.1 5.2,-4.4 7.6,-6.8 5,-4.8 3.7,-15.6 3.7,-15.6 l -20.2,17.9 c -9.6,-5.9 -39.6,-23.4 -61.2,-23.2 -26,0.3 -40.5,26.8 -40.5,26.8 0,0 15.1,28.6 39.9,28.6 26.6,0 49.5,-16.7 59.5,-25.2 l 22.5,20 c 0,0 1.3,-10.9 -3.7,-15.7 z m -96.2,-7.1 c -2.2,0 -3.9,-2.2 -3.9,-5 0,-2.8 1.8,-5 3.9,-5 2.1,0 3.9,2.2 3.9,5 0,2.8 -1.8,5 -3.9,5 z M 66.6,358 c 4.2,-5.9 6.6,-13 6.8,-20.3 0.3,-12.1 -6.8,-17.8 -6.8,-17.8 0,0 11.4,-0.1 11.8,18 0.4,18.1 -11.8,20.2 -11.8,20.1 z m 111.1,44 H 22.3 C 10,402 0,392 0,379.7 V 224.3 C 0,212 10,202 22.3,202 h 155.4 c 12.3,0 22.3,10 22.3,22.3 V 379.7 C 200,392 190,402 177.7,402 Z M 22.3,207 C 12.8,207 5,214.8 5,224.3 v 155.4 c 0,9.5 7.8,17.3 17.3,17.3 h 155.4 c 9.5,0 17.3,-7.8 17.3,-17.3 V 224.3 C 195,214.8 187.2,207 177.7,207 Z M 145.2,53.5 c -6.3,0 -11.3,-5.1 -11.3,-11.3 0,-6.3 5.1,-11.3 11.3,-11.3 6.2,0 11.3,5.1 11.3,11.3 0,6.2 -5,11.3 -11.3,11.3 z m -26.7,16.9 v 34.8 c 0,6.8 9.1,6.8 9.1,0 l 0.8,-31.8 h 2.3 v 87.2 c 0,9 12.4,8.8 12.4,0 l 0.8,-50.6 h 2.5 l 0.8,50.6 c 0,8.8 12.4,9 12.4,0 V 73.4 h 2.4 l 0.8,31.8 c 0,6.8 9.1,6.8 9.1,0 V 70.4 c 0,-11.9 -3.6,-14.7 -14.5,-14.7 H 133 c -10.9,0 -14.5,2.8 -14.5,14.7 z m -48,-28.2 c 0,-6.3 -5,-11.4 -11.3,-11.4 -6.3,0 -11.4,5 -11.4,11.3 0,6.3 5,11.4 11.3,11.4 0,0 0.1,0 0.1,0 6.3,0 11.3,-5.1 11.3,-11.3 0.1,-0.1 0.1,-0.1 0,0 z m -34,58.5 10.3,-29.3 H 48 c 0,0 -13.5,52.4 -14.1,54.4 -0.3,1 0.1,1.7 1.2,1.7 H 46.8 V 162 c 0,7 10.5,7 10.5,0 v -34.7 h 4 V 162 c 0,7 10.5,7 10.5,0 v -34.5 h 11.7 c 1,0 1.4,-0.7 1.2,-1.7 -0.6,-2 -14.1,-54.4 -14.1,-54.4 h 1.2 l 10.3,29.3 c 2.1,6.4 10,4 8,-2.9 l -9.7,-32 C 78.5,60.1 72.9,55.7 64.6,55.7 H 54 c -8.2,0 -13.9,4.5 -15.8,10.1 l -9.7,32 c -2.1,6.9 5.9,9.4 8,2.9 z m 61.7,61 c 0,3 2.4,5.5 5.5,5.5 0,0 0,0 0,0 v 0 c 3,0 5.5,-2.5 5.5,-5.5 0,0 0,0 0,0 V 36.3 c 0,-3 -2.4,-5.5 -5.5,-5.5 v 0 0 c -3,0 -5.5,2.4 -5.5,5.5 0,0 0,0 0,0 z m 101.8,16 V 22.3 C 200,10 190,0 177.7,0 H 22.3 C 10,0 0,10 0,22.3 V 177.7 C 0,190 10,200 22.3,200 H 177.7 C 190,200 200,190 200,177.7 Z M 177.7,5 c 9.5,0 17.3,7.8 17.3,17.3 v 155.4 c 0,9.5 -7.8,17.3 -17.3,17.3 H 22.3 C 12.8,195 5,187.2 5,177.7 V 22.3 C 5,12.8 12.8,5 22.3,5 Z"\n    />\n  </svg>\n'
   ),
-  Be.set(
+  Ie.set(
     'l,l',
     '\n  <svg viewBox="0 0 200 402" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="icon bulk" fill="$stickerColor"\n      d="m 145.2,255.4 c -6.3,0 -11.3,-5.1 -11.3,-11.3 0,-6.3 5.1,-11.3 11.3,-11.3 6.2,0 11.3,5.1 11.3,11.3 0,6.3 -5.1,11.4 -11.3,11.3 z m -26.7,17.1 v 34.8 c 0,6.8 9.1,6.8 9.1,0 l 0.8,-31.8 h 2.3 v 87.2 c 0,9 12.4,8.8 12.4,0 l 0.8,-50.6 h 2.5 l 0.8,50.6 c 0,8.8 12.4,9 12.4,0 v -87.2 h 2.4 l 0.8,31.8 c 0,6.8 9.1,6.8 9.1,0 v -34.8 c 0,-11.9 -3.6,-14.7 -14.5,-14.7 H 133 c -10.9,-0.1 -14.5,2.7 -14.5,14.7 z m -48,-28.3 c 0,-6.3 -5,-11.4 -11.3,-11.4 -6.3,0 -11.4,5 -11.4,11.3 0,6.3 5,11.4 11.3,11.4 0,0 0.1,0 0.1,0 6.3,0 11.3,-5.1 11.3,-11.3 0,-0.1 0,-0.1 0,0 z m -34,58.5 10.3,-29.3 H 48 c 0,0 -13.5,52.4 -14.1,54.4 -0.3,1 0.1,1.7 1.2,1.7 H 46.8 V 364 c 0,7 10.5,7 10.5,0 v -34.7 h 4 V 364 c 0,7 10.5,7 10.5,0 v -34.5 h 11.7 c 1,0 1.4,-0.7 1.2,-1.7 -0.6,-2 -14.1,-54.4 -14.1,-54.4 h 1.2 l 10.3,29.3 c 2.1,6.4 10,4 8,-2.9 l -9.7,-32 C 78.5,262.2 72.9,257.7 64.6,257.7 H 54 c -8.2,0 -13.9,4.5 -15.8,10.1 l -9.7,32 c -2.1,6.9 5.9,9.4 8,2.9 z m 61.7,61 c 0,3 2.4,5.5 5.5,5.5 0,0 0,0 0,0 v 0 c 3,0 5.5,-2.5 5.5,-5.5 0,0 0,0 0,0 V 238.3 c 0,-3 -2.4,-5.5 -5.5,-5.5 v 0 0 c -3,0 -5.5,2.4 -5.5,5.5 0,0 0,0 0,0 z m 101.8,16 V 224.3 C 200,212 190,202 177.7,202 H 22.3 C 10,202 0,212 0,224.3 V 379.7 C 0,392 10,402 22.3,402 H 177.7 C 190,402 200,392 200,379.7 Z M 177.7,207 c 9.5,0 17.3,7.8 17.3,17.3 v 155.4 c 0,9.5 -7.8,17.3 -17.3,17.3 H 22.3 C 12.8,397 5,389.2 5,379.7 V 224.3 C 5,214.8 12.8,207 22.3,207 Z M 145.2,53.5 c -6.3,0 -11.3,-5.1 -11.3,-11.3 0,-6.3 5.1,-11.3 11.3,-11.3 6.2,0 11.3,5.1 11.3,11.3 0,6.2 -5,11.3 -11.3,11.3 z m -26.7,16.9 v 34.8 c 0,6.8 9.1,6.8 9.1,0 l 0.8,-31.8 h 2.3 v 87.2 c 0,9 12.4,8.8 12.4,0 l 0.8,-50.6 h 2.5 l 0.8,50.6 c 0,8.8 12.4,9 12.4,0 V 73.4 h 2.4 l 0.8,31.8 c 0,6.8 9.1,6.8 9.1,0 V 70.4 c 0,-11.9 -3.6,-14.7 -14.5,-14.7 H 133 c -10.9,0 -14.5,2.8 -14.5,14.7 z m -48,-28.2 c 0,-6.3 -5,-11.4 -11.3,-11.4 -6.3,0 -11.4,5 -11.4,11.3 0,6.3 5,11.4 11.3,11.4 0,0 0.1,0 0.1,0 6.3,0 11.3,-5.1 11.3,-11.3 0.1,-0.1 0.1,-0.1 0,0 z m -34,58.5 10.3,-29.3 H 48 c 0,0 -13.5,52.4 -14.1,54.4 -0.3,1 0.1,1.7 1.2,1.7 H 46.8 V 162 c 0,7 10.5,7 10.5,0 v -34.7 h 4 V 162 c 0,7 10.5,7 10.5,0 v -34.5 h 11.7 c 1,0 1.4,-0.7 1.2,-1.7 -0.6,-2 -14.1,-54.4 -14.1,-54.4 h 1.2 l 10.3,29.3 c 2.1,6.4 10,4 8,-2.9 l -9.7,-32 C 78.5,60.1 72.9,55.7 64.6,55.7 H 54 c -8.2,0 -13.9,4.5 -15.8,10.1 l -9.7,32 c -2.1,6.9 5.9,9.4 8,2.9 z m 61.7,61 c 0,3 2.4,5.5 5.5,5.5 0,0 0,0 0,0 v 0 c 3,0 5.5,-2.5 5.5,-5.5 0,0 0,0 0,0 V 36.3 c 0,-3 -2.4,-5.5 -5.5,-5.5 v 0 0 c -3,0 -5.5,2.4 -5.5,5.5 0,0 0,0 0,0 z m 101.8,16 V 22.3 C 200,10 190,0 177.7,0 H 22.3 C 10,0 0,10 0,22.3 V 177.7 C 0,190 10,200 22.3,200 H 177.7 C 190,200 200,190 200,177.7 Z M 177.7,5 c 9.5,0 17.3,7.8 17.3,17.3 v 155.4 c 0,9.5 -7.8,17.3 -17.3,17.3 H 22.3 C 12.8,195 5,187.2 5,177.7 V 22.3 C 5,12.8 12.8,5 22.3,5 Z"\n    />\n  </svg>\n'
   ),
-  Be.set(
+  Ie.set(
     'l,s',
     '\n  <svg viewBox="0 0 200 402" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="icon bulk" fill="$stickerColor"\n      d="M 22.300781 0 C 10.000781 0 2.3684758e-15 10.000781 0 22.300781 L 0 177.69922 C 0 189.99922 10.000781 200 22.300781 200 L 177.69922 200 C 189.99922 200 200 189.99922 200 177.69922 L 200 22.300781 C 200 10.000781 189.99922 2.3684758e-15 177.69922 0 L 22.300781 0 z M 22.300781 5 L 177.69922 5 C 187.19922 5 195 12.800781 195 22.300781 L 195 177.69922 C 195 187.19922 187.19922 195 177.69922 195 L 22.300781 195 C 12.800781 195 5 187.19922 5 177.69922 L 5 22.300781 C 5 12.800781 12.800781 5 22.300781 5 z M 59.199219 30.800781 C 52.899219 30.800781 47.800781 35.799609 47.800781 42.099609 C 47.800781 48.399609 52.799609 53.5 59.099609 53.5 L 59.199219 53.5 C 65.499219 53.5 70.5 48.399219 70.5 42.199219 C 70.5 35.899219 65.499219 30.800781 59.199219 30.800781 z M 103.69922 30.800781 C 100.69922 30.800781 98.199219 33.200781 98.199219 36.300781 L 98.199219 161.69922 C 98.199219 164.69922 100.59922 167.19922 103.69922 167.19922 C 106.69922 167.19922 109.19922 164.69922 109.19922 161.69922 L 109.19922 36.300781 C 109.19922 33.300781 106.79922 30.800781 103.69922 30.800781 z M 145.19922 30.900391 C 138.99922 30.900391 133.90039 35.899219 133.90039 42.199219 C 133.90039 48.399219 138.89922 53.5 145.19922 53.5 C 151.49922 53.5 156.5 48.399219 156.5 42.199219 C 156.5 35.999219 151.39922 30.900391 145.19922 30.900391 z M 54 55.699219 C 45.8 55.699219 40.099219 60.200781 38.199219 65.800781 L 28.5 97.800781 C 26.4 104.70078 34.4 107.19922 36.5 100.69922 L 46.800781 71.400391 L 48 71.400391 C 48 71.400391 34.500391 123.80078 33.900391 125.80078 C 33.600391 126.80078 33.999609 127.5 35.099609 127.5 L 46.800781 127.5 L 46.800781 162 C 46.800781 169 57.300781 169 57.300781 162 L 57.300781 127.30078 L 61.300781 127.30078 L 61.300781 162 C 61.300781 169 71.800781 169 71.800781 162 L 71.800781 127.5 L 83.5 127.5 C 84.5 127.5 84.899219 126.80078 84.699219 125.80078 C 84.099219 123.80078 70.599609 71.400391 70.599609 71.400391 L 71.800781 71.400391 L 82.099609 100.69922 C 84.199609 107.09922 92.099609 104.70078 90.099609 97.800781 L 80.400391 65.800781 C 78.500391 60.100781 72.899609 55.699219 64.599609 55.699219 L 54 55.699219 z M 133 55.699219 C 122.1 55.699219 118.5 58.500391 118.5 70.400391 L 118.5 105.19922 C 118.5 111.99922 127.59961 111.99922 127.59961 105.19922 L 128.40039 73.400391 L 130.69922 73.400391 L 130.69922 160.59961 C 130.69922 169.59961 143.09961 169.39961 143.09961 160.59961 L 143.90039 110 L 146.40039 110 L 147.19922 160.59961 C 147.19922 169.39961 159.59961 169.59961 159.59961 160.59961 L 159.59961 73.400391 L 162 73.400391 L 162.80078 105.19922 C 162.80078 111.99922 171.90039 111.99922 171.90039 105.19922 L 171.90039 70.400391 C 171.90039 58.500391 168.30039 55.699219 157.40039 55.699219 L 133 55.699219 z M 22.300781 202 C 10.000781 202 2.3684758e-15 212.00078 0 224.30078 L 0 379.69922 C 0 391.99922 10.000781 402 22.300781 402 L 177.69922 402 C 189.99922 402 200 391.99922 200 379.69922 L 200 224.30078 C 200 212.00078 189.99922 202 177.69922 202 L 22.300781 202 z M 22.300781 207 L 177.69922 207 C 187.19922 207 195 214.80078 195 224.30078 L 195 379.69922 C 195 389.19922 187.19922 397 177.69922 397 L 22.300781 397 C 12.800781 397 5 389.19922 5 379.69922 L 5 224.30078 C 5 214.80078 12.800781 207 22.300781 207 z M 160.40039 231.80078 C 152.10039 231.80078 147.39922 234.00078 141.19922 238.30078 C 135.49922 242.30078 27.000391 322.79922 22.400391 326.19922 C 20.400391 327.69922 20 330.59961 21.5 332.59961 C 23 334.59961 25.900391 335 27.900391 333.5 C 29.100391 332.7 140.9 249.70078 146.5 245.80078 C 151.8 242.10078 154.5 240.90039 160.5 240.90039 L 173.90039 240.90039 C 176.50039 240.90039 178.5 238.80078 178.5 236.30078 C 178.5 233.70078 176.40078 231.70078 173.80078 231.80078 L 160.40039 231.80078 z M 145.30078 269.69922 L 145.30078 291.5 L 113.30078 291.5 L 113.30078 312.09961 L 83.599609 312.09961 L 83.599609 331.5 L 52.699219 331.5 L 52.699219 353.19922 L 21.800781 353.19922 L 21.800781 375 L 176.19922 375 L 176.19922 269.69922 L 145.30078 269.69922 z"\n    />\n  </svg>\n'
   ),
-  Be.set(
+  Ie.set(
     'l',
     '\n  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="icon bulk" fill="$stickerColor"\n      d="M145.19,53.45a11.33,11.33,0,1,1,11.35-11.33A11.34,11.34,0,0,1,145.19,53.45Zm-26.67,17v34.8c0,6.76,9.11,6.76,9.11,0l.79-31.83h2.34v87.15c0,9,12.41,8.78,12.41,0l.78-50.59h2.46l.79,50.59c0,8.78,12.41,9,12.41,0V73.38H162l.79,31.83c0,6.76,9.12,6.76,9.12,0V70.4c0-11.91-3.56-14.72-14.49-14.72H133C122.08,55.68,118.53,58.49,118.53,70.4Zm-48-28.29A11.34,11.34,0,1,0,59.21,53.45,11.33,11.33,0,0,0,70.55,42.11ZM36.49,100.73,46.76,71.45h1.18s-13.49,52.42-14.06,54.39c-.29,1,.12,1.69,1.16,1.69H46.71V162c0,7,10.49,7,10.49,0v-34.7h4V162c0,7,10.49,7,10.49,0V127.53H83.39c1,0,1.45-.71,1.16-1.69-.56-2-14.06-54.39-14.06-54.39h1.17l10.28,29.28c2.08,6.43,10,4,8-2.9l-9.73-32c-1.88-5.65-7.53-10.12-15.8-10.12H54c-8.25,0-13.91,4.46-15.79,10.12l-9.74,32C26.44,104.72,34.39,107.16,36.49,100.73Zm61.67,61a5.48,5.48,0,0,0,5.48,5.49h0a5.48,5.48,0,0,0,5.47-5.49V36.26a5.47,5.47,0,0,0-5.47-5.47h0a5.47,5.47,0,0,0-5.48,5.47Zm101.85,16V22.31A22.34,22.34,0,0,0,177.69,0H22.31A22.34,22.34,0,0,0,0,22.31V177.69A22.34,22.34,0,0,0,22.31,200H177.69A22.34,22.34,0,0,0,200,177.69ZM177.69,5A17.37,17.37,0,0,1,195,22.31V177.69A17.37,17.37,0,0,1,177.69,195H22.31A17.37,17.37,0,0,1,5,177.69V22.31A17.37,17.37,0,0,1,22.31,5Z"\n    />\n  </svg>\n'
   ),
-  Be.set(
+  Ie.set(
     'lg',
     '\n  <svg viewBox="0 0 402 200" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="icon bulk" fill="$stickerColor"\n      d="m 340.5,36 c -33.7,-5.3 -66.3,8 -74.6,21.7 h -15.1 c 0,-4.3 -3.1,-7.7 -6.8,-7.7 -3.7,0 -6.8,3.4 -6.8,7.7 -0.1,2.9 1.5,5.6 4,7 -2.5,1.2 -4,3.8 -4,6.6 -0.2,3.8 2.7,7 6.5,7.2 3.8,0.2 7,-2.7 7.2,-6.5 0,-0.2 0,-0.5 0,-0.7 h 15 c 7.1,13.3 33.6,25.4 74.7,21.1 6.7,-0.7 12.2,-12.6 12.2,-28.2 0,-15.6 -5.6,-27.2 -12.3,-28.2 z m 0,52.2 c -5.7,0 -10.3,-10.7 -10.3,-24 0,-13.3 4.6,-24 10.3,-24 5.7,0 10.3,10.7 10.3,24 0,13.3 -4.6,23.9 -10.3,24 z m 3.7,-24 c 0,4.8 -1.7,8.6 -3.7,8.6 -2,0 -3.7,-3.9 -3.7,-8.6 0,-4.7 1.7,-8.6 3.7,-8.6 2,0 3.7,3.8 3.7,8.6 z m 9.7,79.8 c -2.4,-2.4 -4.9,-4.6 -7.6,-6.8 2.6,-2.1 5.2,-4.4 7.6,-6.8 5,-4.8 3.7,-15.6 3.7,-15.6 l -20.2,17.9 c -9.6,-5.9 -39.6,-23.4 -61.2,-23.2 -26,0.3 -40.5,26.8 -40.5,26.8 0,0 15.1,28.6 39.9,28.6 26.6,0 49.5,-16.7 59.5,-25.2 l 22.5,20 c 0,0 1.3,-10.9 -3.7,-15.7 z m -96.3,-7.1 c -2.2,0 -3.9,-2.2 -3.9,-5 0,-2.8 1.8,-5 3.9,-5 2.2,0 3.9,2.2 3.9,5 0,2.8 -1.7,5 -3.9,5 z m 11,19.2 c 4.2,-5.9 6.6,-13 6.8,-20.3 0.3,-12.1 -6.8,-17.8 -6.8,-17.8 0,0 11.4,-0.1 11.8,18 0.4,18.2 -11.8,20.1 -11.8,20.1 z M 379.7,200 H 224.3 C 212,200 202,190 202,177.7 V 22.3 C 202,10 212,0 224.3,0 H 379.7 C 392,0 402,10 402,22.3 V 177.7 C 402,190 392,200 379.7,200 Z M 224.3,5 C 214.8,5 207,12.8 207,22.3 v 155.4 c 0,9.5 7.8,17.3 17.3,17.3 h 155.4 c 9.5,0 17.3,-7.8 17.3,-17.3 V 22.3 C 397,12.8 389.2,5 379.7,5 Z m -79.1,48.5 c -6.3,0 -11.3,-5.1 -11.3,-11.3 0,-6.3 5.1,-11.3 11.3,-11.3 6.2,0 11.3,5.1 11.3,11.3 0,6.2 -5,11.3 -11.3,11.3 z m -26.7,16.9 v 34.8 c 0,6.8 9.1,6.8 9.1,0 l 0.8,-31.8 h 2.3 v 87.2 c 0,9 12.4,8.8 12.4,0 l 0.8,-50.6 h 2.5 l 0.8,50.6 c 0,8.8 12.4,9 12.4,0 V 73.4 h 2.4 l 0.8,31.8 c 0,6.8 9.1,6.8 9.1,0 V 70.4 c 0,-11.9 -3.6,-14.7 -14.5,-14.7 H 133 c -10.9,0 -14.5,2.8 -14.5,14.7 z m -48,-28.2 c 0,-6.3 -5,-11.4 -11.3,-11.4 -6.3,0 -11.4,5 -11.4,11.3 0,6.3 5,11.4 11.3,11.4 0,0 0.1,0 0.1,0 6.3,0 11.3,-5.1 11.3,-11.3 0.1,-0.1 0.1,-0.1 0,0 z m -34,58.5 10.3,-29.3 H 48 c 0,0 -13.5,52.4 -14.1,54.4 -0.3,1 0.1,1.7 1.2,1.7 H 46.8 V 162 c 0,7 10.5,7 10.5,0 v -34.7 h 4 V 162 c 0,7 10.5,7 10.5,0 v -34.5 h 11.7 c 1,0 1.4,-0.7 1.2,-1.7 -0.6,-2 -14.1,-54.4 -14.1,-54.4 h 1.2 l 10.3,29.3 c 2.1,6.4 10,4 8,-2.9 l -9.7,-32 C 78.5,60.1 72.9,55.7 64.6,55.7 H 54 c -8.2,0 -13.9,4.5 -15.8,10.1 l -9.7,32 c -2.1,6.9 5.9,9.4 8,2.9 z m 61.7,61 c 0,3 2.4,5.5 5.5,5.5 0,0 0,0 0,0 v 0 c 3,0 5.5,-2.5 5.5,-5.5 0,0 0,0 0,0 V 36.3 c 0,-3 -2.4,-5.5 -5.5,-5.5 v 0 0 c -3,0 -5.5,2.4 -5.5,5.5 0,0 0,0 0,0 z m 101.8,16 V 22.3 C 200,10 190,0 177.7,0 H 22.3 C 10,0 0,10 0,22.3 V 177.7 C 0,190 10,200 22.3,200 H 177.7 C 190,200 200,190 200,177.7 Z M 177.7,5 c 9.5,0 17.3,7.8 17.3,17.3 v 155.4 c 0,9.5 -7.8,17.3 -17.3,17.3 H 22.3 C 12.8,195 5,187.2 5,177.7 V 22.3 C 5,12.8 12.8,5 22.3,5 Z"\n    />\n  </svg>\n'
   ),
-  Be.set(
+  Ie.set(
     'll,g',
     '\n  <svg viewBox="0 0 402 402" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="icon bulk" fill="$stickerColor"\n      d="M 22.300781 0 C 10.000781 0 2.3684758e-15 10.000781 0 22.300781 L 0 177.69922 C 0 189.99922 10.000781 200 22.300781 200 L 177.69922 200 C 189.99922 200 200 189.99922 200 177.69922 L 200 22.300781 C 200 10.000781 189.99922 2.3684758e-15 177.69922 0 L 22.300781 0 z M 224.30078 0 C 212.00078 0 202 10.000781 202 22.300781 L 202 177.69922 C 202 189.99922 212.00078 200 224.30078 200 L 379.69922 200 C 391.99922 200 402 189.99922 402 177.69922 L 402 22.300781 C 402 10.000781 391.99922 2.3684758e-15 379.69922 0 L 224.30078 0 z M 22.300781 5 L 177.69922 5 C 187.19922 5 195 12.800781 195 22.300781 L 195 177.69922 C 195 187.19922 187.19922 195 177.69922 195 L 22.300781 195 C 12.800781 195 5 187.19922 5 177.69922 L 5 22.300781 C 5 12.800781 12.800781 5 22.300781 5 z M 224.30078 5 L 379.69922 5 C 389.19922 5 397 12.800781 397 22.300781 L 397 177.69922 C 397 187.19922 389.19922 195 379.69922 195 L 224.30078 195 C 214.80078 195 207 187.19922 207 177.69922 L 207 22.300781 C 207 12.800781 214.80078 5 224.30078 5 z M 59.199219 30.800781 C 52.899219 30.800781 47.800781 35.799609 47.800781 42.099609 C 47.800781 48.399609 52.799609 53.5 59.099609 53.5 L 59.199219 53.5 C 65.499219 53.5 70.5 48.399219 70.5 42.199219 C 70.5 35.899219 65.499219 30.800781 59.199219 30.800781 z M 103.69922 30.800781 C 100.69922 30.800781 98.199219 33.200781 98.199219 36.300781 L 98.199219 161.69922 C 98.199219 164.69922 100.59922 167.19922 103.69922 167.19922 C 106.69922 167.19922 109.19922 164.69922 109.19922 161.69922 L 109.19922 36.300781 C 109.19922 33.300781 106.79922 30.800781 103.69922 30.800781 z M 261.19922 30.800781 C 254.89922 30.800781 249.80078 35.799609 249.80078 42.099609 C 249.80078 48.399609 254.79961 53.5 261.09961 53.5 L 261.19922 53.5 C 267.49922 53.5 272.5 48.399219 272.5 42.199219 C 272.5 35.899219 267.49922 30.800781 261.19922 30.800781 z M 305.59961 30.800781 C 302.59961 30.800781 300.09961 33.200781 300.09961 36.300781 L 300.09961 161.69922 C 300.09961 164.69922 302.49961 167.19922 305.59961 167.19922 C 308.59961 167.19922 311.09961 164.69922 311.09961 161.69922 L 311.09961 36.300781 C 311.09961 33.300781 308.69961 30.800781 305.59961 30.800781 z M 145.19922 30.900391 C 138.99922 30.900391 133.90039 35.899219 133.90039 42.199219 C 133.90039 48.399219 138.89922 53.5 145.19922 53.5 C 151.49922 53.5 156.5 48.399219 156.5 42.199219 C 156.5 35.999219 151.39922 30.900391 145.19922 30.900391 z M 347.30078 30.900391 C 341.00078 30.900391 335.90039 35.899219 335.90039 42.199219 C 335.90039 48.399219 340.89922 53.5 347.19922 53.5 C 353.39922 53.5 358.49961 48.399219 358.59961 42.199219 C 358.59961 35.999219 353.50078 30.900391 347.30078 30.900391 z M 54 55.699219 C 45.8 55.699219 40.099219 60.200781 38.199219 65.800781 L 28.5 97.800781 C 26.4 104.70078 34.4 107.19922 36.5 100.69922 L 46.800781 71.400391 L 48 71.400391 C 48 71.400391 34.500391 123.80078 33.900391 125.80078 C 33.600391 126.80078 33.999609 127.5 35.099609 127.5 L 46.800781 127.5 L 46.800781 162 C 46.800781 169 57.300781 169 57.300781 162 L 57.300781 127.30078 L 61.300781 127.30078 L 61.300781 162 C 61.300781 169 71.800781 169 71.800781 162 L 71.800781 127.5 L 83.5 127.5 C 84.5 127.5 84.899219 126.80078 84.699219 125.80078 C 84.099219 123.80078 70.599609 71.400391 70.599609 71.400391 L 71.800781 71.400391 L 82.099609 100.69922 C 84.199609 107.09922 92.099609 104.70078 90.099609 97.800781 L 80.400391 65.800781 C 78.500391 60.100781 72.899609 55.699219 64.599609 55.699219 L 54 55.699219 z M 133 55.699219 C 122.1 55.699219 118.5 58.500391 118.5 70.400391 L 118.5 105.19922 C 118.5 111.99922 127.59961 111.99922 127.59961 105.19922 L 128.40039 73.400391 L 130.69922 73.400391 L 130.69922 160.59961 C 130.69922 169.59961 143.09961 169.39961 143.09961 160.59961 L 143.90039 110 L 146.40039 110 L 147.19922 160.59961 C 147.19922 169.39961 159.59961 169.59961 159.59961 160.59961 L 159.59961 73.400391 L 162 73.400391 L 162.80078 105.19922 C 162.80078 111.99922 171.90039 111.99922 171.90039 105.19922 L 171.90039 70.400391 C 171.90039 58.500391 168.30039 55.699219 157.40039 55.699219 L 133 55.699219 z M 256 55.699219 C 247.8 55.699219 242.09922 60.200781 240.19922 65.800781 L 230.5 97.800781 C 228.4 104.70078 236.4 107.19922 238.5 100.69922 L 248.80078 71.400391 L 250 71.400391 C 250 71.400391 236.50039 123.80078 235.90039 125.80078 C 235.60039 126.80078 235.99961 127.5 237.09961 127.5 L 248.80078 127.5 L 248.80078 162 C 248.80078 169 259.30078 169 259.30078 162 L 259.30078 127.30078 L 263.30078 127.30078 L 263.30078 162 C 263.30078 169 273.80078 169 273.80078 162 L 273.80078 127.5 L 285.5 127.5 C 286.5 127.5 286.89922 126.80078 286.69922 125.80078 C 286.09922 123.80078 272.59961 71.400391 272.59961 71.400391 L 273.80078 71.400391 L 284.09961 100.69922 C 286.19961 107.09922 294.09961 104.70078 292.09961 97.800781 L 282.40039 65.800781 C 280.50039 60.100781 274.89961 55.699219 266.59961 55.699219 L 256 55.699219 z M 335 55.699219 C 324.1 55.699219 320.5 58.500391 320.5 70.400391 L 320.5 105.19922 C 320.5 111.99922 329.59961 111.99922 329.59961 105.19922 L 330.40039 73.400391 L 332.69922 73.400391 L 332.69922 160.59961 C 332.69922 169.59961 345.09961 169.39961 345.09961 160.59961 L 345.90039 110 L 348.40039 110 L 349.19922 160.59961 C 349.19922 169.39961 361.59961 169.59961 361.59961 160.59961 L 361.59961 73.400391 L 364 73.400391 L 364.80078 105.19922 C 364.80078 111.99922 373.90039 111.99922 373.90039 105.19922 L 373.90039 70.400391 C 373.90039 58.500391 370.30039 55.699219 359.40039 55.699219 L 335 55.699219 z M 124.30078 202 C 112.00078 202 102 212.00078 102 224.30078 L 102 379.69922 C 102 391.99922 112.00078 402 124.30078 402 L 279.69922 402 C 291.99922 402 302 391.99922 302 379.69922 L 302 224.30078 C 302 212.00078 291.99922 202 279.69922 202 L 124.30078 202 z M 124.30078 207 L 279.69922 207 C 289.19922 207 297 214.80078 297 224.30078 L 297 379.69922 C 297 389.19922 289.19922 397 279.69922 397 L 124.30078 397 C 114.80078 397 107 389.19922 107 379.69922 L 107 224.30078 C 107 214.80078 114.80078 207 124.30078 207 z M 224.87305 236.80859 C 197.20662 236.86611 172.90352 248.13984 165.90039 259.69922 L 150.80078 259.69922 C 150.80078 255.39922 147.7 252 144 252 C 140.3 252 137.19922 255.39922 137.19922 259.69922 C 137.09922 262.59922 138.69922 265.29922 141.19922 266.69922 C 138.69922 267.89922 137.19922 270.50078 137.19922 273.30078 C 136.99922 277.10078 139.89922 280.3 143.69922 280.5 C 147.49922 280.7 150.70039 277.8 150.90039 274 L 150.90039 273.30078 L 165.90039 273.30078 C 173.00039 286.60078 199.49961 298.70039 240.59961 294.40039 C 247.29961 293.70039 252.80078 281.79922 252.80078 266.19922 C 252.70078 250.59922 247.1 239 240.5 238 C 235.23438 237.17188 229.99646 236.79794 224.87305 236.80859 z M 240.5 242.19922 C 246.2 242.19922 250.80078 252.89922 250.80078 266.19922 C 250.80078 279.49922 246.2 290.09922 240.5 290.19922 C 234.8 290.19922 230.19922 279.49922 230.19922 266.19922 C 230.19922 252.89922 234.8 242.19922 240.5 242.19922 z M 240.5 257.59961 C 238.5 257.59961 236.80078 261.39922 236.80078 266.19922 C 236.80078 270.89922 238.5 274.80078 240.5 274.80078 C 242.5 274.80078 244.19922 270.99922 244.19922 266.19922 C 244.19922 261.39922 242.5 257.59961 240.5 257.59961 z M 176.19922 311.5 C 150.19922 311.8 135.69922 338.30078 135.69922 338.30078 C 135.69922 338.30078 150.79961 366.90039 175.59961 366.90039 C 202.19961 366.90039 225.09961 350.19922 235.09961 341.69922 L 257.59961 361.69922 C 257.59961 361.69922 258.90039 350.8 253.90039 346 C 251.50039 343.6 249.00078 341.39922 246.30078 339.19922 C 248.90078 337.09922 251.50039 334.80039 253.90039 332.40039 C 258.90039 327.60039 257.59961 316.80078 257.59961 316.80078 L 237.40039 334.69922 C 227.80039 328.79922 197.79922 311.3 176.19922 311.5 z M 168.59961 319.90039 C 168.59961 319.90039 180.00039 319.80039 180.40039 337.90039 C 180.80039 356.20039 168.59961 358.1 168.59961 358 C 172.79961 352.1 175.20039 344.99922 175.40039 337.69922 C 175.70039 325.59922 168.59961 319.90039 168.59961 319.90039 z M 157.59961 328.90039 C 159.79961 328.90039 161.5 331.10039 161.5 333.90039 C 161.5 336.70039 159.79961 338.90039 157.59961 338.90039 C 155.39961 338.90039 153.69922 336.70039 153.69922 333.90039 C 153.69922 331.10039 155.49961 328.90039 157.59961 328.90039 z "\n    />\n  </svg>\n'
   ),
-  Be.set(
+  Ie.set(
     'll,ll',
     '\n  <svg viewBox="0 0 402 402" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="icon bulk" fill="$stickerColor"\n      d="m 347.2,53.5 c -6.3,0 -11.3,-5.1 -11.3,-11.3 0,-6.3 5.1,-11.3 11.4,-11.3 6.2,0 11.3,5.1 11.3,11.3 -0.1,6.2 -5.1,11.3 -11.4,11.3 z m -26.7,16.9 v 34.8 c 0,6.8 9.1,6.8 9.1,0 l 0.8,-31.8 h 2.3 v 87.2 c 0,9 12.4,8.8 12.4,0 L 346,110 h 2.5 l 0.8,50.6 c 0,8.8 12.4,9 12.4,0 V 73.4 h 2.4 l 0.8,31.8 c 0,6.8 9.1,6.8 9.1,0 V 70.4 C 374,58.5 370.4,55.7 359.5,55.7 H 335 c -10.9,0 -14.5,2.8 -14.5,14.7 z m -48,-28.2 c 0,-6.3 -5,-11.4 -11.3,-11.4 -6.3,0 -11.4,5 -11.4,11.3 0,6.3 5,11.4 11.3,11.4 h 0.1 c 6.3,0 11.3,-5.1 11.3,-11.3 0.1,-0.1 0.1,-0.1 0,0 z m -34,58.5 10.3,-29.3 h 1.2 c 0,0 -13.5,52.4 -14.1,54.4 -0.3,1 0.1,1.7 1.2,1.7 h 11.7 V 162 c 0,7 10.5,7 10.5,0 v -34.7 h 4 V 162 c 0,7 10.5,7 10.5,0 v -34.5 h 11.7 c 1,0 1.4,-0.7 1.2,-1.7 -0.6,-2 -14.1,-54.4 -14.1,-54.4 h 1.2 l 10.3,29.3 c 2.1,6.4 10,4 8,-2.9 l -9.7,-32 C 280.5,60.1 274.9,55.7 266.6,55.7 H 256 c -8.2,0 -13.9,4.5 -15.8,10.1 l -9.7,32 c -2.1,6.9 5.9,9.4 8,2.9 z m 61.7,61 c 0,3 2.4,5.5 5.5,5.5 v 0 0 c 3,0 5.5,-2.5 5.5,-5.5 v 0 -125.4 c 0,-3 -2.4,-5.5 -5.5,-5.5 v 0 0 c -3,0 -5.5,2.4 -5.5,5.5 v 0 z m 101.8,16 V 22.3 C 402,10 392,0 379.7,0 H 224.3 C 212,0 202,10 202,22.3 v 155.4 c 0,12.3 10,22.3 22.3,22.3 H 379.7 C 392,200 402,190 402,177.7 Z M 379.7,5 c 9.5,0 17.3,7.8 17.3,17.3 v 155.4 c 0,9.5 -7.8,17.3 -17.3,17.3 H 224.3 C 214.8,195 207,187.2 207,177.7 V 22.3 C 207,12.8 214.8,5 224.3,5 Z m -32.5,250.4 c -6.3,0 -11.3,-5.1 -11.3,-11.3 0,-6.3 5.1,-11.3 11.4,-11.3 6.2,0 11.3,5.1 11.3,11.3 -0.1,6.3 -5.1,11.4 -11.4,11.3 z m -26.7,17.1 v 34.8 c 0,6.8 9.1,6.8 9.1,0 l 0.8,-31.8 h 2.3 v 87.2 c 0,9 12.4,8.8 12.4,0 L 346,312 h 2.5 l 0.8,50.6 c 0,8.8 12.4,9 12.4,0 v -87.2 h 2.4 l 0.8,31.8 c 0,6.8 9.1,6.8 9.1,0 v -34.8 c 0,-11.9 -3.6,-14.7 -14.5,-14.7 H 335 c -10.9,0 -14.5,2.8 -14.5,14.8 z m -48,-28.3 c 0,-6.3 -5,-11.4 -11.3,-11.4 -6.3,0 -11.4,5 -11.4,11.3 0,6.3 5,11.4 11.3,11.4 h 0.1 c 6.3,0 11.3,-5.1 11.3,-11.3 0.1,-0.1 0.1,-0.1 0,0 z m -34,58.5 10.3,-29.3 h 1.2 c 0,0 -13.5,52.4 -14.1,54.4 -0.3,1 0.1,1.7 1.2,1.7 h 11.7 V 364 c 0,7 10.5,7 10.5,0 v -34.7 h 4 V 364 c 0,7 10.5,7 10.5,0 v -34.5 h 11.7 c 1,0 1.4,-0.7 1.2,-1.7 -0.6,-2 -14.1,-54.4 -14.1,-54.4 h 1.2 l 10.3,29.3 c 2.1,6.4 10,4 8,-2.9 l -9.7,-32 c -1.9,-5.6 -7.5,-10.1 -15.8,-10.1 H 256 c -8.2,0 -13.9,4.5 -15.8,10.1 l -9.7,32 c -2.1,6.9 5.9,9.4 8,2.9 z m 61.7,61 c 0,3 2.4,5.5 5.5,5.5 v 0 0 c 3,0 5.5,-2.5 5.5,-5.5 v 0 -125.4 c 0,-3 -2.4,-5.5 -5.5,-5.5 v 0 0 c -3,0 -5.5,2.4 -5.5,5.5 v 0 z m 101.8,16 V 224.3 C 402,212 392,202 379.7,202 H 224.3 C 212,202 202,212 202,224.3 v 155.4 c 0,12.3 10,22.3 22.3,22.3 H 379.7 C 392,402 402,392 402,379.7 Z M 379.7,207 c 9.5,0 17.3,7.8 17.3,17.3 v 155.4 c 0,9.5 -7.8,17.3 -17.3,17.3 H 224.3 C 214.8,397 207,389.2 207,379.7 V 224.3 c 0,-9.5 7.8,-17.3 17.3,-17.3 z m -234.5,48.4 c -6.3,0 -11.3,-5.1 -11.3,-11.3 0,-6.3 5.1,-11.3 11.3,-11.3 6.2,0 11.3,5.1 11.3,11.3 0,6.3 -5,11.4 -11.3,11.3 z m -26.7,17.1 v 34.8 c 0,6.8 9.1,6.8 9.1,0 l 0.8,-31.8 h 2.3 v 87.2 c 0,9 12.4,8.8 12.4,0 l 0.8,-50.6 h 2.5 l 0.8,50.6 c 0,8.8 12.4,9 12.4,0 v -87.2 h 2.4 l 0.8,31.8 c 0,6.8 9.1,6.8 9.1,0 v -34.8 c 0,-11.9 -3.6,-14.7 -14.5,-14.7 H 133 c -10.9,-0.1 -14.5,2.7 -14.5,14.7 z m -48,-28.3 c 0,-6.3 -5,-11.4 -11.3,-11.4 -6.3,0 -11.4,5 -11.4,11.3 0,6.3 5,11.4 11.3,11.4 h 0.1 c 6.3,0 11.3,-5.1 11.3,-11.3 0.1,-0.1 0.1,-0.1 0,0 z m -34,58.5 10.3,-29.3 H 48 c 0,0 -13.5,52.4 -14.1,54.4 -0.3,1 0.1,1.7 1.2,1.7 H 46.8 V 364 c 0,7 10.5,7 10.5,0 v -34.7 h 4 V 364 c 0,7 10.5,7 10.5,0 v -34.5 h 11.7 c 1,0 1.4,-0.7 1.2,-1.7 -0.6,-2 -14.1,-54.4 -14.1,-54.4 h 1.2 l 10.3,29.3 c 2.1,6.4 10,4 8,-2.9 l -9.7,-32 C 78.5,262.2 72.9,257.7 64.6,257.7 H 54 c -8.2,0 -13.9,4.5 -15.8,10.1 l -9.7,32 c -2.1,6.9 5.9,9.4 8,2.9 z m 61.7,61 c 0,3 2.4,5.5 5.5,5.5 v 0 0 c 3,0 5.5,-2.5 5.5,-5.5 v 0 -125.4 c 0,-3 -2.4,-5.5 -5.5,-5.5 v 0 0 c -3,0 -5.5,2.4 -5.5,5.5 v 0 z m 101.8,16 V 224.3 C 200,212 190,202 177.7,202 H 22.3 C 10,202 0,212 0,224.3 V 379.7 C 0,392 10,402 22.3,402 H 177.7 C 190,402 200,392 200,379.7 Z M 177.7,207 c 9.5,0 17.3,7.8 17.3,17.3 v 155.4 c 0,9.5 -7.8,17.3 -17.3,17.3 H 22.3 C 12.8,397 5,389.2 5,379.7 V 224.3 C 5,214.8 12.8,207 22.3,207 Z M 145.2,53.5 c -6.3,0 -11.3,-5.1 -11.3,-11.3 0,-6.3 5.1,-11.3 11.3,-11.3 6.2,0 11.3,5.1 11.3,11.3 0,6.2 -5,11.3 -11.3,11.3 z m -26.7,16.9 v 34.8 c 0,6.8 9.1,6.8 9.1,0 l 0.8,-31.8 h 2.3 v 87.2 c 0,9 12.4,8.8 12.4,0 l 0.8,-50.6 h 2.5 l 0.8,50.6 c 0,8.8 12.4,9 12.4,0 V 73.4 h 2.4 l 0.8,31.8 c 0,6.8 9.1,6.8 9.1,0 V 70.4 c 0,-11.9 -3.6,-14.7 -14.5,-14.7 H 133 c -10.9,0 -14.5,2.8 -14.5,14.7 z m -48,-28.2 c 0,-6.3 -5,-11.4 -11.3,-11.4 -6.3,0 -11.4,5 -11.4,11.3 0,6.3 5,11.4 11.3,11.4 h 0.1 c 6.3,0 11.3,-5.1 11.3,-11.3 0.1,-0.1 0.1,-0.1 0,0 z m -34,58.5 10.3,-29.3 H 48 c 0,0 -13.5,52.4 -14.1,54.4 -0.3,1 0.1,1.7 1.2,1.7 H 46.8 V 162 c 0,7 10.5,7 10.5,0 v -34.7 h 4 V 162 c 0,7 10.5,7 10.5,0 v -34.5 h 11.7 c 1,0 1.4,-0.7 1.2,-1.7 -0.6,-2 -14.1,-54.4 -14.1,-54.4 h 1.2 l 10.3,29.3 c 2.1,6.4 10,4 8,-2.9 l -9.7,-32 C 78.5,60.1 72.9,55.7 64.6,55.7 H 54 c -8.2,0 -13.9,4.5 -15.8,10.1 l -9.7,32 c -2.1,6.9 5.9,9.4 8,2.9 z m 61.7,61 c 0,3 2.4,5.5 5.5,5.5 v 0 0 c 3,0 5.5,-2.5 5.5,-5.5 v 0 -125.4 c 0,-3 -2.4,-5.5 -5.5,-5.5 v 0 0 c -3,0 -5.5,2.4 -5.5,5.5 v 0 z m 101.8,16 V 22.3 C 200,10 190,0 177.7,0 H 22.3 C 10,0 0,10 0,22.3 V 177.7 C 0,190 10,200 22.3,200 H 177.7 C 190,200 200,190 200,177.7 Z M 177.7,5 c 9.5,0 17.3,7.8 17.3,17.3 v 155.4 c 0,9.5 -7.8,17.3 -17.3,17.3 H 22.3 C 12.8,195 5,187.2 5,177.7 V 22.3 C 5,12.8 12.8,5 22.3,5 Z"\n    />\n  </svg>\n'
   ),
-  Be.set(
+  Ie.set(
     'll,s',
     '\n  <svg viewBox="0 0 402 402" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="icon bulk" fill="$stickerColor"\n      d="M 22.300781 0 C 10.000781 0 2.3684758e-15 10.000781 0 22.300781 L 0 177.69922 C 0 189.99922 10.000781 200 22.300781 200 L 177.69922 200 C 189.99922 200 200 189.99922 200 177.69922 L 200 22.300781 C 200 10.000781 189.99922 2.3684758e-15 177.69922 0 L 22.300781 0 z M 224.30078 0 C 212.00078 0 202 10.000781 202 22.300781 L 202 177.69922 C 202 189.99922 212.00078 200 224.30078 200 L 379.69922 200 C 391.99922 200 402 189.99922 402 177.69922 L 402 22.300781 C 402 10.000781 391.99922 2.3684758e-15 379.69922 0 L 224.30078 0 z M 22.300781 5 L 177.69922 5 C 187.19922 5 195 12.800781 195 22.300781 L 195 177.69922 C 195 187.19922 187.19922 195 177.69922 195 L 22.300781 195 C 12.800781 195 5 187.19922 5 177.69922 L 5 22.300781 C 5 12.800781 12.800781 5 22.300781 5 z M 224.30078 5 L 379.69922 5 C 389.19922 5 397 12.800781 397 22.300781 L 397 177.69922 C 397 187.19922 389.19922 195 379.69922 195 L 224.30078 195 C 214.80078 195 207 187.19922 207 177.69922 L 207 22.300781 C 207 12.800781 214.80078 5 224.30078 5 z M 59.199219 30.800781 C 52.899219 30.800781 47.800781 35.799609 47.800781 42.099609 C 47.800781 48.399609 52.799609 53.5 59.099609 53.5 L 59.199219 53.5 C 65.499219 53.5 70.5 48.399219 70.5 42.199219 C 70.5 35.899219 65.499219 30.800781 59.199219 30.800781 z M 103.69922 30.800781 C 100.69922 30.800781 98.199219 33.200781 98.199219 36.300781 L 98.199219 161.69922 C 98.199219 164.69922 100.59922 167.19922 103.69922 167.19922 C 106.69922 167.19922 109.19922 164.69922 109.19922 161.69922 L 109.19922 36.300781 C 109.19922 33.300781 106.79922 30.800781 103.69922 30.800781 z M 261.19922 30.800781 C 254.89922 30.800781 249.80078 35.799609 249.80078 42.099609 C 249.80078 48.399609 254.79961 53.5 261.09961 53.5 L 261.19922 53.5 C 267.49922 53.5 272.5 48.399219 272.5 42.199219 C 272.5 35.899219 267.49922 30.800781 261.19922 30.800781 z M 305.59961 30.800781 C 302.59961 30.800781 300.09961 33.200781 300.09961 36.300781 L 300.09961 161.69922 C 300.09961 164.69922 302.49961 167.19922 305.59961 167.19922 C 308.59961 167.19922 311.09961 164.69922 311.09961 161.69922 L 311.09961 36.300781 C 311.09961 33.300781 308.69961 30.800781 305.59961 30.800781 z M 145.19922 30.900391 C 138.99922 30.900391 133.90039 35.899219 133.90039 42.199219 C 133.90039 48.399219 138.89922 53.5 145.19922 53.5 C 151.49922 53.5 156.5 48.399219 156.5 42.199219 C 156.5 35.999219 151.39922 30.900391 145.19922 30.900391 z M 347.30078 30.900391 C 341.00078 30.900391 335.90039 35.899219 335.90039 42.199219 C 335.90039 48.399219 340.89922 53.5 347.19922 53.5 C 353.39922 53.5 358.49961 48.399219 358.59961 42.199219 C 358.59961 35.999219 353.50078 30.900391 347.30078 30.900391 z M 54 55.699219 C 45.8 55.699219 40.099219 60.200781 38.199219 65.800781 L 28.5 97.800781 C 26.4 104.70078 34.4 107.19922 36.5 100.69922 L 46.800781 71.400391 L 48 71.400391 C 48 71.400391 34.500391 123.80078 33.900391 125.80078 C 33.600391 126.80078 33.999609 127.5 35.099609 127.5 L 46.800781 127.5 L 46.800781 162 C 46.800781 169 57.300781 169 57.300781 162 L 57.300781 127.30078 L 61.300781 127.30078 L 61.300781 162 C 61.300781 169 71.800781 169 71.800781 162 L 71.800781 127.5 L 83.5 127.5 C 84.5 127.5 84.899219 126.80078 84.699219 125.80078 C 84.099219 123.80078 70.599609 71.400391 70.599609 71.400391 L 71.800781 71.400391 L 82.099609 100.69922 C 84.199609 107.09922 92.099609 104.70078 90.099609 97.800781 L 80.400391 65.800781 C 78.500391 60.100781 72.899609 55.699219 64.599609 55.699219 L 54 55.699219 z M 133 55.699219 C 122.1 55.699219 118.5 58.500391 118.5 70.400391 L 118.5 105.19922 C 118.5 111.99922 127.59961 111.99922 127.59961 105.19922 L 128.40039 73.400391 L 130.69922 73.400391 L 130.69922 160.59961 C 130.69922 169.59961 143.09961 169.39961 143.09961 160.59961 L 143.90039 110 L 146.40039 110 L 147.19922 160.59961 C 147.19922 169.39961 159.59961 169.59961 159.59961 160.59961 L 159.59961 73.400391 L 162 73.400391 L 162.80078 105.19922 C 162.80078 111.99922 171.90039 111.99922 171.90039 105.19922 L 171.90039 70.400391 C 171.90039 58.500391 168.30039 55.699219 157.40039 55.699219 L 133 55.699219 z M 256 55.699219 C 247.8 55.699219 242.09922 60.200781 240.19922 65.800781 L 230.5 97.800781 C 228.4 104.70078 236.4 107.19922 238.5 100.69922 L 248.80078 71.400391 L 250 71.400391 C 250 71.400391 236.50039 123.80078 235.90039 125.80078 C 235.60039 126.80078 235.99961 127.5 237.09961 127.5 L 248.80078 127.5 L 248.80078 162 C 248.80078 169 259.30078 169 259.30078 162 L 259.30078 127.30078 L 263.30078 127.30078 L 263.30078 162 C 263.30078 169 273.80078 169 273.80078 162 L 273.80078 127.5 L 285.5 127.5 C 286.5 127.5 286.89922 126.80078 286.69922 125.80078 C 286.09922 123.80078 272.59961 71.400391 272.59961 71.400391 L 273.80078 71.400391 L 284.09961 100.69922 C 286.19961 107.09922 294.09961 104.70078 292.09961 97.800781 L 282.40039 65.800781 C 280.50039 60.100781 274.89961 55.699219 266.59961 55.699219 L 256 55.699219 z M 335 55.699219 C 324.1 55.699219 320.5 58.500391 320.5 70.400391 L 320.5 105.19922 C 320.5 111.99922 329.59961 111.99922 329.59961 105.19922 L 330.40039 73.400391 L 332.69922 73.400391 L 332.69922 160.59961 C 332.69922 169.59961 345.09961 169.39961 345.09961 160.59961 L 345.90039 110 L 348.40039 110 L 349.19922 160.59961 C 349.19922 169.39961 361.59961 169.59961 361.59961 160.59961 L 361.59961 73.400391 L 364 73.400391 L 364.80078 105.19922 C 364.80078 111.99922 373.90039 111.99922 373.90039 105.19922 L 373.90039 70.400391 C 373.90039 58.500391 370.30039 55.699219 359.40039 55.699219 L 335 55.699219 z M 122.30078 202 C 110.00078 202 100 212.00078 100 224.30078 L 100 379.69922 C 100 391.99922 110.00078 402 122.30078 402 L 277.69922 402 C 289.99922 402 300 391.99922 300 379.69922 L 300 224.30078 C 300 212.00078 289.99922 202 277.69922 202 L 122.30078 202 z M 122.30078 207 L 277.69922 207 C 287.19922 207 295 214.80078 295 224.30078 L 295 379.69922 C 295 389.19922 287.19922 397 277.69922 397 L 122.30078 397 C 112.80078 397 105 389.19922 105 379.69922 L 105 224.30078 C 105 214.80078 112.80078 207 122.30078 207 z M 260.40039 231.80078 C 252.10039 231.80078 247.39922 234.00078 241.19922 238.30078 C 235.49922 242.30078 127.00039 322.79922 122.40039 326.19922 C 120.40039 327.69922 120 330.59961 121.5 332.59961 C 123 334.59961 125.90039 335 127.90039 333.5 C 129.10039 332.7 240.9 249.70078 246.5 245.80078 C 251.8 242.10078 254.5 240.90039 260.5 240.90039 L 273.90039 240.90039 C 276.50039 240.90039 278.5 238.80078 278.5 236.30078 C 278.5 233.70078 276.40078 231.70078 273.80078 231.80078 L 260.40039 231.80078 z M 245.30078 269.69922 L 245.30078 291.5 L 213.30078 291.5 L 213.30078 312.09961 L 183.59961 312.09961 L 183.59961 331.5 L 152.69922 331.5 L 152.69922 353.19922 L 121.80078 353.19922 L 121.80078 375 L 276.19922 375 L 276.19922 269.69922 L 245.30078 269.69922 z"\n    />\n  </svg>\n'
   ),
-  Be.set(
+  Ie.set(
     'll',
     '\n  <svg viewBox="0 0 402 200" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="icon bulk" fill="$stickerColor"\n      d="M 22.300781 0 C 10.000781 0 2.3684758e-15 10.000781 0 22.300781 L 0 177.69922 C 0 189.99922 10.000781 200 22.300781 200 L 177.69922 200 C 189.99922 200 200 189.99922 200 177.69922 L 200 22.300781 C 200 10.000781 189.99922 2.3684758e-15 177.69922 0 L 22.300781 0 z M 224.30078 0 C 212.00078 0 202 10.000781 202 22.300781 L 202 177.69922 C 202 189.99922 212.00078 200 224.30078 200 L 379.69922 200 C 391.99922 200 402 189.99922 402 177.69922 L 402 22.300781 C 402 10.000781 391.99922 2.3684758e-15 379.69922 0 L 224.30078 0 z M 22.300781 5 L 177.69922 5 C 187.19922 5 195 12.800781 195 22.300781 L 195 177.69922 C 195 187.19922 187.19922 195 177.69922 195 L 22.300781 195 C 12.800781 195 5 187.19922 5 177.69922 L 5 22.300781 C 5 12.800781 12.800781 5 22.300781 5 z M 224.30078 5 L 379.69922 5 C 389.19922 5 397 12.800781 397 22.300781 L 397 177.69922 C 397 187.19922 389.19922 195 379.69922 195 L 224.30078 195 C 214.80078 195 207 187.19922 207 177.69922 L 207 22.300781 C 207 12.800781 214.80078 5 224.30078 5 z M 59.199219 30.800781 C 52.899219 30.800781 47.800781 35.799609 47.800781 42.099609 C 47.800781 48.399609 52.799609 53.5 59.099609 53.5 L 59.199219 53.5 C 65.499219 53.5 70.5 48.399219 70.5 42.199219 C 70.5 35.899219 65.499219 30.800781 59.199219 30.800781 z M 103.69922 30.800781 C 100.69922 30.800781 98.199219 33.200781 98.199219 36.300781 L 98.199219 161.69922 C 98.199219 164.69922 100.59922 167.19922 103.69922 167.19922 C 106.69922 167.19922 109.19922 164.69922 109.19922 161.69922 L 109.19922 36.300781 C 109.19922 33.300781 106.79922 30.800781 103.69922 30.800781 z M 261.19922 30.800781 C 254.89922 30.800781 249.80078 35.799609 249.80078 42.099609 C 249.80078 48.399609 254.79961 53.5 261.09961 53.5 L 261.19922 53.5 C 267.49922 53.5 272.5 48.399219 272.5 42.199219 C 272.5 35.899219 267.49922 30.800781 261.19922 30.800781 z M 305.59961 30.800781 C 302.59961 30.800781 300.09961 33.200781 300.09961 36.300781 L 300.09961 161.69922 C 300.09961 164.69922 302.49961 167.19922 305.59961 167.19922 C 308.59961 167.19922 311.09961 164.69922 311.09961 161.69922 L 311.09961 36.300781 C 311.09961 33.300781 308.69961 30.800781 305.59961 30.800781 z M 145.19922 30.900391 C 138.99922 30.900391 133.90039 35.899219 133.90039 42.199219 C 133.90039 48.399219 138.89922 53.5 145.19922 53.5 C 151.49922 53.5 156.5 48.399219 156.5 42.199219 C 156.5 35.999219 151.39922 30.900391 145.19922 30.900391 z M 347.30078 30.900391 C 341.00078 30.900391 335.90039 35.899219 335.90039 42.199219 C 335.90039 48.399219 340.89922 53.5 347.19922 53.5 C 353.39922 53.5 358.49961 48.399219 358.59961 42.199219 C 358.59961 35.999219 353.50078 30.900391 347.30078 30.900391 z M 54 55.699219 C 45.8 55.699219 40.099219 60.200781 38.199219 65.800781 L 28.5 97.800781 C 26.4 104.70078 34.4 107.19922 36.5 100.69922 L 46.800781 71.400391 L 48 71.400391 C 48 71.400391 34.500391 123.80078 33.900391 125.80078 C 33.600391 126.80078 33.999609 127.5 35.099609 127.5 L 46.800781 127.5 L 46.800781 162 C 46.800781 169 57.300781 169 57.300781 162 L 57.300781 127.30078 L 61.300781 127.30078 L 61.300781 162 C 61.300781 169 71.800781 169 71.800781 162 L 71.800781 127.5 L 83.5 127.5 C 84.5 127.5 84.899219 126.80078 84.699219 125.80078 C 84.099219 123.80078 70.599609 71.400391 70.599609 71.400391 L 71.800781 71.400391 L 82.099609 100.69922 C 84.199609 107.09922 92.099609 104.70078 90.099609 97.800781 L 80.400391 65.800781 C 78.500391 60.100781 72.899609 55.699219 64.599609 55.699219 L 54 55.699219 z M 133 55.699219 C 122.1 55.699219 118.5 58.500391 118.5 70.400391 L 118.5 105.19922 C 118.5 111.99922 127.59961 111.99922 127.59961 105.19922 L 128.40039 73.400391 L 130.69922 73.400391 L 130.69922 160.59961 C 130.69922 169.59961 143.09961 169.39961 143.09961 160.59961 L 143.90039 110 L 146.40039 110 L 147.19922 160.59961 C 147.19922 169.39961 159.59961 169.59961 159.59961 160.59961 L 159.59961 73.400391 L 162 73.400391 L 162.80078 105.19922 C 162.80078 111.99922 171.90039 111.99922 171.90039 105.19922 L 171.90039 70.400391 C 171.90039 58.500391 168.30039 55.699219 157.40039 55.699219 L 133 55.699219 z M 256 55.699219 C 247.8 55.699219 242.09922 60.200781 240.19922 65.800781 L 230.5 97.800781 C 228.4 104.70078 236.4 107.19922 238.5 100.69922 L 248.80078 71.400391 L 250 71.400391 C 250 71.400391 236.50039 123.80078 235.90039 125.80078 C 235.60039 126.80078 235.99961 127.5 237.09961 127.5 L 248.80078 127.5 L 248.80078 162 C 248.80078 169 259.30078 169 259.30078 162 L 259.30078 127.30078 L 263.30078 127.30078 L 263.30078 162 C 263.30078 169 273.80078 169 273.80078 162 L 273.80078 127.5 L 285.5 127.5 C 286.5 127.5 286.89922 126.80078 286.69922 125.80078 C 286.09922 123.80078 272.59961 71.400391 272.59961 71.400391 L 273.80078 71.400391 L 284.09961 100.69922 C 286.19961 107.09922 294.09961 104.70078 292.09961 97.800781 L 282.40039 65.800781 C 280.50039 60.100781 274.89961 55.699219 266.59961 55.699219 L 256 55.699219 z M 335 55.699219 C 324.1 55.699219 320.5 58.500391 320.5 70.400391 L 320.5 105.19922 C 320.5 111.99922 329.59961 111.99922 329.59961 105.19922 L 330.40039 73.400391 L 332.69922 73.400391 L 332.69922 160.59961 C 332.69922 169.59961 345.09961 169.39961 345.09961 160.59961 L 345.90039 110 L 348.40039 110 L 349.19922 160.59961 C 349.19922 169.39961 361.59961 169.59961 361.59961 160.59961 L 361.59961 73.400391 L 364 73.400391 L 364.80078 105.19922 C 364.80078 111.99922 373.90039 111.99922 373.90039 105.19922 L 373.90039 70.400391 C 373.90039 58.500391 370.30039 55.699219 359.40039 55.699219 L 335 55.699219 z"\n    />\n  </svg>\n'
   ),
-  Be.set(
+  Ie.set(
     'ls',
     '\n  <svg viewBox="0 0 402 200" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="icon bulk" fill="$stickerColor"\n      d="M 22.300781 0 C 10.000781 0 2.3684758e-15 10.000781 0 22.300781 L 0 177.69922 C 0 189.99922 10.000781 200 22.300781 200 L 177.69922 200 C 189.99922 200 200 189.99922 200 177.69922 L 200 22.300781 C 200 10.000781 189.99922 2.3684758e-15 177.69922 0 L 22.300781 0 z M 224.30078 0 C 212.00078 0 202 10.000781 202 22.300781 L 202 177.69922 C 202 189.99922 212.00078 200 224.30078 200 L 379.69922 200 C 391.99922 200 402 189.99922 402 177.69922 L 402 22.300781 C 402 10.000781 391.99922 2.3684758e-15 379.69922 0 L 224.30078 0 z M 22.300781 5 L 177.69922 5 C 187.19922 5 195 12.800781 195 22.300781 L 195 177.69922 C 195 187.19922 187.19922 195 177.69922 195 L 22.300781 195 C 12.800781 195 5 187.19922 5 177.69922 L 5 22.300781 C 5 12.800781 12.800781 5 22.300781 5 z M 224.30078 5 L 379.69922 5 C 389.19922 5 397 12.800781 397 22.300781 L 397 177.69922 C 397 187.19922 389.19922 195 379.69922 195 L 224.30078 195 C 214.80078 195 207 187.19922 207 177.69922 L 207 22.300781 C 207 12.800781 214.80078 5 224.30078 5 z M 362.40039 29.800781 C 354.10039 29.800781 349.39922 32.000781 343.19922 36.300781 C 337.49922 40.300781 229.00039 120.79922 224.40039 124.19922 C 222.40039 125.69922 222 128.59961 223.5 130.59961 C 225 132.59961 227.90039 133 229.90039 131.5 C 231.10039 130.7 342.9 47.700781 348.5 43.800781 C 353.8 40.100781 356.5 38.900391 362.5 38.900391 L 375.90039 38.900391 C 378.50039 38.900391 380.5 36.800781 380.5 34.300781 C 380.5 31.700781 378.40078 29.700781 375.80078 29.800781 L 362.40039 29.800781 z M 59.199219 30.800781 C 52.899219 30.800781 47.800781 35.799609 47.800781 42.099609 C 47.800781 48.399609 52.799609 53.5 59.099609 53.5 L 59.199219 53.5 C 65.499219 53.5 70.5 48.399219 70.5 42.199219 C 70.5 35.899219 65.499219 30.800781 59.199219 30.800781 z M 103.69922 30.800781 C 100.69922 30.800781 98.199219 33.200781 98.199219 36.300781 L 98.199219 161.69922 C 98.199219 164.69922 100.59922 167.19922 103.69922 167.19922 C 106.69922 167.19922 109.19922 164.69922 109.19922 161.69922 L 109.19922 36.300781 C 109.19922 33.300781 106.79922 30.800781 103.69922 30.800781 z M 145.19922 30.900391 C 138.99922 30.900391 133.90039 35.899219 133.90039 42.199219 C 133.90039 48.399219 138.89922 53.5 145.19922 53.5 C 151.49922 53.5 156.5 48.399219 156.5 42.199219 C 156.5 35.999219 151.39922 30.900391 145.19922 30.900391 z M 54 55.699219 C 45.8 55.699219 40.099219 60.200781 38.199219 65.800781 L 28.5 97.800781 C 26.4 104.70078 34.4 107.19922 36.5 100.69922 L 46.800781 71.400391 L 48 71.400391 C 48 71.400391 34.500391 123.80078 33.900391 125.80078 C 33.600391 126.80078 33.999609 127.5 35.099609 127.5 L 46.800781 127.5 L 46.800781 162 C 46.800781 169 57.300781 169 57.300781 162 L 57.300781 127.30078 L 61.300781 127.30078 L 61.300781 162 C 61.300781 169 71.800781 169 71.800781 162 L 71.800781 127.5 L 83.5 127.5 C 84.5 127.5 84.899219 126.80078 84.699219 125.80078 C 84.099219 123.80078 70.599609 71.400391 70.599609 71.400391 L 71.800781 71.400391 L 82.099609 100.69922 C 84.199609 107.09922 92.099609 104.70078 90.099609 97.800781 L 80.400391 65.800781 C 78.500391 60.100781 72.899609 55.699219 64.599609 55.699219 L 54 55.699219 z M 133 55.699219 C 122.1 55.699219 118.5 58.500391 118.5 70.400391 L 118.5 105.19922 C 118.5 111.99922 127.59961 111.99922 127.59961 105.19922 L 128.40039 73.400391 L 130.69922 73.400391 L 130.69922 160.59961 C 130.69922 169.59961 143.09961 169.39961 143.09961 160.59961 L 143.90039 110 L 146.40039 110 L 147.19922 160.59961 C 147.19922 169.39961 159.59961 169.59961 159.59961 160.59961 L 159.59961 73.400391 L 162 73.400391 L 162.80078 105.19922 C 162.80078 111.99922 171.90039 111.99922 171.90039 105.19922 L 171.90039 70.400391 C 171.90039 58.500391 168.30039 55.699219 157.40039 55.699219 L 133 55.699219 z M 347.30078 67.699219 L 347.30078 89.5 L 315.30078 89.5 L 315.30078 110.09961 L 285.59961 110.09961 L 285.59961 129.5 L 254.69922 129.5 L 254.69922 151.19922 L 223.80078 151.19922 L 223.80078 173 L 378.19922 173 L 378.19922 67.699219 L 347.30078 67.699219 z"\n    />\n  </svg>\n'
   ),
-  Be.set(
+  Ie.set(
     's,g',
     '\n  <svg viewBox="0 0 200 402" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="icon bulk" fill="$stickerColor"\n      d="M 22.300781 0 C 10.000781 0 2.3684758e-15 10.000781 0 22.300781 L 0 177.69922 C 0 189.99922 10.000781 200 22.300781 200 L 177.69922 200 C 189.99922 200 200 189.99922 200 177.69922 L 200 22.300781 C 200 10.000781 189.99922 2.3684758e-15 177.69922 0 L 22.300781 0 z M 22.300781 5 L 177.69922 5 C 187.19922 5 195 12.800781 195 22.300781 L 195 177.69922 C 195 187.19922 187.19922 195 177.69922 195 L 22.300781 195 C 12.800781 195 5 187.19922 5 177.69922 L 5 22.300781 C 5 12.800781 12.800781 5 22.300781 5 z M 160.40039 29.800781 C 152.10039 29.800781 147.39922 32.000781 141.19922 36.300781 C 135.49922 40.300781 27.000391 120.79922 22.400391 124.19922 C 20.400391 125.69922 20 128.59961 21.5 130.59961 C 23 132.59961 25.900391 133 27.900391 131.5 C 29.100391 130.7 140.9 47.700781 146.5 43.800781 C 151.8 40.100781 154.5 38.900391 160.5 38.900391 L 173.90039 38.900391 C 176.50039 38.900391 178.5 36.800781 178.5 34.300781 C 178.5 31.700781 176.40078 29.700781 173.80078 29.800781 L 160.40039 29.800781 z M 145.30078 67.699219 L 145.30078 89.5 L 113.30078 89.5 L 113.30078 110.09961 L 83.599609 110.09961 L 83.599609 129.5 L 52.699219 129.5 L 52.699219 151.19922 L 21.800781 151.19922 L 21.800781 173 L 176.19922 173 L 176.19922 67.699219 L 145.30078 67.699219 z M 22.300781 202 C 10.000781 202 0 212.00078 0 224.30078 L 0 379.69922 C 2.3684758e-15 391.99922 10.000781 402 22.300781 402 L 177.69922 402 C 189.99922 402 200 391.99922 200 379.69922 L 200 224.30078 C 200 212.00078 189.99922 202 177.69922 202 L 22.300781 202 z M 22.300781 207 L 177.69922 207 C 187.19922 207 195 214.80078 195 224.30078 L 195 379.69922 C 195 389.19922 187.19922 397 177.69922 397 L 22.300781 397 C 12.800781 397 5 389.19922 5 379.69922 L 5 224.30078 C 5 214.80078 12.800781 207 22.300781 207 z M 122.87305 236.80859 C 95.206616 236.86611 70.903516 248.13984 63.900391 259.69922 L 48.800781 259.69922 C 48.800781 255.39922 45.7 252 42 252 C 38.3 252 35.199219 255.39922 35.199219 259.69922 C 35.099219 262.59922 36.699219 265.29922 39.199219 266.69922 C 36.699219 267.89922 35.199219 270.50078 35.199219 273.30078 C 34.999219 277.10078 37.899219 280.3 41.699219 280.5 C 45.499219 280.7 48.700391 277.8 48.900391 274 L 48.900391 273.30078 L 63.900391 273.30078 C 71.000391 286.60078 97.499609 298.70039 138.59961 294.40039 C 145.29961 293.70039 150.80078 281.79922 150.80078 266.19922 C 150.80078 250.59922 145.2 239 138.5 238 C 133.23438 237.17188 127.99646 236.79794 122.87305 236.80859 z M 138.5 242.19922 C 144.2 242.19922 148.80078 252.89922 148.80078 266.19922 C 148.80078 279.49922 144.2 290.09922 138.5 290.19922 C 132.8 290.19922 128.19922 279.49922 128.19922 266.19922 C 128.19922 252.89922 132.8 242.19922 138.5 242.19922 z M 138.5 257.59961 C 136.5 257.59961 134.80078 261.49922 134.80078 266.19922 C 134.80078 270.89922 136.5 274.80078 138.5 274.80078 C 140.5 274.80078 142.19922 270.99922 142.19922 266.19922 C 142.19922 261.39922 140.5 257.59961 138.5 257.59961 z M 74.199219 311.5 C 48.199219 311.8 33.699219 338.30078 33.699219 338.30078 C 33.699219 338.30078 48.799609 366.90039 73.599609 366.90039 C 100.19961 366.90039 123.09961 350.19922 133.09961 341.69922 L 155.59961 361.69922 C 155.59961 361.69922 156.90039 350.8 151.90039 346 C 149.50039 343.6 147.00078 341.39922 144.30078 339.19922 C 146.90078 337.09922 149.50039 334.80039 151.90039 332.40039 C 156.90039 327.60039 155.59961 316.80078 155.59961 316.80078 L 135.40039 334.69922 C 125.80039 328.79922 95.799219 311.3 74.199219 311.5 z M 66.599609 320 C 66.599609 320 78.000391 319.9 78.400391 338 C 78.800391 356.2 66.599609 358.09961 66.599609 358.09961 C 70.799609 352.19961 73.200391 345.10078 73.400391 337.80078 C 73.700391 325.70078 66.599609 320 66.599609 320 z M 55.599609 328.90039 C 57.799609 328.90039 59.5 331.10039 59.5 333.90039 C 59.5 336.70039 57.799609 338.90039 55.599609 338.90039 C 53.399609 338.90039 51.699219 336.70039 51.699219 333.90039 C 51.699219 331.10039 53.499609 328.90039 55.599609 328.90039 z"\n    />\n  </svg>\n'
   ),
-  Be.set(
+  Ie.set(
     's,l,g',
     '\n  <svg viewBox="0 0 200 604" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="icon bulk" fill="$stickerColor"\n      d="M 22.300781 0 C 10.000781 0 2.3684758e-15 10.000781 0 22.300781 L 0 177.69922 C 0 189.99922 10.000781 200 22.300781 200 L 177.69922 200 C 189.99922 200 200 189.99922 200 177.69922 L 200 22.300781 C 200 10.000781 189.99922 2.3684758e-15 177.69922 0 L 22.300781 0 z M 22.300781 5 L 177.69922 5 C 187.19922 5 195 12.800781 195 22.300781 L 195 177.69922 C 195 187.19922 187.19922 195 177.69922 195 L 22.300781 195 C 12.800781 195 5 187.19922 5 177.69922 L 5 22.300781 C 5 12.800781 12.800781 5 22.300781 5 z M 160.40039 29.800781 C 152.10039 29.800781 147.39922 32.000781 141.19922 36.300781 C 135.49922 40.300781 27.000391 120.79922 22.400391 124.19922 C 20.400391 125.69922 20 128.59961 21.5 130.59961 C 23 132.59961 25.900391 133 27.900391 131.5 C 29.100391 130.7 140.9 47.700781 146.5 43.800781 C 151.8 40.100781 154.5 38.900391 160.5 38.900391 L 173.90039 38.900391 C 176.50039 38.900391 178.5 36.800781 178.5 34.300781 C 178.5 31.700781 176.40078 29.700781 173.80078 29.800781 L 160.40039 29.800781 z M 145.30078 67.699219 L 145.30078 89.5 L 113.30078 89.5 L 113.30078 110.09961 L 83.599609 110.09961 L 83.599609 129.5 L 52.699219 129.5 L 52.699219 151.19922 L 21.800781 151.19922 L 21.800781 173 L 176.19922 173 L 176.19922 67.699219 L 145.30078 67.699219 z M 22.300781 202 C 10.000781 202 2.3684758e-15 212.00078 0 224.30078 L 0 379.69922 C 0 391.99922 10.000781 402 22.300781 402 L 177.69922 402 C 189.99922 402 200 391.99922 200 379.69922 L 200 224.30078 C 200 212.00078 189.99922 202 177.69922 202 L 22.300781 202 z M 22.300781 207 L 177.69922 207 C 187.19922 207 195 214.80078 195 224.30078 L 195 379.69922 C 195 389.19922 187.19922 397 177.69922 397 L 22.300781 397 C 12.800781 397 5 389.19922 5 379.69922 L 5 224.30078 C 5 214.80078 12.800781 207 22.300781 207 z M 59.199219 232.80078 C 52.899219 232.80078 47.800781 237.79961 47.800781 244.09961 C 47.800781 250.39961 52.799609 255.5 59.099609 255.5 L 59.199219 255.5 C 65.499219 255.5 70.5 250.39922 70.5 244.19922 C 70.5 237.89922 65.499219 232.80078 59.199219 232.80078 z M 103.69922 232.80078 C 100.69922 232.80078 98.199219 235.20078 98.199219 238.30078 L 98.199219 363.69922 C 98.199219 366.69922 100.59922 369.19922 103.69922 369.19922 C 106.69922 369.19922 109.19922 366.69922 109.19922 363.69922 L 109.19922 238.30078 C 109.19922 235.30078 106.79922 232.80078 103.69922 232.80078 z M 145.19922 232.80078 C 138.99922 232.80078 133.90039 237.79961 133.90039 244.09961 C 133.90039 250.29961 138.89922 255.40039 145.19922 255.40039 C 151.39922 255.50039 156.5 250.39961 156.5 244.09961 C 156.5 237.89961 151.39922 232.80078 145.19922 232.80078 z M 54 257.69922 C 45.8 257.69922 40.099219 262.20078 38.199219 267.80078 L 28.5 299.80078 C 26.4 306.70078 34.4 309.19922 36.5 302.69922 L 46.800781 273.40039 L 48 273.40039 C 48 273.40039 34.500391 325.80078 33.900391 327.80078 C 33.600391 328.80078 33.999609 329.5 35.099609 329.5 L 46.800781 329.5 L 46.800781 364 C 46.800781 371 57.300781 371 57.300781 364 L 57.300781 329.30078 L 61.300781 329.30078 L 61.300781 364 C 61.300781 371 71.800781 371 71.800781 364 L 71.800781 329.5 L 83.5 329.5 C 84.5 329.5 84.899219 328.80078 84.699219 327.80078 C 84.099219 325.80078 70.599609 273.40039 70.599609 273.40039 L 71.800781 273.40039 L 82.099609 302.69922 C 84.199609 309.09922 92.099609 306.70078 90.099609 299.80078 L 80.400391 267.80078 C 78.500391 262.20078 72.899609 257.69922 64.599609 257.69922 L 54 257.69922 z M 133 257.80078 C 122.1 257.70078 118.5 260.5 118.5 272.5 L 118.5 307.30078 C 118.5 314.10078 127.59961 314.10078 127.59961 307.30078 L 128.40039 275.5 L 130.69922 275.5 L 130.69922 362.69922 C 130.69922 371.69922 143.09961 371.49922 143.09961 362.69922 L 143.90039 312.09961 L 146.40039 312.09961 L 147.19922 362.69922 C 147.19922 371.49922 159.59961 371.69922 159.59961 362.69922 L 159.59961 275.5 L 162 275.5 L 162.80078 307.30078 C 162.80078 314.10078 171.90039 314.10078 171.90039 307.30078 L 171.90039 272.5 C 171.90039 260.6 168.30039 257.80078 157.40039 257.80078 L 133 257.80078 z M 22.300781 404 C 10.000781 404 0 414.00078 0 426.30078 L 0 581.69922 C 2.3684758e-15 593.99922 10.000781 604 22.300781 604 L 177.69922 604 C 189.99922 604 200 593.99922 200 581.69922 L 200 426.30078 C 200 414.00078 189.99922 404 177.69922 404 L 22.300781 404 z M 22.300781 409 L 177.69922 409 C 187.19922 409 195 416.80078 195 426.30078 L 195 581.69922 C 195 591.19922 187.19922 599 177.69922 599 L 22.300781 599 C 12.800781 599 5 591.19922 5 581.69922 L 5 426.30078 C 5 416.80078 12.800781 409 22.300781 409 z M 122.87305 438.80859 C 95.206616 438.86611 70.903516 450.13984 63.900391 461.69922 L 48.800781 461.69922 C 48.800781 457.39922 45.7 454 42 454 C 38.3 454 35.199219 457.39922 35.199219 461.69922 C 35.099219 464.59922 36.699219 467.29922 39.199219 468.69922 C 36.699219 469.89922 35.199219 472.50078 35.199219 475.30078 C 34.999219 479.10078 37.899219 482.3 41.699219 482.5 C 45.499219 482.7 48.700391 479.8 48.900391 476 L 48.900391 475.30078 L 63.900391 475.30078 C 71.000391 488.60078 97.499609 500.70039 138.59961 496.40039 C 145.29961 495.70039 150.80078 483.79922 150.80078 468.19922 C 150.70078 452.59922 145.2 441 138.5 440 C 133.23438 439.17188 127.99646 438.79794 122.87305 438.80859 z M 138.5 444.19922 C 144.2 444.19922 148.80078 454.89922 148.80078 468.19922 C 148.80078 481.49922 144.2 492.09922 138.5 492.19922 C 132.8 492.19922 128.19922 481.49922 128.19922 468.19922 C 128.19922 454.89922 132.8 444.19922 138.5 444.19922 z M 138.5 459.59961 C 136.5 459.59961 134.80078 463.39922 134.80078 468.19922 C 134.80078 472.89922 136.5 476.80078 138.5 476.80078 C 140.5 476.80078 142.19922 472.99922 142.19922 468.19922 C 142.19922 463.39922 140.5 459.59961 138.5 459.59961 z M 74.199219 513.5 C 48.199219 513.8 33.699219 540.30078 33.699219 540.30078 C 33.699219 540.30078 48.799609 568.90039 73.599609 568.90039 C 100.19961 568.90039 123.09961 552.19922 133.09961 543.69922 L 155.59961 563.69922 C 155.59961 563.69922 156.90039 552.8 151.90039 548 C 149.50039 545.6 147.00078 543.39922 144.30078 541.19922 C 146.90078 539.09922 149.50039 536.80039 151.90039 534.40039 C 156.90039 529.60039 155.59961 518.80078 155.59961 518.80078 L 135.40039 536.69922 C 125.80039 530.79922 95.799219 513.3 74.199219 513.5 z M 66.599609 521.90039 C 66.599609 521.90039 78.000391 521.80039 78.400391 539.90039 C 78.800391 558.00039 66.599609 560.1 66.599609 560 C 70.799609 554.1 73.200391 546.99922 73.400391 539.69922 C 73.700391 527.59922 66.599609 521.90039 66.599609 521.90039 z M 55.699219 530.80078 C 57.799219 530.80078 59.599609 533.00078 59.599609 535.80078 C 59.599609 538.60078 57.799219 540.90078 55.699219 540.80078 C 53.499219 540.80078 51.800781 538.60078 51.800781 535.80078 C 51.800781 533.00078 53.599219 530.80078 55.699219 530.80078 z"\n    />\n  </svg>\n'
   ),
-  Be.set(
+  Ie.set(
     's,l',
     '\n  <svg viewBox="0 0 200 402" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="icon bulk" fill="$stickerColor"\n      d="M 22.300781 0 C 10.000781 0 2.3684758e-15 10.000781 0 22.300781 L 0 177.69922 C 0 189.99922 10.000781 200 22.300781 200 L 177.69922 200 C 189.99922 200 200 189.99922 200 177.69922 L 200 22.300781 C 200 10.000781 189.99922 2.3684758e-15 177.69922 0 L 22.300781 0 z M 22.300781 5 L 177.69922 5 C 187.19922 5 195 12.800781 195 22.300781 L 195 177.69922 C 195 187.19922 187.19922 195 177.69922 195 L 22.300781 195 C 12.800781 195 5 187.19922 5 177.69922 L 5 22.300781 C 5 12.800781 12.800781 5 22.300781 5 z M 160.40039 29.800781 C 152.10039 29.800781 147.39922 32.000781 141.19922 36.300781 C 135.49922 40.300781 27.000391 120.79922 22.400391 124.19922 C 20.400391 125.69922 20 128.59961 21.5 130.59961 C 23 132.59961 25.900391 133 27.900391 131.5 C 29.100391 130.7 140.9 47.700781 146.5 43.800781 C 151.8 40.100781 154.5 38.900391 160.5 38.900391 L 173.90039 38.900391 C 176.50039 38.900391 178.5 36.800781 178.5 34.300781 C 178.5 31.700781 176.40078 29.700781 173.80078 29.800781 L 160.40039 29.800781 z M 145.30078 67.699219 L 145.30078 89.5 L 113.30078 89.5 L 113.30078 110.09961 L 83.599609 110.09961 L 83.599609 129.5 L 52.699219 129.5 L 52.699219 151.19922 L 21.800781 151.19922 L 21.800781 173 L 176.19922 173 L 176.19922 67.699219 L 145.30078 67.699219 z M 22.300781 202 C 10.000781 202 2.3684758e-15 212.00078 0 224.30078 L 0 379.69922 C 0 391.99922 10.000781 402 22.300781 402 L 177.69922 402 C 189.99922 402 200 391.99922 200 379.69922 L 200 224.30078 C 200 212.00078 189.99922 202 177.69922 202 L 22.300781 202 z M 22.300781 207 L 177.69922 207 C 187.19922 207 195 214.80078 195 224.30078 L 195 379.69922 C 195 389.19922 187.19922 397 177.69922 397 L 22.300781 397 C 12.800781 397 5 389.19922 5 379.69922 L 5 224.30078 C 5 214.80078 12.800781 207 22.300781 207 z M 59.199219 232.80078 C 52.899219 232.80078 47.800781 237.79961 47.800781 244.09961 C 47.800781 250.39961 52.799609 255.5 59.099609 255.5 L 59.199219 255.5 C 65.499219 255.5 70.5 250.39922 70.5 244.19922 C 70.5 237.89922 65.499219 232.80078 59.199219 232.80078 z M 103.69922 232.80078 C 100.69922 232.80078 98.199219 235.20078 98.199219 238.30078 L 98.199219 363.69922 C 98.199219 366.69922 100.59922 369.19922 103.69922 369.19922 C 106.69922 369.19922 109.19922 366.69922 109.19922 363.69922 L 109.19922 238.30078 C 109.19922 235.30078 106.79922 232.80078 103.69922 232.80078 z M 145.19922 232.80078 C 138.99922 232.80078 133.90039 237.79961 133.90039 244.09961 C 133.90039 250.29961 138.89922 255.40039 145.19922 255.40039 C 151.49922 255.50039 156.5 250.39961 156.5 244.09961 C 156.5 237.89961 151.39922 232.80078 145.19922 232.80078 z M 54 257.69922 C 45.8 257.69922 40.099219 262.20078 38.199219 267.80078 L 28.5 299.80078 C 26.4 306.70078 34.4 309.19922 36.5 302.69922 L 46.800781 273.40039 L 48 273.40039 C 48 273.40039 34.500391 325.80078 33.900391 327.80078 C 33.600391 328.80078 33.999609 329.5 35.099609 329.5 L 46.800781 329.5 L 46.800781 364 C 46.800781 371 57.300781 371 57.300781 364 L 57.300781 329.30078 L 61.300781 329.30078 L 61.300781 364 C 61.300781 371 71.800781 371 71.800781 364 L 71.800781 329.5 L 83.5 329.5 C 84.5 329.5 84.899219 328.80078 84.699219 327.80078 C 84.099219 325.80078 70.599609 273.40039 70.599609 273.40039 L 71.800781 273.40039 L 82.099609 302.69922 C 84.199609 309.09922 92.099609 306.70078 90.099609 299.80078 L 80.400391 267.80078 C 78.500391 262.20078 72.899609 257.69922 64.599609 257.69922 L 54 257.69922 z M 133 257.80078 C 122.1 257.70078 118.5 260.5 118.5 272.5 L 118.5 307.30078 C 118.5 314.10078 127.59961 314.10078 127.59961 307.30078 L 128.40039 275.5 L 130.69922 275.5 L 130.69922 362.69922 C 130.69922 371.69922 143.09961 371.49922 143.09961 362.69922 L 143.90039 312.09961 L 146.40039 312.09961 L 147.19922 362.69922 C 147.19922 371.49922 159.59961 371.69922 159.59961 362.69922 L 159.59961 275.5 L 162 275.5 L 162.80078 307.30078 C 162.80078 314.10078 171.90039 314.10078 171.90039 307.30078 L 171.90039 272.5 C 171.90039 260.6 168.30039 257.80078 157.40039 257.80078 L 133 257.80078 z "\n    />\n  </svg>\n'
   ),
-  Be.set(
+  Ie.set(
     's',
     '\n  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="icon bulk" fill="$stickerColor"\n      d="M177.7,0H22.3C10,0,0,10,0,22.3v155.4C0,190,10,200,22.3,200h155.4c12.3,0,22.3-10,22.3-22.3V22.3C200,10,190,0,177.7,0z M195,177.7c0,9.5-7.8,17.3-17.3,17.3H22.3C12.8,195,5,187.2,5,177.7V22.3C5,12.8,12.8,5,22.3,5h155.4c9.5,0,17.3,7.8,17.3,17.3 V177.7z M145.3,67.7h30.9V173H21.8v-21.8h30.9v-21.7h30.9v-19.4h29.7V89.5h32L145.3,67.7z M178.5,34.3c0,2.5-2,4.6-4.6,4.6 c0,0,0,0,0,0h-13.4c-6,0-8.7,1.2-14,4.9c-5.6,3.9-117.4,86.9-118.6,87.7c-2,1.5-4.9,1.1-6.4-0.9s-1.1-4.9,0.9-6.4 c4.6-3.4,113.1-83.9,118.8-87.9c6.2-4.3,10.9-6.5,19.2-6.5h13.4C176.4,29.7,178.5,31.7,178.5,34.3C178.5,34.2,178.5,34.3,178.5,34.3z"\n    />\n  </svg>\n'
   ),
-  Be.set(
+  Ie.set(
     'sg',
     '\n  <svg viewBox="0 0 402 200" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="icon bulk" fill="$stickerColor"\n      d="M 22.300781 0 C 10.000781 0 2.3684758e-15 10.000781 0 22.300781 L 0 177.69922 C 0 189.99922 10.000781 200 22.300781 200 L 177.69922 200 C 189.99922 200 200 189.99922 200 177.69922 L 200 22.300781 C 200 10.000781 189.99922 2.3684758e-15 177.69922 0 L 22.300781 0 z M 223.30078 0 C 211.00078 2.3684758e-15 201 10.000781 201 22.300781 L 201 177.69922 C 201 189.99922 211.00078 200 223.30078 200 L 378.69922 200 C 390.99922 200 401 189.99922 401 177.69922 L 401 22.300781 C 401 10.000781 390.99922 0 378.69922 0 L 223.30078 0 z M 22.300781 5 L 177.69922 5 C 187.19922 5 195 12.800781 195 22.300781 L 195 177.69922 C 195 187.19922 187.19922 195 177.69922 195 L 22.300781 195 C 12.800781 195 5 187.19922 5 177.69922 L 5 22.300781 C 5 12.800781 12.800781 5 22.300781 5 z M 223.30078 5 L 378.69922 5 C 388.19922 5 396 12.800781 396 22.300781 L 396 177.69922 C 396 187.19922 388.19922 195 378.69922 195 L 223.30078 195 C 213.80078 195 206 187.19922 206 177.69922 L 206 22.300781 C 206 12.800781 213.80078 5 223.30078 5 z M 160.40039 29.800781 C 152.10039 29.800781 147.39922 32.000781 141.19922 36.300781 C 135.49922 40.300781 27.000391 120.79922 22.400391 124.19922 C 20.400391 125.69922 20 128.59961 21.5 130.59961 C 23 132.59961 25.900391 133 27.900391 131.5 C 29.100391 130.7 140.9 47.700781 146.5 43.800781 C 151.8 40.100781 154.5 38.900391 160.5 38.900391 L 173.90039 38.900391 C 176.50039 38.900391 178.5 36.800781 178.5 34.300781 C 178.5 31.700781 176.40078 29.700781 173.80078 29.800781 L 160.40039 29.800781 z M 323.87305 34.808594 C 296.20662 34.866107 271.90352 46.139844 264.90039 57.699219 L 249.80078 57.699219 C 249.80078 53.399219 246.7 50 243 50 C 239.3 50 236.19922 53.399219 236.19922 57.699219 C 236.09922 60.599219 237.69922 63.299219 240.19922 64.699219 C 237.69922 65.899219 236.19922 68.500781 236.19922 71.300781 C 235.99922 75.100781 238.89922 78.3 242.69922 78.5 C 246.49922 78.7 249.70039 75.8 249.90039 72 L 249.90039 71.300781 L 264.90039 71.300781 C 272.00039 84.600781 298.49961 96.700391 339.59961 92.400391 C 346.29961 91.700391 351.80078 79.799219 351.80078 64.199219 C 351.80078 48.599219 346.2 37 339.5 36 C 334.23438 35.171875 328.99646 34.797943 323.87305 34.808594 z M 339.5 40.199219 C 345.2 40.199219 349.80078 50.899219 349.80078 64.199219 C 349.80078 77.499219 345.2 88.099219 339.5 88.199219 C 333.8 88.199219 329.19922 77.499219 329.19922 64.199219 C 329.19922 50.899219 333.8 40.199219 339.5 40.199219 z M 339.5 55.599609 C 337.5 55.599609 335.80078 59.499219 335.80078 64.199219 C 335.80078 68.899219 337.5 72.800781 339.5 72.800781 C 341.5 72.800781 343.19922 68.999219 343.19922 64.199219 C 343.19922 59.399219 341.5 55.599609 339.5 55.599609 z M 145.30078 67.699219 L 145.30078 89.5 L 113.30078 89.5 L 113.30078 110.09961 L 83.599609 110.09961 L 83.599609 129.5 L 52.699219 129.5 L 52.699219 151.19922 L 21.800781 151.19922 L 21.800781 173 L 176.19922 173 L 176.19922 67.699219 L 145.30078 67.699219 z M 275.19922 109.5 C 249.19922 109.8 234.69922 136.30078 234.69922 136.30078 C 234.69922 136.30078 249.79961 164.90039 274.59961 164.90039 C 301.19961 164.90039 324.09961 148.19922 334.09961 139.69922 L 356.59961 159.69922 C 356.59961 159.69922 357.90039 148.8 352.90039 144 C 350.50039 141.6 348.00078 139.39922 345.30078 137.19922 C 347.90078 135.09922 350.50039 132.80039 352.90039 130.40039 C 357.90039 125.60039 356.59961 114.80078 356.59961 114.80078 L 336.40039 132.69922 C 326.80039 126.79922 296.79922 109.3 275.19922 109.5 z M 267.59961 118 C 267.59961 118 279.00039 117.9 279.40039 136 C 279.80039 154.2 267.59961 156.09961 267.59961 156.09961 C 271.79961 150.19961 274.20039 143.10078 274.40039 135.80078 C 274.70039 123.70078 267.59961 118 267.59961 118 z M 256.59961 126.90039 C 258.79961 126.90039 260.5 129.10039 260.5 131.90039 C 260.5 134.70039 258.79961 136.90039 256.59961 136.90039 C 254.39961 136.90039 252.69922 134.70039 252.69922 131.90039 C 252.69922 129.10039 254.49961 126.90039 256.59961 126.90039 z"\n    />\n  </svg>\n'
   ),
-  Be.set(
+  Ie.set(
     'sl',
     '\n  <svg viewBox="0 0 402 200" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="icon bulk" fill="$stickerColor"\n      d="M 22.300781 0 C 10.000781 0 2.3684758e-15 10.000781 0 22.300781 L 0 177.69922 C 0 189.99922 10.000781 200 22.300781 200 L 177.69922 200 C 189.99922 200 200 189.99922 200 177.69922 L 200 22.300781 C 200 10.000781 189.99922 2.3684758e-15 177.69922 0 L 22.300781 0 z M 223.30078 0 C 211.00078 0 201 10.000781 201 22.300781 L 201 177.69922 C 201 189.99922 211.00078 200 223.30078 200 L 378.69922 200 C 390.99922 200 401 189.99922 401 177.69922 L 401 22.300781 C 401 10.000781 390.99922 2.3684758e-15 378.69922 0 L 223.30078 0 z M 22.300781 5 L 177.69922 5 C 187.19922 5 195 12.800781 195 22.300781 L 195 177.69922 C 195 187.19922 187.19922 195 177.69922 195 L 22.300781 195 C 12.800781 195 5 187.19922 5 177.69922 L 5 22.300781 C 5 12.800781 12.800781 5 22.300781 5 z M 223.30078 5 L 378.69922 5 C 388.19922 5 396 12.800781 396 22.300781 L 396 177.69922 C 396 187.19922 388.19922 195 378.69922 195 L 223.30078 195 C 213.80078 195 206 187.19922 206 177.69922 L 206 22.300781 C 206 12.800781 213.80078 5 223.30078 5 z M 160.40039 29.800781 C 152.10039 29.800781 147.39922 32.000781 141.19922 36.300781 C 135.49922 40.300781 27.000391 120.79922 22.400391 124.19922 C 20.400391 125.69922 20 128.59961 21.5 130.59961 C 23 132.59961 25.900391 133 27.900391 131.5 C 29.100391 130.7 140.9 47.700781 146.5 43.800781 C 151.8 40.100781 154.5 38.900391 160.5 38.900391 L 173.90039 38.900391 C 176.50039 38.900391 178.5 36.800781 178.5 34.300781 C 178.5 31.700781 176.40078 29.700781 173.80078 29.800781 L 160.40039 29.800781 z M 260.19922 30.800781 C 253.89922 30.800781 248.80078 35.799609 248.80078 42.099609 C 248.80078 48.399609 253.79961 53.5 260.09961 53.5 L 260.19922 53.5 C 266.49922 53.5 271.5 48.399219 271.5 42.199219 C 271.5 35.899219 266.49922 30.800781 260.19922 30.800781 z M 304.69922 30.800781 C 301.69922 30.800781 299.19922 33.200781 299.19922 36.300781 L 299.19922 161.69922 C 299.19922 164.69922 301.59922 167.19922 304.69922 167.19922 C 307.69922 167.19922 310.19922 164.69922 310.19922 161.69922 L 310.19922 36.300781 C 310.19922 33.300781 307.79922 30.800781 304.69922 30.800781 z M 346.30078 30.900391 C 340.00078 30.900391 334.90039 35.899219 334.90039 42.199219 C 334.90039 48.399219 339.89922 53.5 346.19922 53.5 C 352.49922 53.5 357.49961 48.399219 357.59961 42.199219 C 357.59961 35.999219 352.50078 30.900391 346.30078 30.900391 z M 255 55.699219 C 246.8 55.699219 241.09922 60.200781 239.19922 65.800781 L 229.5 97.800781 C 227.4 104.70078 235.4 107.19922 237.5 100.69922 L 247.80078 71.400391 L 249 71.400391 C 249 71.400391 235.50039 123.80078 234.90039 125.80078 C 234.60039 126.80078 234.99961 127.5 236.09961 127.5 L 247.80078 127.5 L 247.80078 162 C 247.80078 169 258.30078 169 258.30078 162 L 258.30078 127.30078 L 262.30078 127.30078 L 262.30078 162 C 262.30078 169 272.80078 169 272.80078 162 L 272.80078 127.5 L 284.5 127.5 C 285.5 127.5 285.89922 126.80078 285.69922 125.80078 C 285.09922 123.80078 271.59961 71.400391 271.59961 71.400391 L 272.80078 71.400391 L 283.09961 100.69922 C 285.19961 107.09922 293.09961 104.70078 291.09961 97.800781 L 281.40039 65.800781 C 279.50039 60.100781 273.89961 55.699219 265.59961 55.699219 L 255 55.699219 z M 334 55.699219 C 323.1 55.699219 319.5 58.500391 319.5 70.400391 L 319.5 105.19922 C 319.5 111.99922 328.59961 111.99922 328.59961 105.19922 L 329.40039 73.400391 L 331.69922 73.400391 L 331.69922 160.59961 C 331.69922 169.59961 344.09961 169.39961 344.09961 160.59961 L 345 110 L 347.5 110 L 348.30078 160.59961 C 348.30078 169.39961 360.69922 169.59961 360.69922 160.59961 L 360.69922 73.400391 L 363.09961 73.400391 L 363.90039 105.19922 C 363.90039 111.99922 373 111.99922 373 105.19922 L 373 70.400391 C 373 58.500391 369.4 55.699219 358.5 55.699219 L 334 55.699219 z M 145.30078 67.699219 L 145.30078 89.5 L 113.30078 89.5 L 113.30078 110.09961 L 83.599609 110.09961 L 83.599609 129.5 L 52.699219 129.5 L 52.699219 151.19922 L 21.800781 151.19922 L 21.800781 173 L 176.19922 173 L 176.19922 67.699219 L 145.30078 67.699219 z"\n    />\n  </svg>\n'
   ),
-  Be.set(
+  Ie.set(
     'u',
     '\n  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="icon bulk" fill="$stickerColor"\n      d="M177.69,0H22.31A22.34,22.34,0,0,0,0,22.31V177.69A22.34,22.34,0,0,0,22.31,200H177.69A22.34,22.34,0,0,0,200,177.69V22.31A22.34,22.34,0,0,0,177.69,0ZM195,177.69A17.37,17.37,0,0,1,177.69,195H22.31A17.37,17.37,0,0,1,5,177.69V22.31A17.37,17.37,0,0,1,22.31,5H177.69A17.37,17.37,0,0,1,195,22.31ZM145.32,67.74h30.89V173H21.77V151.25H52.66V129.51H83.55V110.07h29.74V89.48h32ZM28.21,63.16H17.63L35.36,36.85,53.09,63.16H42.51V82.61H28.21ZM178.5,34.28a4.57,4.57,0,0,1-4.58,4.58H160.48c-6,0-8.72,1.22-14,4.89-5.6,3.92-117.45,86.89-118.58,87.72a4.57,4.57,0,1,1-5.45-7.35c4.61-3.42,113.08-83.88,118.79-87.88,6.2-4.34,10.88-6.55,19.21-6.55h13.44A4.57,4.57,0,0,1,178.5,34.28Z"\n    />\n  </svg>\n'
   ),
-  Be.set(
+  Ie.set(
     'upstairs',
     '\n  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">\n    <path\n      class="icon bulk" fill="$stickerColor"\n      d="M177.69,0H22.31A22.34,22.34,0,0,0,0,22.31V177.69A22.34,22.34,0,0,0,22.31,200H177.69A22.34,22.34,0,0,0,200,177.69V22.31A22.34,22.34,0,0,0,177.69,0ZM195,177.69A17.37,17.37,0,0,1,177.69,195H22.31A17.37,17.37,0,0,1,5,177.69V22.31A17.37,17.37,0,0,1,22.31,5H177.69A17.37,17.37,0,0,1,195,22.31ZM145.32,67.74h30.89V173H21.77V151.25H52.66V129.51H83.55V110.07h29.74V89.48h32ZM28.21,63.16H17.63L35.36,36.85,53.09,63.16H42.51V82.61H28.21ZM178.5,34.28a4.57,4.57,0,0,1-4.58,4.58H160.48c-6,0-8.72,1.22-14,4.89-5.6,3.92-117.45,86.89-118.58,87.72a4.57,4.57,0,1,1-5.45-7.35c4.61-3.42,113.08-83.88,118.79-87.88,6.2-4.34,10.88-6.55,19.21-6.55h13.44A4.57,4.57,0,0,1,178.5,34.28Z"\n    />\n  </svg>\n'
   );
 /*! @license DOMPurify 3.2.4 | (c) Cure53 and other contributors | Released under the Apache license 2.0 and Mozilla Public License 2.0 | github.com/cure53/DOMPurify/blob/3.2.4/LICENSE */
-const { entries: Ne, setPrototypeOf: We, isFrozen: Pe, getPrototypeOf: De, getOwnPropertyDescriptor: Re } = Object;
-let { freeze: je, seal: Fe, create: Ze } = Object,
+const { entries: We, setPrototypeOf: Pe, isFrozen: Re, getPrototypeOf: Ne, getOwnPropertyDescriptor: De } = Object;
+let { freeze: Fe, seal: je, create: Ze } = Object,
   { apply: Ue, construct: Ge } = 'undefined' != typeof Reflect && Reflect;
-je ||
-  (je = function (e) {
+Fe ||
+  (Fe = function (e) {
     return e;
   }),
-  Fe ||
-    (Fe = function (e) {
+  je ||
+    (je = function (e) {
       return e;
     }),
   Ue ||
@@ -1719,9 +1717,9 @@ je ||
       return new e(...t);
     });
 const Ke = ct(Array.prototype.forEach),
-  Je = ct(Array.prototype.lastIndexOf),
-  qe = ct(Array.prototype.pop),
-  Ye = ct(Array.prototype.push),
+  qe = ct(Array.prototype.lastIndexOf),
+  Ye = ct(Array.prototype.pop),
+  Je = ct(Array.prototype.push),
   Xe = ct(Array.prototype.splice),
   Qe = ct(String.prototype.toLowerCase),
   et = ct(String.prototype.toString),
@@ -1746,13 +1744,13 @@ function ct(e) {
 }
 function dt(e, t) {
   let r = arguments.length > 2 && void 0 !== arguments[2] ? arguments[2] : Qe;
-  We && We(e, null);
+  Pe && Pe(e, null);
   let l = t.length;
   for (; l--; ) {
     let i = t[l];
     if ('string' == typeof i) {
       const e = r(i);
-      e !== i && (Pe(t) || (t[l] = e), (i = e));
+      e !== i && (Re(t) || (t[l] = e), (i = e));
     }
     e[i] = !0;
   }
@@ -1766,7 +1764,7 @@ function ht(e) {
 }
 function gt(e) {
   const t = Ze(null);
-  for (const [r, l] of Ne(e)) {
+  for (const [r, l] of We(e)) {
     ot(e, r) &&
       (Array.isArray(l)
         ? (t[r] = ht(l))
@@ -1778,18 +1776,18 @@ function gt(e) {
 }
 function pt(e, t) {
   for (; null !== e; ) {
-    const r = Re(e, t);
+    const r = De(e, t);
     if (r) {
       if (r.get) return ct(r.get);
       if ('function' == typeof r.value) return ct(r.value);
     }
-    e = De(e);
+    e = Ne(e);
   }
   return function () {
     return null;
   };
 }
-const mt = je([
+const mt = Fe([
     'a',
     'abbr',
     'acronym',
@@ -1908,7 +1906,7 @@ const mt = je([
     'video',
     'wbr',
   ]),
-  Ct = je([
+  Ct = Fe([
     'svg',
     'a',
     'altglyph',
@@ -1953,7 +1951,7 @@ const mt = je([
     'view',
     'vkern',
   ]),
-  ut = je([
+  ut = Fe([
     'feBlend',
     'feColorMatrix',
     'feComponentTransfer',
@@ -1980,7 +1978,7 @@ const mt = je([
     'feTile',
     'feTurbulence',
   ]),
-  ft = je([
+  ft = Fe([
     'animate',
     'color-profile',
     'cursor',
@@ -2004,7 +2002,7 @@ const mt = je([
     'unknown',
     'use',
   ]),
-  kt = je([
+  kt = Fe([
     'math',
     'menclose',
     'merror',
@@ -2036,7 +2034,7 @@ const mt = je([
     'munderover',
     'mprescripts',
   ]),
-  vt = je([
+  vt = Fe([
     'maction',
     'maligngroup',
     'malignmark',
@@ -2053,8 +2051,8 @@ const mt = je([
     'mprescripts',
     'none',
   ]),
-  wt = je(['#text']),
-  bt = je([
+  wt = Fe(['#text']),
+  Lt = Fe([
     'accept',
     'action',
     'align',
@@ -2169,7 +2167,7 @@ const mt = je([
     'xmlns',
     'slot',
   ]),
-  Lt = je([
+  bt = Fe([
     'accent-height',
     'accumulate',
     'additive',
@@ -2358,7 +2356,7 @@ const mt = je([
     'z',
     'zoomandpan',
   ]),
-  xt = je([
+  xt = Fe([
     'accent',
     'accentunder',
     'align',
@@ -2413,42 +2411,42 @@ const mt = je([
     'width',
     'xmlns',
   ]),
-  Mt = je(['xlink:href', 'xml:id', 'xlink:title', 'xml:space', 'xmlns:xlink']),
-  yt = Fe(/\{\{[\w\W]*|[\w\W]*\}\}/gm),
-  zt = Fe(/<%[\w\W]*|[\w\W]*%>/gm),
-  St = Fe(/\$\{[\w\W]*/gm),
-  Tt = Fe(/^data-[\-\w.\u00B7-\uFFFF]+$/),
-  Et = Fe(/^aria-[\-\w]+$/),
-  Ht = Fe(/^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i),
-  At = Fe(/^(?:\w+script|data):/i),
-  _t = Fe(/[\u0000-\u0020\u00A0\u1680\u180E\u2000-\u2029\u205F\u3000]/g),
-  $t = Fe(/^html$/i),
-  Vt = Fe(/^[a-z][.\w]*(-[.\w]+)+$/i);
+  Mt = Fe(['xlink:href', 'xml:id', 'xlink:title', 'xml:space', 'xmlns:xlink']),
+  zt = je(/\{\{[\w\W]*|[\w\W]*\}\}/gm),
+  yt = je(/<%[\w\W]*|[\w\W]*%>/gm),
+  St = je(/\$\{[\w\W]*/gm),
+  Tt = je(/^data-[\-\w.\u00B7-\uFFFF]+$/),
+  Et = je(/^aria-[\-\w]+$/),
+  Ht = je(/^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i),
+  _t = je(/^(?:\w+script|data):/i),
+  $t = je(/[\u0000-\u0020\u00A0\u1680\u180E\u2000-\u2029\u205F\u3000]/g),
+  At = je(/^html$/i),
+  Vt = je(/^[a-z][.\w]*(-[.\w]+)+$/i);
 var Ot = Object.freeze({
   __proto__: null,
   ARIA_ATTR: Et,
-  ATTR_WHITESPACE: _t,
+  ATTR_WHITESPACE: $t,
   CUSTOM_ELEMENT: Vt,
   DATA_ATTR: Tt,
-  DOCTYPE_NAME: $t,
-  ERB_EXPR: zt,
+  DOCTYPE_NAME: At,
+  ERB_EXPR: yt,
   IS_ALLOWED_URI: Ht,
-  IS_SCRIPT_OR_DATA: At,
-  MUSTACHE_EXPR: yt,
+  IS_SCRIPT_OR_DATA: _t,
+  MUSTACHE_EXPR: zt,
   TMPLIT_EXPR: St,
 });
-const It = 1,
-  Bt = 3,
-  Nt = 7,
-  Wt = 8,
-  Pt = 9,
-  Dt = function () {
+const Bt = 1,
+  It = 3,
+  Wt = 7,
+  Pt = 8,
+  Rt = 9,
+  Nt = function () {
     return 'undefined' == typeof window ? null : window;
   };
-var Rt = (function e() {
-  let t = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : Dt();
+var Dt = (function e() {
+  let t = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : Nt();
   const r = t => e(t);
-  if (((r.version = '3.2.4'), (r.removed = []), !t || !t.document || t.document.nodeType !== Pt || !t.Element))
+  if (((r.version = '3.2.4'), (r.removed = []), !t || !t.document || t.document.nodeType !== Rt || !t.Element))
     return (r.isSupported = !1), r;
   let { document: l } = t;
   const i = l,
@@ -2474,9 +2472,9 @@ var Rt = (function e() {
     const e = l.createElement('template');
     e.content && e.content.ownerDocument && (l = e.content.ownerDocument);
   }
-  let b,
-    L = '';
-  const { implementation: x, createNodeIterator: M, createDocumentFragment: y, getElementsByTagName: z } = l,
+  let L,
+    b = '';
+  const { implementation: x, createNodeIterator: M, createDocumentFragment: z, getElementsByTagName: y } = l,
     { importNode: S } = i;
   let T = {
     afterSanitizeAttributes: [],
@@ -2489,38 +2487,38 @@ var Rt = (function e() {
     uponSanitizeElement: [],
     uponSanitizeShadowNode: [],
   };
-  r.isSupported = 'function' == typeof Ne && 'function' == typeof w && x && void 0 !== x.createHTMLDocument;
+  r.isSupported = 'function' == typeof We && 'function' == typeof w && x && void 0 !== x.createHTMLDocument;
   const {
     MUSTACHE_EXPR: E,
     ERB_EXPR: H,
-    TMPLIT_EXPR: A,
-    DATA_ATTR: _,
-    ARIA_ATTR: $,
+    TMPLIT_EXPR: _,
+    DATA_ATTR: $,
+    ARIA_ATTR: A,
     IS_SCRIPT_OR_DATA: V,
     ATTR_WHITESPACE: O,
-    CUSTOM_ELEMENT: I,
+    CUSTOM_ELEMENT: B,
   } = Ot;
-  let { IS_ALLOWED_URI: B } = Ot,
-    N = null;
-  const W = dt({}, [...mt, ...Ct, ...ut, ...kt, ...wt]);
-  let P = null;
-  const D = dt({}, [...bt, ...Lt, ...xt, ...Mt]);
-  let R = Object.seal(
+  let { IS_ALLOWED_URI: I } = Ot,
+    W = null;
+  const P = dt({}, [...mt, ...Ct, ...ut, ...kt, ...wt]);
+  let R = null;
+  const N = dt({}, [...Lt, ...bt, ...xt, ...Mt]);
+  let D = Object.seal(
       Ze(null, {
         tagNameCheck: { writable: !0, configurable: !1, enumerable: !0, value: null },
         attributeNameCheck: { writable: !0, configurable: !1, enumerable: !0, value: null },
         allowCustomizedBuiltInElements: { writable: !0, configurable: !1, enumerable: !0, value: !1 },
       })
     ),
-    j = null,
     F = null,
+    j = null,
     Z = !0,
     U = !0,
     G = !1,
     K = !0,
+    q = !1,
+    Y = !0,
     J = !1,
-    q = !0,
-    Y = !1,
     X = !1,
     Q = !1,
     ee = !1,
@@ -2585,12 +2583,12 @@ var Rt = (function e() {
     ke = !1,
     ve = null;
   const we = dt({}, [me, Ce, ue], et);
-  let be = dt({}, ['mi', 'mo', 'mn', 'ms', 'mtext']),
-    Le = dt({}, ['annotation-xml']);
+  let Le = dt({}, ['mi', 'mo', 'mn', 'ms', 'mtext']),
+    be = dt({}, ['annotation-xml']);
   const xe = dt({}, ['title', 'style', 'font', 'a', 'script']);
   let Me = null;
-  const ye = ['application/xhtml+xml', 'text/html'];
-  let ze = null,
+  const ze = ['application/xhtml+xml', 'text/html'];
+  let ye = null,
     Se = null;
   const Te = l.createElement('form'),
     Ee = function (e) {
@@ -2602,24 +2600,24 @@ var Rt = (function e() {
         if (
           ((e && 'object' == typeof e) || (e = {}),
           (e = gt(e)),
-          (Me = -1 === ye.indexOf(e.PARSER_MEDIA_TYPE) ? 'text/html' : e.PARSER_MEDIA_TYPE),
-          (ze = 'application/xhtml+xml' === Me ? et : Qe),
-          (N = ot(e, 'ALLOWED_TAGS') ? dt({}, e.ALLOWED_TAGS, ze) : W),
-          (P = ot(e, 'ALLOWED_ATTR') ? dt({}, e.ALLOWED_ATTR, ze) : D),
+          (Me = -1 === ze.indexOf(e.PARSER_MEDIA_TYPE) ? 'text/html' : e.PARSER_MEDIA_TYPE),
+          (ye = 'application/xhtml+xml' === Me ? et : Qe),
+          (W = ot(e, 'ALLOWED_TAGS') ? dt({}, e.ALLOWED_TAGS, ye) : P),
+          (R = ot(e, 'ALLOWED_ATTR') ? dt({}, e.ALLOWED_ATTR, ye) : N),
           (ve = ot(e, 'ALLOWED_NAMESPACES') ? dt({}, e.ALLOWED_NAMESPACES, et) : we),
-          (ge = ot(e, 'ADD_URI_SAFE_ATTR') ? dt(gt(pe), e.ADD_URI_SAFE_ATTR, ze) : pe),
-          (de = ot(e, 'ADD_DATA_URI_TAGS') ? dt(gt(he), e.ADD_DATA_URI_TAGS, ze) : he),
-          (ne = ot(e, 'FORBID_CONTENTS') ? dt({}, e.FORBID_CONTENTS, ze) : ce),
-          (j = ot(e, 'FORBID_TAGS') ? dt({}, e.FORBID_TAGS, ze) : {}),
-          (F = ot(e, 'FORBID_ATTR') ? dt({}, e.FORBID_ATTR, ze) : {}),
+          (ge = ot(e, 'ADD_URI_SAFE_ATTR') ? dt(gt(pe), e.ADD_URI_SAFE_ATTR, ye) : pe),
+          (de = ot(e, 'ADD_DATA_URI_TAGS') ? dt(gt(he), e.ADD_DATA_URI_TAGS, ye) : he),
+          (ne = ot(e, 'FORBID_CONTENTS') ? dt({}, e.FORBID_CONTENTS, ye) : ce),
+          (F = ot(e, 'FORBID_TAGS') ? dt({}, e.FORBID_TAGS, ye) : {}),
+          (j = ot(e, 'FORBID_ATTR') ? dt({}, e.FORBID_ATTR, ye) : {}),
           (ae = !!ot(e, 'USE_PROFILES') && e.USE_PROFILES),
           (Z = !1 !== e.ALLOW_ARIA_ATTR),
           (U = !1 !== e.ALLOW_DATA_ATTR),
           (G = e.ALLOW_UNKNOWN_PROTOCOLS || !1),
           (K = !1 !== e.ALLOW_SELF_CLOSE_IN_ATTR),
-          (J = e.SAFE_FOR_TEMPLATES || !1),
-          (q = !1 !== e.SAFE_FOR_XML),
-          (Y = e.WHOLE_DOCUMENT || !1),
+          (q = e.SAFE_FOR_TEMPLATES || !1),
+          (Y = !1 !== e.SAFE_FOR_XML),
+          (J = e.WHOLE_DOCUMENT || !1),
           (ee = e.RETURN_DOM || !1),
           (te = e.RETURN_DOM_FRAGMENT || !1),
           (re = e.RETURN_TRUSTED_TYPE || !1),
@@ -2628,46 +2626,46 @@ var Rt = (function e() {
           (ie = e.SANITIZE_NAMED_PROPS || !1),
           (oe = !1 !== e.KEEP_CONTENT),
           (se = e.IN_PLACE || !1),
-          (B = e.ALLOWED_URI_REGEXP || Ht),
+          (I = e.ALLOWED_URI_REGEXP || Ht),
           (fe = e.NAMESPACE || ue),
-          (be = e.MATHML_TEXT_INTEGRATION_POINTS || be),
-          (Le = e.HTML_INTEGRATION_POINTS || Le),
-          (R = e.CUSTOM_ELEMENT_HANDLING || {}),
+          (Le = e.MATHML_TEXT_INTEGRATION_POINTS || Le),
+          (be = e.HTML_INTEGRATION_POINTS || be),
+          (D = e.CUSTOM_ELEMENT_HANDLING || {}),
           e.CUSTOM_ELEMENT_HANDLING &&
             Ee(e.CUSTOM_ELEMENT_HANDLING.tagNameCheck) &&
-            (R.tagNameCheck = e.CUSTOM_ELEMENT_HANDLING.tagNameCheck),
+            (D.tagNameCheck = e.CUSTOM_ELEMENT_HANDLING.tagNameCheck),
           e.CUSTOM_ELEMENT_HANDLING &&
             Ee(e.CUSTOM_ELEMENT_HANDLING.attributeNameCheck) &&
-            (R.attributeNameCheck = e.CUSTOM_ELEMENT_HANDLING.attributeNameCheck),
+            (D.attributeNameCheck = e.CUSTOM_ELEMENT_HANDLING.attributeNameCheck),
           e.CUSTOM_ELEMENT_HANDLING &&
             'boolean' == typeof e.CUSTOM_ELEMENT_HANDLING.allowCustomizedBuiltInElements &&
-            (R.allowCustomizedBuiltInElements = e.CUSTOM_ELEMENT_HANDLING.allowCustomizedBuiltInElements),
-          J && (U = !1),
+            (D.allowCustomizedBuiltInElements = e.CUSTOM_ELEMENT_HANDLING.allowCustomizedBuiltInElements),
+          q && (U = !1),
           te && (ee = !0),
           ae &&
-            ((N = dt({}, wt)),
-            (P = []),
-            !0 === ae.html && (dt(N, mt), dt(P, bt)),
-            !0 === ae.svg && (dt(N, Ct), dt(P, Lt), dt(P, Mt)),
-            !0 === ae.svgFilters && (dt(N, ut), dt(P, Lt), dt(P, Mt)),
-            !0 === ae.mathMl && (dt(N, kt), dt(P, xt), dt(P, Mt))),
-          e.ADD_TAGS && (N === W && (N = gt(N)), dt(N, e.ADD_TAGS, ze)),
-          e.ADD_ATTR && (P === D && (P = gt(P)), dt(P, e.ADD_ATTR, ze)),
-          e.ADD_URI_SAFE_ATTR && dt(ge, e.ADD_URI_SAFE_ATTR, ze),
-          e.FORBID_CONTENTS && (ne === ce && (ne = gt(ne)), dt(ne, e.FORBID_CONTENTS, ze)),
-          oe && (N['#text'] = !0),
-          Y && dt(N, ['html', 'head', 'body']),
-          N.table && (dt(N, ['tbody']), delete j.tbody),
+            ((W = dt({}, wt)),
+            (R = []),
+            !0 === ae.html && (dt(W, mt), dt(R, Lt)),
+            !0 === ae.svg && (dt(W, Ct), dt(R, bt), dt(R, Mt)),
+            !0 === ae.svgFilters && (dt(W, ut), dt(R, bt), dt(R, Mt)),
+            !0 === ae.mathMl && (dt(W, kt), dt(R, xt), dt(R, Mt))),
+          e.ADD_TAGS && (W === P && (W = gt(W)), dt(W, e.ADD_TAGS, ye)),
+          e.ADD_ATTR && (R === N && (R = gt(R)), dt(R, e.ADD_ATTR, ye)),
+          e.ADD_URI_SAFE_ATTR && dt(ge, e.ADD_URI_SAFE_ATTR, ye),
+          e.FORBID_CONTENTS && (ne === ce && (ne = gt(ne)), dt(ne, e.FORBID_CONTENTS, ye)),
+          oe && (W['#text'] = !0),
+          J && dt(W, ['html', 'head', 'body']),
+          W.table && (dt(W, ['tbody']), delete F.tbody),
           e.TRUSTED_TYPES_POLICY)
         ) {
           if ('function' != typeof e.TRUSTED_TYPES_POLICY.createHTML)
             throw at('TRUSTED_TYPES_POLICY configuration option must provide a "createHTML" hook.');
           if ('function' != typeof e.TRUSTED_TYPES_POLICY.createScriptURL)
             throw at('TRUSTED_TYPES_POLICY configuration option must provide a "createScriptURL" hook.');
-          (b = e.TRUSTED_TYPES_POLICY), (L = b.createHTML(''));
+          (L = e.TRUSTED_TYPES_POLICY), (b = L.createHTML(''));
         } else
-          void 0 === b &&
-            (b = (function (e, t) {
+          void 0 === L &&
+            (L = (function (e, t) {
               if ('object' != typeof e || 'function' != typeof e.createPolicy) return null;
               let r = null;
               const l = 'data-tt-policy-suffix';
@@ -2679,14 +2677,14 @@ var Rt = (function e() {
                 return console.warn('TrustedTypes policy ' + i + ' could not be created.'), null;
               }
             })(m, o)),
-            null !== b && 'string' == typeof L && (L = b.createHTML(''));
-        je && je(e), (Se = e);
+            null !== L && 'string' == typeof b && (b = L.createHTML(''));
+        Fe && Fe(e), (Se = e);
       }
     },
-    Ae = dt({}, [...Ct, ...ut, ...ft]),
-    _e = dt({}, [...kt, ...vt]),
-    $e = function (e) {
-      Ye(r.removed, { element: e });
+    _e = dt({}, [...Ct, ...ut, ...ft]),
+    $e = dt({}, [...kt, ...vt]),
+    Ae = function (e) {
+      Je(r.removed, { element: e });
       try {
         w(e).removeChild(e);
       } catch (t) {
@@ -2695,14 +2693,14 @@ var Rt = (function e() {
     },
     Ve = function (e, t) {
       try {
-        Ye(r.removed, { attribute: t.getAttributeNode(e), from: t });
+        Je(r.removed, { attribute: t.getAttributeNode(e), from: t });
       } catch (e) {
-        Ye(r.removed, { attribute: null, from: t });
+        Je(r.removed, { attribute: null, from: t });
       }
       if ((t.removeAttribute(e), 'is' === e))
         if (ee || te)
           try {
-            $e(t);
+            Ae(t);
           } catch (e) {}
         else
           try {
@@ -2720,7 +2718,7 @@ var Rt = (function e() {
       'application/xhtml+xml' === Me &&
         fe === ue &&
         (e = '<html xmlns="http://www.w3.org/1999/xhtml"><head></head><body>' + e + '</body></html>');
-      const i = b ? b.createHTML(e) : e;
+      const i = L ? L.createHTML(e) : e;
       if (fe === ue)
         try {
           t = new p().parseFromString(i, Me);
@@ -2728,16 +2726,16 @@ var Rt = (function e() {
       if (!t || !t.documentElement) {
         t = x.createDocument(fe, 'template', null);
         try {
-          t.documentElement.innerHTML = ke ? L : i;
+          t.documentElement.innerHTML = ke ? b : i;
         } catch (e) {}
       }
       const o = t.body || t.documentElement;
       return (
         e && r && o.insertBefore(l.createTextNode(r), o.childNodes[0] || null),
-        fe === ue ? z.call(t, Y ? 'html' : 'body')[0] : Y ? t.documentElement : o
+        fe === ue ? y.call(t, J ? 'html' : 'body')[0] : J ? t.documentElement : o
       );
     },
-    Ie = function (e) {
+    Be = function (e) {
       return M.call(
         e.ownerDocument || e,
         e,
@@ -2745,7 +2743,7 @@ var Rt = (function e() {
         null
       );
     },
-    Be = function (e) {
+    Ie = function (e) {
       return (
         e instanceof g &&
         ('string' != typeof e.nodeName ||
@@ -2759,29 +2757,29 @@ var Rt = (function e() {
           'function' != typeof e.hasChildNodes)
       );
     },
-    We = function (e) {
+    Pe = function (e) {
       return 'function' == typeof n && e instanceof n;
     };
-  function Pe(e, t, l) {
+  function Re(e, t, l) {
     Ke(e, e => {
       e.call(r, t, l, Se);
     });
   }
-  const De = function (e) {
+  const Ne = function (e) {
       let t = null;
-      if ((Pe(T.beforeSanitizeElements, e, null), Be(e))) return $e(e), !0;
-      const l = ze(e.nodeName);
+      if ((Re(T.beforeSanitizeElements, e, null), Ie(e))) return Ae(e), !0;
+      const l = ye(e.nodeName);
       if (
-        (Pe(T.uponSanitizeElement, e, { tagName: l, allowedTags: N }),
-        e.hasChildNodes() && !We(e.firstElementChild) && st(/<[/\w]/g, e.innerHTML) && st(/<[/\w]/g, e.textContent))
+        (Re(T.uponSanitizeElement, e, { tagName: l, allowedTags: W }),
+        e.hasChildNodes() && !Pe(e.firstElementChild) && st(/<[/\w]/g, e.innerHTML) && st(/<[/\w]/g, e.textContent))
       )
-        return $e(e), !0;
-      if (e.nodeType === Nt) return $e(e), !0;
-      if (q && e.nodeType === Wt && st(/<[/\w]/g, e.data)) return $e(e), !0;
-      if (!N[l] || j[l]) {
-        if (!j[l] && Fe(l)) {
-          if (R.tagNameCheck instanceof RegExp && st(R.tagNameCheck, l)) return !1;
-          if (R.tagNameCheck instanceof Function && R.tagNameCheck(l)) return !1;
+        return Ae(e), !0;
+      if (e.nodeType === Wt) return Ae(e), !0;
+      if (Y && e.nodeType === Pt && st(/<[/\w]/g, e.data)) return Ae(e), !0;
+      if (!W[l] || F[l]) {
+        if (!F[l] && je(l)) {
+          if (D.tagNameCheck instanceof RegExp && st(D.tagNameCheck, l)) return !1;
+          if (D.tagNameCheck instanceof Function && D.tagNameCheck(l)) return !1;
         }
         if (oe && !ne[l]) {
           const t = w(e) || e.parentNode,
@@ -2793,7 +2791,7 @@ var Rt = (function e() {
             }
           }
         }
-        return $e(e), !0;
+        return Ae(e), !0;
       }
       return e instanceof c &&
         !(function (e) {
@@ -2807,53 +2805,53 @@ var Rt = (function e() {
               ? t.namespaceURI === ue
                 ? 'svg' === r
                 : t.namespaceURI === me
-                ? 'svg' === r && ('annotation-xml' === l || be[l])
-                : Boolean(Ae[r])
+                ? 'svg' === r && ('annotation-xml' === l || Le[l])
+                : Boolean(_e[r])
               : e.namespaceURI === me
               ? t.namespaceURI === ue
                 ? 'math' === r
                 : t.namespaceURI === Ce
-                ? 'math' === r && Le[l]
-                : Boolean(_e[r])
+                ? 'math' === r && be[l]
+                : Boolean($e[r])
               : e.namespaceURI === ue
-              ? !(t.namespaceURI === Ce && !Le[l]) && !(t.namespaceURI === me && !be[l]) && !_e[r] && (xe[r] || !Ae[r])
+              ? !(t.namespaceURI === Ce && !be[l]) && !(t.namespaceURI === me && !Le[l]) && !$e[r] && (xe[r] || !_e[r])
               : !('application/xhtml+xml' !== Me || !ve[e.namespaceURI]))
           );
         })(e)
-        ? ($e(e), !0)
+        ? (Ae(e), !0)
         : ('noscript' !== l && 'noembed' !== l && 'noframes' !== l) || !st(/<\/no(script|embed|frames)/i, e.innerHTML)
-        ? (J &&
-            e.nodeType === Bt &&
+        ? (q &&
+            e.nodeType === It &&
             ((t = e.textContent),
-            Ke([E, H, A], e => {
+            Ke([E, H, _], e => {
               t = rt(t, e, ' ');
             }),
-            e.textContent !== t && (Ye(r.removed, { element: e.cloneNode() }), (e.textContent = t))),
-          Pe(T.afterSanitizeElements, e, null),
+            e.textContent !== t && (Je(r.removed, { element: e.cloneNode() }), (e.textContent = t))),
+          Re(T.afterSanitizeElements, e, null),
           !1)
-        : ($e(e), !0);
+        : (Ae(e), !0);
     },
-    Re = function (e, t, r) {
+    De = function (e, t, r) {
       if (le && ('id' === t || 'name' === t) && (r in l || r in Te)) return !1;
-      if (U && !F[t] && st(_, t));
-      else if (Z && st($, t));
-      else if (!P[t] || F[t]) {
+      if (U && !j[t] && st($, t));
+      else if (Z && st(A, t));
+      else if (!R[t] || j[t]) {
         if (
           !(
-            (Fe(e) &&
-              ((R.tagNameCheck instanceof RegExp && st(R.tagNameCheck, e)) ||
-                (R.tagNameCheck instanceof Function && R.tagNameCheck(e))) &&
-              ((R.attributeNameCheck instanceof RegExp && st(R.attributeNameCheck, t)) ||
-                (R.attributeNameCheck instanceof Function && R.attributeNameCheck(t)))) ||
+            (je(e) &&
+              ((D.tagNameCheck instanceof RegExp && st(D.tagNameCheck, e)) ||
+                (D.tagNameCheck instanceof Function && D.tagNameCheck(e))) &&
+              ((D.attributeNameCheck instanceof RegExp && st(D.attributeNameCheck, t)) ||
+                (D.attributeNameCheck instanceof Function && D.attributeNameCheck(t)))) ||
             ('is' === t &&
-              R.allowCustomizedBuiltInElements &&
-              ((R.tagNameCheck instanceof RegExp && st(R.tagNameCheck, r)) ||
-                (R.tagNameCheck instanceof Function && R.tagNameCheck(r))))
+              D.allowCustomizedBuiltInElements &&
+              ((D.tagNameCheck instanceof RegExp && st(D.tagNameCheck, r)) ||
+                (D.tagNameCheck instanceof Function && D.tagNameCheck(r))))
           )
         )
           return !1;
       } else if (ge[t]);
-      else if (st(B, rt(r, O, '')));
+      else if (st(I, rt(r, O, '')));
       else if (
         ('src' !== t && 'xlink:href' !== t && 'href' !== t) ||
         'script' === e ||
@@ -2865,29 +2863,29 @@ var Rt = (function e() {
       } else;
       return !0;
     },
-    Fe = function (e) {
-      return 'annotation-xml' !== e && tt(e, I);
+    je = function (e) {
+      return 'annotation-xml' !== e && tt(e, B);
     },
     Ue = function (e) {
-      Pe(T.beforeSanitizeAttributes, e, null);
+      Re(T.beforeSanitizeAttributes, e, null);
       const { attributes: t } = e;
-      if (!t || Be(e)) return;
-      const l = { attrName: '', attrValue: '', keepAttr: !0, allowedAttributes: P, forceKeepAttr: void 0 };
+      if (!t || Ie(e)) return;
+      const l = { attrName: '', attrValue: '', keepAttr: !0, allowedAttributes: R, forceKeepAttr: void 0 };
       let i = t.length;
       for (; i--; ) {
         const o = t[i],
           { name: s, namespaceURI: a, value: n } = o,
-          c = ze(s);
+          c = ye(s);
         let d = 'value' === s ? n : it(n);
         if (
           ((l.attrName = c),
           (l.attrValue = d),
           (l.keepAttr = !0),
           (l.forceKeepAttr = void 0),
-          Pe(T.uponSanitizeAttribute, e, l),
+          Re(T.uponSanitizeAttribute, e, l),
           (d = l.attrValue),
           !ie || ('id' !== c && 'name' !== c) || (Ve(s, e), (d = 'user-content-' + d)),
-          q && st(/((--!?|])>)|<\/(style|title)/i, d))
+          Y && st(/((--!?|])>)|<\/(style|title)/i, d))
         ) {
           Ve(s, e);
           continue;
@@ -2898,35 +2896,35 @@ var Rt = (function e() {
           Ve(s, e);
           continue;
         }
-        J &&
-          Ke([E, H, A], e => {
+        q &&
+          Ke([E, H, _], e => {
             d = rt(d, e, ' ');
           });
-        const h = ze(e.nodeName);
-        if (Re(h, c, d)) {
-          if (b && 'object' == typeof m && 'function' == typeof m.getAttributeType)
+        const h = ye(e.nodeName);
+        if (De(h, c, d)) {
+          if (L && 'object' == typeof m && 'function' == typeof m.getAttributeType)
             if (a);
             else
               switch (m.getAttributeType(h, c)) {
                 case 'TrustedHTML':
-                  d = b.createHTML(d);
+                  d = L.createHTML(d);
                   break;
                 case 'TrustedScriptURL':
-                  d = b.createScriptURL(d);
+                  d = L.createScriptURL(d);
               }
           try {
-            a ? e.setAttributeNS(a, s, d) : e.setAttribute(s, d), Be(e) ? $e(e) : qe(r.removed);
+            a ? e.setAttributeNS(a, s, d) : e.setAttribute(s, d), Ie(e) ? Ae(e) : Ye(r.removed);
           } catch (e) {}
         }
       }
-      Pe(T.afterSanitizeAttributes, e, null);
+      Re(T.afterSanitizeAttributes, e, null);
     },
     Ge = function e(t) {
       let r = null;
-      const l = Ie(t);
-      for (Pe(T.beforeSanitizeShadowDOM, t, null); (r = l.nextNode()); )
-        Pe(T.uponSanitizeShadowNode, r, null), De(r), Ue(r), r.content instanceof s && e(r.content);
-      Pe(T.afterSanitizeShadowDOM, t, null);
+      const l = Be(t);
+      for (Re(T.beforeSanitizeShadowDOM, t, null); (r = l.nextNode()); )
+        Re(T.uponSanitizeShadowNode, r, null), Ne(r), Ue(r), r.content instanceof s && e(r.content);
+      Re(T.afterSanitizeShadowDOM, t, null);
     };
   return (
     (r.sanitize = function (e) {
@@ -2935,47 +2933,47 @@ var Rt = (function e() {
         o = null,
         a = null,
         c = null;
-      if (((ke = !e), ke && (e = '\x3c!--\x3e'), 'string' != typeof e && !We(e))) {
+      if (((ke = !e), ke && (e = '\x3c!--\x3e'), 'string' != typeof e && !Pe(e))) {
         if ('function' != typeof e.toString) throw at('toString is not a function');
         if ('string' != typeof (e = e.toString())) throw at('dirty is not a string, aborting');
       }
       if (!r.isSupported) return e;
       if ((X || He(t), (r.removed = []), 'string' == typeof e && (se = !1), se)) {
         if (e.nodeName) {
-          const t = ze(e.nodeName);
-          if (!N[t] || j[t]) throw at('root node is forbidden and cannot be sanitized in-place');
+          const t = ye(e.nodeName);
+          if (!W[t] || F[t]) throw at('root node is forbidden and cannot be sanitized in-place');
         }
       } else if (e instanceof n)
         (l = Oe('\x3c!----\x3e')),
           (o = l.ownerDocument.importNode(e, !0)),
-          (o.nodeType === It && 'BODY' === o.nodeName) || 'HTML' === o.nodeName ? (l = o) : l.appendChild(o);
+          (o.nodeType === Bt && 'BODY' === o.nodeName) || 'HTML' === o.nodeName ? (l = o) : l.appendChild(o);
       else {
-        if (!ee && !J && !Y && -1 === e.indexOf('<')) return b && re ? b.createHTML(e) : e;
-        if (((l = Oe(e)), !l)) return ee ? null : re ? L : '';
+        if (!ee && !q && !J && -1 === e.indexOf('<')) return L && re ? L.createHTML(e) : e;
+        if (((l = Oe(e)), !l)) return ee ? null : re ? b : '';
       }
-      l && Q && $e(l.firstChild);
-      const d = Ie(se ? e : l);
-      for (; (a = d.nextNode()); ) De(a), Ue(a), a.content instanceof s && Ge(a.content);
+      l && Q && Ae(l.firstChild);
+      const d = Be(se ? e : l);
+      for (; (a = d.nextNode()); ) Ne(a), Ue(a), a.content instanceof s && Ge(a.content);
       if (se) return e;
       if (ee) {
-        if (te) for (c = y.call(l.ownerDocument); l.firstChild; ) c.appendChild(l.firstChild);
+        if (te) for (c = z.call(l.ownerDocument); l.firstChild; ) c.appendChild(l.firstChild);
         else c = l;
-        return (P.shadowroot || P.shadowrootmode) && (c = S.call(i, c, !0)), c;
+        return (R.shadowroot || R.shadowrootmode) && (c = S.call(i, c, !0)), c;
       }
-      let h = Y ? l.outerHTML : l.innerHTML;
+      let h = J ? l.outerHTML : l.innerHTML;
       return (
-        Y &&
-          N['!doctype'] &&
+        J &&
+          W['!doctype'] &&
           l.ownerDocument &&
           l.ownerDocument.doctype &&
           l.ownerDocument.doctype.name &&
-          st($t, l.ownerDocument.doctype.name) &&
+          st(At, l.ownerDocument.doctype.name) &&
           (h = '<!DOCTYPE ' + l.ownerDocument.doctype.name + '>\n' + h),
-        J &&
-          Ke([E, H, A], e => {
+        q &&
+          Ke([E, H, _], e => {
             h = rt(h, e, ' ');
           }),
-        b && re ? b.createHTML(h) : h
+        L && re ? L.createHTML(h) : h
       );
     }),
     (r.setConfig = function () {
@@ -2986,19 +2984,19 @@ var Rt = (function e() {
     }),
     (r.isValidAttribute = function (e, t, r) {
       Se || He({});
-      const l = ze(e),
-        i = ze(t);
-      return Re(l, i, r);
+      const l = ye(e),
+        i = ye(t);
+      return De(l, i, r);
     }),
     (r.addHook = function (e, t) {
-      'function' == typeof t && Ye(T[e], t);
+      'function' == typeof t && Je(T[e], t);
     }),
     (r.removeHook = function (e, t) {
       if (void 0 !== t) {
-        const r = Je(T[e], t);
+        const r = qe(T[e], t);
         return -1 === r ? void 0 : Xe(T[e], r, 1)[0];
       }
-      return qe(T[e]);
+      return Ye(T[e]);
     }),
     (r.removeHooks = function (e) {
       T[e] = [];
@@ -3019,7 +3017,7 @@ var Rt = (function e() {
     r
   );
 })();
-const jt = ({ iconType: t }) => {
+const Ft = ({ iconType: t }) => {
   var l;
   const [i, o] = e.useState(''),
     s = e.useRef(),
@@ -3034,9 +3032,9 @@ const jt = ({ iconType: t }) => {
       o(r ? 'bulk__sticker--album' : 'bulk__sticker--portrait');
     })();
   }, []);
-  let g = Be.get(h);
+  let g = Ie.get(h);
   g = h && (null === (l = g) || void 0 === l ? void 0 : l.replace('$stickerColor', d));
-  const p = Rt.sanitize(g),
+  const p = Dt.sanitize(g),
     m = c.scaleType === w.ZOOM ? 'zoomed_bulk__sticker' : 'bulk__sticker';
   return r.default.createElement(
     'div',
@@ -3044,7 +3042,7 @@ const jt = ({ iconType: t }) => {
     h && r.default.createElement('div', { className: 'bulk__icon', dangerouslySetInnerHTML: { __html: p } })
   );
 };
-function Ft(e, t) {
+function jt(e, t) {
   void 0 === t && (t = {});
   var r = t.insertAt;
   if (e && 'undefined' != typeof document) {
@@ -3055,7 +3053,7 @@ function Ft(e, t) {
       i.styleSheet ? (i.styleSheet.cssText = e) : i.appendChild(document.createTextNode(e));
   }
 }
-Ft(
+jt(
   '.bulk{position:absolute;transform-style:preserve-3d}.bulk__icon{display:block;height:100%;object-fit:contain;width:100%}.bulk__sticker_wrap{left:0;position:absolute;top:0;width:100%}.bulk__sticker,.zoomed_bulk__sticker{left:50%;position:absolute;top:50%;transform:translate(-50%,-50%)}.bulk__sticker--album{height:2em;width:4em}.bulk__sticker--portrait{height:4em;width:2em}'
 );
 const Zt = { 26: 1, 27: 1, 28: 1 },
@@ -3063,75 +3061,75 @@ const Zt = { 26: 1, 27: 1, 28: 1 },
     var d, h, g;
     const { params: p, config: m, colorTheme: C } = e.useContext(xe),
       { bulkBaseColor: u, bulkCutColor: f, bulkIconColor: k } = C,
-      [v, b] = e.useState(0),
-      L = e.useRef(null),
+      [v, L] = e.useState(0),
+      b = e.useRef(null),
       { isSafari: x } = Oe(),
-      [M, y] = e.useState(() => {
+      [M, z] = e.useState(() => {
         const e = Zt[t] || 0.7,
           r = Math.floor(o * e),
           l = Math.floor(s * e),
-          a = i === R.left ? Math.max(n, 0) : j,
-          d = i === R.right ? Math.max(n, 0) : j,
+          a = i === D.left ? Math.max(n, 0) : F,
+          d = i === D.right ? Math.max(n, 0) : F,
           h = p.innerWidth / 2,
           g = r / 2,
-          m = i === R.center && n ? Math.floor(n * e + h - g) : j;
+          m = i === D.center && n ? Math.floor(n * e + h - g) : F;
         return {
           top: c,
-          left: i === R.left ? a : m,
+          left: i === D.left ? a : m,
           right: d,
           width: r,
           height: l,
-          transform: i === R.right ? 'scaleX(-1)' : '',
+          transform: i === D.right ? 'scaleX(-1)' : '',
         };
       });
     e.useEffect(() => {
       (() => {
         const e = M.width > M.height ? M.width / 10 : M.height / 10,
           t = { ...M };
-        (t.fontSize = `${Math.round(e)}px`), y(t);
+        (t.fontSize = `${Math.round(e)}px`), z(t);
       })(),
         (() => {
-          if (!L.current) return;
-          const e = L.current.querySelector('.bulk-base');
+          if (!b.current) return;
+          const e = b.current.querySelector('.bulk-base');
           if (!e) return;
           const t = e.getBoundingClientRect(),
             r = null != p && p.isHorizontal ? t.width : t.height,
             l = x && (null == m ? void 0 : m.scaleType) === w.ZOOM ? r : r * (null == p ? void 0 : p.antiScale),
             i = Math.round(M.height - 0.7 * l);
-          b(i);
+          L(i);
         })();
     }, []);
-    let z = Ie.get(t);
-    if (!z) return r.default.createElement('div', { className: 'bulk', ref: L });
-    (z = null === (d = z) || void 0 === d ? void 0 : d.replace('$baseColor', u)),
-      (z = null === (h = z) || void 0 === h ? void 0 : h.replace('$cutColor', f)),
-      (z = null === (g = z) || void 0 === g ? void 0 : g.split('$stickerColor').join(k));
-    const S = Rt.sanitize(z);
+    let y = Be.get(t);
+    if (!y) return r.default.createElement('div', { className: 'bulk', ref: b });
+    (y = null === (d = y) || void 0 === d ? void 0 : d.replace('$baseColor', u)),
+      (y = null === (h = y) || void 0 === h ? void 0 : h.replace('$cutColor', f)),
+      (y = null === (g = y) || void 0 === g ? void 0 : g.split('$stickerColor').join(k));
+    const S = Dt.sanitize(y);
     return r.default.createElement(
       'div',
-      { className: 'bulk', style: M, ref: L },
+      { className: 'bulk', style: M, ref: b },
       r.default.createElement('div', { className: 'bulk__icon', dangerouslySetInnerHTML: { __html: S } }),
       r.default.createElement(
         'div',
         { className: 'bulk__sticker_wrap', style: { height: `${v}px` } },
-        r.default.createElement(jt, { iconType: a })
+        r.default.createElement(Ft, { iconType: a })
       )
     );
   };
-Ft(
+jt(
   '.jets-btn{-webkit-font-smoothing:antialiased;background-color:#4071b9;border:1px solid #ccc;border-radius:2px;color:#fff;cursor:pointer;display:inline-block;font-family:inherit;font-size:14px;font-weight:600;height:40px;line-height:1.5;padding:9.5px 18px;text-align:center;text-decoration:none;vertical-align:middle}.jets-btn:disabled{background-color:#ccc!important;color:#000!important;cursor:not-allowed}'
 );
 const Gt = ({ content: e, onClick: t, className: l, disabled: o, active: s, ...a }) =>
   r.default.createElement('button', i({}, a, { className: l, onClick: t, disabled: o }), e);
 Gt.defaultProps = { content: 'Btn', className: 'jets-btn', disabled: !1, active: !1, onClick: () => {} };
-Ft(
+jt(
   '.deck-exit{height:72px;position:absolute;width:72px;z-index:-1}.deck-bulk__image{display:block;height:100%;object-fit:contain;width:100%}'
 );
 const Kt = ({ type: t, topOffset: l }) => {
   const { colorTheme: i } = e.useContext(xe),
     { exitIconUrlLeft: o, exitIconUrlRight: s } = i,
     a = !o || !s,
-    [n, c] = e.useState(() => ({ top: l, left: 'left' === t ? 0 : j, right: 'right' === t ? 0 : j }));
+    [n, c] = e.useState(() => ({ top: l, left: 'left' === t ? 0 : F, right: 'right' === t ? 0 : F }));
   return r.default.createElement(
     'div',
     { className: 'deck-exit', style: n },
@@ -3148,8 +3146,8 @@ const Kt = ({ type: t, topOffset: l }) => {
       : r.default.createElement('img', { className: 'deck-exit__image', src: 'left' === t ? o : s })
   );
 };
-Ft('.jets-deck--title{font-size:18px;font-weight:700;position:absolute;top:0}');
-const Jt = ({ number: t, lang: l, localeKey: i }) => {
+jt('.jets-deck--title{font-size:18px;font-weight:700;position:absolute;top:0}');
+const qt = ({ number: t, lang: l, localeKey: i }) => {
     const { config: o, params: s, colorTheme: a } = e.useContext(xe),
       n = e.useRef(null),
       { isSafari: c } = Oe(),
@@ -3160,9 +3158,9 @@ const Jt = ({ number: t, lang: l, localeKey: i }) => {
         height: '80px',
         color: a.deckLabelTitleColor,
       };
-    return r.default.createElement('div', { className: 'jets-deck--title', style: h, ref: n }, y[l][i], ': ', t);
+    return r.default.createElement('div', { className: 'jets-deck--title', style: h, ref: n }, z[l][i], ': ', t);
   },
-  qt = {
+  Yt = {
     getSeatIcon(e, t) {
       if (!e) return;
       const [r, l] = e.split('-'),
@@ -3170,7 +3168,7 @@ const Jt = ({ number: t, lang: l, localeKey: i }) => {
       if (i <= 4)
         switch (r) {
           case 'F':
-            return Yt.getTemplate(i, t);
+            return Jt.getTemplate(i, t);
           case 'B':
             return Xt.getTemplate(i, t);
           case 'P':
@@ -3181,7 +3179,7 @@ const Jt = ({ number: t, lang: l, localeKey: i }) => {
       return tr.getTemplate(i, t);
     },
   },
-  Yt = {
+  Jt = {
     getTemplate(e, t) {
       return 1 === e ? this._type1(t) : 2 === e ? this._type2(t) : 3 === e ? this._type3(t) : this._default(t);
     },
@@ -3309,10 +3307,10 @@ const Jt = ({ number: t, lang: l, localeKey: i }) => {
     },
   },
   rr = ({ seatType: e, style: t }) => {
-    const l = Rt.sanitize(qt.getSeatIcon(e, t));
+    const l = Dt.sanitize(Yt.getSeatIcon(e, t));
     return r.default.createElement('div', { className: 'jets-seat-svg', dangerouslySetInnerHTML: { __html: l } });
   };
-Ft(
+jt(
   '.jets-seat-price{align-items:center;background:#fefefe;border-radius:12px;box-shadow:1px 1px 1px 1px rgba(0,0,0,.6);box-sizing:border-box;color:#000;display:flex;height:45px;justify-content:center;overflow:hidden;padding:5px 2px;position:absolute;top:-45px}.jets-seat-price .currency{font-size:21px;left:5px;line-height:1;position:absolute;top:11px}.jets-seat-price .cost{flex:1;font-size:28px;margin-left:16px;overflow:hidden;padding-left:3px;text-overflow:ellipsis;white-space:nowrap}'
 );
 const lr = ({ cost: e, currency: t, maxWidth: l }) => {
@@ -3325,7 +3323,7 @@ const lr = ({ cost: e, currency: t, maxWidth: l }) => {
     r.default.createElement('span', { className: 'cost' }, e)
   );
 };
-Ft(
+jt(
   '.jets-seat{align-items:center;box-sizing:border-box;display:flex;float:left;justify-content:center;position:relative;z-index:10}.jets-unavailable{cursor:not-allowed;position:relative}.jets-available,.jets-selected{cursor:pointer;position:relative}.jets-selected{color:#fff}.jets-aisle,.jets-empty,.jets-index{pointer-events:none}.jets-seat-r-nw{transform:rotate(-20deg)}.jets-seat-r-nw>.jets-seat-number,.jets-seat-r-nw>.jets-seat-passenger{transform:rotate(20deg)}.jets-seat-r-nw45{transform:rotate(-45deg)}.jets-seat-r-nw45>.jets-seat-number,.jets-seat-r-nw45>.jets-seat-passenger{transform:rotate(45deg)}.jets-seat-r-ne{transform:rotate(20deg)}.jets-seat-r-ne>.jets-seat-number,.jets-seat-r-ne>.jets-seat-passenger{transform:rotate(-20deg)}.jets-seat-r-ne45{transform:rotate(45deg)}.jets-seat-r-ne45>.jets-seat-number,.jets-seat-r-ne45>.jets-seat-passenger{transform:rotate(-45deg)}.jets-seat-r-s{transform:rotate(180deg)}.jets-seat-r-s>.jets-seat-number,.jets-seat-r-s>.jets-seat-passenger{transform:rotate(-180deg)}.jets-seat-r-se{transform:scale(.8) rotate(160deg)}.jets-seat-r-se>.jets-seat-number,.jets-seat-r-se>.jets-seat-passenger{transform:rotate(-160deg)}.jets-seat-r-sw{transform:scale(.8) rotate(-160deg)}.jets-seat-r-sw>.jets-seat-number,.jets-seat-r-sw>.jets-seat-passenger{transform:rotate(160deg)}.jets-seat-map svg{height:100%;width:100%}.jets-seat-passenger{align-items:center;border-radius:50%;display:flex;font-size:36px;justify-content:center;max-height:192px;max-width:192px;position:absolute;z-index:11}.jets-seat-svg{height:100%;width:100%}.jets-seat-number{color:#fff;font-size:30px;position:absolute;text-align:center;top:18%;z-index:1}.ST-5,.ST-6{top:28%}.ST-8{margin-left:12px}.ST-9{margin-right:12px}.ST-10{margin-left:60px}.ST-11{margin-right:60px}.ST-12{margin-right:106px;top:25%}.ST-13{margin-left:106px;top:25%}.ST-15{margin-left:38px}.ST-16{margin-right:38px}.ST-17{margin-left:72px}.ST-18{margin-right:72px}.ST-20,.ST-21{top:65%}.ST-22,.ST-23{top:60%}.ST-24,.ST-25{top:55%}.ST-26{margin-right:50px;top:30%}.ST-27{margin-left:50px;top:30%}.ST-28{margin-right:62px;top:45%}.ST-29{margin-left:62px;top:45%}.ST-30{margin-right:62px;top:60%}.ST-31{margin-left:62px;top:60%}.ST-32{margin-right:58px;top:60%}.ST-33{margin-left:58px;top:60%}.ST-34{margin-left:27px;top:40%}.ST-35{margin-right:27px;top:40%}.ST-36{margin-right:122px;top:62%}.ST-37{margin-left:122px;top:62%}.ST-38{margin-right:122px;top:28%}.ST-39{margin-left:122px;top:28%}.ST-42{margin-left:260px;top:70%}.ST-43{margin-right:242px;top:70%}.ST-44{margin-right:254px;top:18%}.ST-45{margin-left:260px;top:18%}'
 );
 const ir = ({ data: t }) => {
@@ -3350,17 +3348,17 @@ const ir = ({ data: t }) => {
       seatType: k,
       seatIconType: v,
       topOffset: w,
-      leftOffset: b,
+      leftOffset: L,
       number: x,
       price: M,
-      cost: y,
-      currency: z,
+      cost: z,
+      currency: y,
     } = t,
-    { index: S, aisle: T } = L,
+    { index: S, aisle: T } = b,
     E = `jets-seat jets-${g} jets-${p} ${f ? `jets-seat-r-${f}` : ''}`,
     H = M && (null == c ? void 0 : c.visibleSeatPriceLabels),
-    A = e.useRef(),
-    [_, $] = e.useState(() => ({
+    _ = e.useRef(),
+    [$, A] = e.useState(() => ({
       width: 0.8 * m.width,
       height: 0.8 * m.width,
       backgroundColor: d.defaultPassengerBadgeColor,
@@ -3369,14 +3367,14 @@ const ir = ({ data: t }) => {
     V = () => (g === S || g === T ? '' : C ? C.abbr || 'P' : '');
   let O = '';
   null == n || !n.isHorizontal || (g !== T && g !== S) || (O = n.rightToLeft ? '' : 'rotate(180deg)');
-  const I = { width: m.width, height: m.height, top: w, left: b, transform: O },
-    B = {
+  const B = { width: m.width, height: m.height, top: w, left: L, transform: O },
+    I = {
       strokeColor: d.seatStrokeColor,
       armrestColor: d.seatArmrestColor,
       fillColor: u,
       strokeWidth: d.seatStrokeWidth,
     },
-    N = {
+    W = {
       transform: `${null == n ? void 0 : n.antiRotation} scale(${n.antiScale})`,
       color: d.seatLabelColor,
       zIndex: 100,
@@ -3384,26 +3382,26 @@ const ir = ({ data: t }) => {
   e.useEffect(() => {
     C &&
       (() => {
-        if (!A.current) return;
-        if (!A.current.querySelector('.seat')) return;
-        const e = { ..._ };
-        null != C && C.passengerColor && (e.backgroundColor = C.passengerColor), $(e);
+        if (!_.current) return;
+        if (!_.current.querySelector('.seat')) return;
+        const e = { ...$ };
+        null != C && C.passengerColor && (e.backgroundColor = C.passengerColor), A(e);
       })();
   }, [C]),
     e.useEffect(() => {
       var e;
       s &&
         (null == x ? void 0 : x.toUpperCase()) === (null == s ? void 0 : s.toUpperCase()) &&
-        (null === (e = A.current) || void 0 === e || e.scrollIntoView(), i(t, A, { nativeEvent: null }), a());
+        (null === (e = _.current) || void 0 === e || e.scrollIntoView(), i(t, _, { nativeEvent: null }), a());
     }, [s]);
   return r.default.createElement(
     'div',
     {
-      ref: A,
-      style: I,
+      ref: _,
+      style: B,
       className: E,
-      onClick: e => l(t, A, e),
-      onMouseEnter: n.tooltipOnHover ? e => i(t, A, e) : null,
+      onClick: e => l(t, _, e),
+      onMouseEnter: n.tooltipOnHover ? e => i(t, _, e) : null,
       onMouseLeave: n.tooltipOnHover
         ? e =>
             ((e, t, r) => {
@@ -3415,7 +3413,7 @@ const ir = ({ data: t }) => {
                 void 0 !== l &&
                 l.includes('tooltip')) ||
                 o(e, t, r);
-            })(t, A, e)
+            })(t, _, e)
         : null,
       'data-testid': 'jets-seat',
     },
@@ -3423,13 +3421,13 @@ const ir = ({ data: t }) => {
       ? r.default.createElement(
           r.default.Fragment,
           null,
-          H && r.default.createElement(lr, { cost: y, currency: z, maxWidth: m.width }),
+          H && r.default.createElement(lr, { cost: z, currency: y, maxWidth: m.width }),
           r.default.createElement('div', { className: `jets-seat-number ST-${v}` }, `${x}`),
-          r.default.createElement(rr, { seatType: k, style: B }),
+          r.default.createElement(rr, { seatType: k, style: I }),
           C &&
             r.default.createElement(
               'div',
-              { className: 'jets-seat-passenger', style: _ },
+              { className: 'jets-seat-passenger', style: $ },
               r.default.createElement(
                 'div',
                 {
@@ -3441,10 +3439,10 @@ const ir = ({ data: t }) => {
               )
             )
         )
-      : r.default.createElement('div', { style: N, 'data-testid': 'jets-seat-index' }, V())
+      : r.default.createElement('div', { style: W, 'data-testid': 'jets-seat-index' }, V())
   );
 };
-Ft('.jets-row{position:absolute}');
+jt('.jets-row{position:absolute}');
 const or = ({ seats: t, top: l }) => {
   var i;
   const o = e.useRef(null),
@@ -3456,14 +3454,14 @@ const or = ({ seats: t, top: l }) => {
     null == t ? void 0 : t.map(e => r.default.createElement(a, { key: e.uniqId, data: e }))
   );
 };
-Ft(
+jt(
   '.jets-cabin-title-container{position:absolute}.jets-cabin-title-hl-right{right:0}.jets-cabin-title-hl-left,.jets-cabin-title-hl-right{position:absolute;top:0;white-space:nowrap;width:60px}.jets-cabin-title-hl-left{left:0}.jets-cabin-title-label-left{right:0;transform-origin:bottom right}.jets-cabin-title-label-left,.jets-cabin-title-label-right{border-radius:3px;font-size:16px;padding:0 6px;position:absolute;top:0}.jets-cabin-title-label-right{left:0;transform-origin:bottom left}'
 );
 const sr = ({ top: t, height: l, lang: i, localeKey: o }) => {
   const { params: s, colorTheme: a, config: n } = e.useContext(xe),
     c = e.useRef(null),
     d = a.cabinTitlesHighlightColors,
-    h = n.customCabinTitles && n.customCabinTitles[o] ? n.customCabinTitles[o] : y[i][o],
+    h = n.customCabinTitles && n.customCabinTitles[o] ? n.customCabinTitles[o] : z[i][o],
     g = { color: a.cabinTitlesLabelColor, top: t, height: l, width: s.innerWidth },
     p = { transform: 'translateY(-50%) rotate(-90deg)', zoom: s.antiScale },
     m = { transform: 'translateY(-50%) rotate(90deg)', zoom: s.antiScale },
@@ -3484,7 +3482,7 @@ const sr = ({ top: t, height: l, lang: i, localeKey: o }) => {
     )
   );
 };
-Ft(
+jt(
   '.jets-deck{align-items:center;box-sizing:border-box;display:flex;flex-direction:column;height:100%;position:relative;transform-style:preserve-3d;width:100%}'
 );
 const ar = 'deck',
@@ -3508,7 +3506,7 @@ const ar = 'deck',
               localeKey: e.classCode,
             })
           ),
-      n && !s && r.default.createElement(Jt, { number: n, lang: l, localeKey: ar }),
+      n && !s && r.default.createElement(qt, { number: n, lang: l, localeKey: ar }),
       a.map(e => r.default.createElement(or, { key: e.uniqId, seats: e.seats, top: e.topOffset })),
       i && i.length
         ? i.map(({ topOffset: e, type: t, uniqId: l }, i) =>
@@ -3532,35 +3530,292 @@ const ar = 'deck',
         : null
     );
   };
-Ft(
+jt(
   '.jets-deck-selector{background-color:hsla(0,0%,50%,.5);border-radius:3px;height:40px;margin:5px;padding:5px;position:absolute;z-index:1000}'
 );
 const cr = ({ direction: t }) => {
-    const { params: l, colorTheme: i, switchDeck: o } = e.useContext(xe),
-      s = e.useRef(null),
-      { deckSelectorStrokeColor: a, deckSelectorFillColor: n, deckSelectorSize: c } = i,
-      d = {
-        transform: `rotate(${180 * Number(t)}deg)`,
-        background: n,
-        height: c,
-        width: c,
-        left: null != l && l.rightToLeft ? 'auto' : 0,
-        right: null != l && l.rightToLeft ? 0 : 'auto',
-      };
-    return r.default.createElement('div', {
-      className: 'jets-deck-selector',
-      style: d,
-      ref: s,
-      onClick: e => o(),
-      dangerouslySetInnerHTML: {
-        __html:
-          ((h = a),
-          `\n<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 384.97 384.97" >\n<g>\n\t<g>\n\t\t<path fill="${h}" d="M360.909,0H24.061C10.767,0,0,10.767,0,24.061v336.848c0,13.293,10.767,24.061,24.061,24.061h336.848\n\t\t\tc13.281,0,24.061-10.767,24.061-24.061V24.061C384.97,10.767,374.191,0,360.909,0z M360.909,360.909H24.061V24.061h336.848\n\t\t\tV360.909z"/>\n\t\t<path fill="${h}" d="M59.935,240.666c0,6.785,5.883,12.151,12.56,11.97h239.92\n\t\t\tc10.671,0.289,16.602-12.872,8.927-20.476l-120.291-119.1c-4.74-4.692-12.403-4.523-17.191,0L63.664,232.065\n\t\t\tC61.379,234.242,59.935,237.274,59.935,240.666z M192.461,138.589l91.021,90.119H101.427L192.461,138.589z"/>\n\t</g>\n</g>\n</svg>\n`),
+  const { params: l, colorTheme: i, switchDeck: o } = e.useContext(xe),
+    s = e.useRef(null),
+    { deckSelectorStrokeColor: a, deckSelectorFillColor: n, deckSelectorSize: c } = i,
+    d = {
+      transform: `rotate(${180 * Number(t)}deg)`,
+      background: n,
+      height: c,
+      width: c,
+      left: null != l && l.rightToLeft ? 'auto' : 0,
+      right: null != l && l.rightToLeft ? 0 : 'auto',
+    };
+  return r.default.createElement('div', {
+    className: 'jets-deck-selector',
+    style: d,
+    ref: s,
+    onClick: e => o(),
+    dangerouslySetInnerHTML: {
+      __html:
+        ((h = a),
+        `\n<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 384.97 384.97" >\n<g>\n\t<g>\n\t\t<path fill="${h}" d="M360.909,0H24.061C10.767,0,0,10.767,0,24.061v336.848c0,13.293,10.767,24.061,24.061,24.061h336.848\n\t\t\tc13.281,0,24.061-10.767,24.061-24.061V24.061C384.97,10.767,374.191,0,360.909,0z M360.909,360.909H24.061V24.061h336.848\n\t\t\tV360.909z"/>\n\t\t<path fill="${h}" d="M59.935,240.666c0,6.785,5.883,12.151,12.56,11.97h239.92\n\t\t\tc10.671,0.289,16.602-12.872,8.927-20.476l-120.291-119.1c-4.74-4.692-12.403-4.523-17.191,0L63.664,232.065\n\t\t\tC61.379,234.242,59.935,237.274,59.935,240.666z M192.461,138.589l91.021,90.119H101.427L192.461,138.589z"/>\n\t</g>\n</g>\n</svg>\n`),
+    },
+  });
+  var h;
+};
+jt(
+  '.jets-no-data{align-items:center;display:flex;font-size:18px;font-weight:700;height:100%;height:100vh;justify-content:center;width:100%}'
+);
+const dr = () => {
+  const { params: t } = e.useContext(xe),
+    l = { transform: `scale(${null == t ? void 0 : t.antiScale})` };
+  return r.default.createElement(
+    'div',
+    { style: l, className: 'jets-no-data' },
+    'Seat map is not found for the flight'
+  );
+};
+jt('.jets-nose{position:relative}.jets-nose:not(.cut) .nose-dotted-line,.nose-dotted-line{stroke:none}');
+const hr = ({ isFull: t }) => {
+  const { params: l, colorTheme: i } = e.useContext(xe),
+    [o, s] = e.useState(0),
+    a = e.useRef(null),
+    { fuselageFillColor: n, fuselageStrokeColor: c, fuselageWindowsColor: d, floorColor: h } = i,
+    g = i.fuselageStrokeWidth / (l.innerWidth / 200),
+    p = { hullColor: n, windowColor: d, outlineColor: c, straightFillColor: t ? n : h, strokeWidth: g };
+  e.useLayoutEffect(() => {
+    s(a.current.getBoundingClientRect().width);
+  }, []);
+  const m = (e =>
+      `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="200" height="214" viewBox="0 0 200 214">\n\n<style type="text/css">\n\t.nose-filling-straight{fill:${e.straightFillColor};}\n\t.nose-filling{fill:${e.hullColor};}\n\t.nose-outline{fill:none;stroke:${e.outlineColor};stroke-width:${e.strokeWidth};stroke-linejoin:round;stroke-miterlimit:10;}\n\t.nose-windows{fill:${e.windowColor};}\n\t.nose-dotted-line{fill:none;stroke:none;stroke-width:${e.strokeWidth};stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:0.9715,5.8292;}\n</style>\n\t\n<path class="nose-filling-straight" d="M1.5 213.5H198.5L198.3 189.5V189.5C198.432 183.009 197.551 176.63 195.513 170.466C183.455 134.002 137.233 2 100 2C62.7343 2.08626 16.4645 134.331 4.45578 170.661C2.43787 176.766 1.5 183.07 1.5 189.5V189.5L1.5 213.5Z" />\n<path class="nose-filling" d="M1.5 191C1.5 191 2.03703 191.308 3 191C9.75537 188.837 37.4722 179.675 47.8 179.5C61.1 179.4 86.8 190 100.1 190C113 190 137.9 179.5 150.8 179.6C163 179.7 197.1 191 197.1 191H198.5V189.4V189.4C198.5 182.97 197.562 176.666 195.544 170.561C183.535 134.232 137.266 2 100 2C62.7343 2.08626 16.4645 134.331 4.45578 170.661C2.43787 176.766 1.5 183.07 1.5 189.5V189.5V191Z" />\n<path class="nose-dotted-line" d="M5 190C14.0715 187.075 38.297 179.661 47.8 179.5C61.1 179.4 86.8 190 100.1 190C113 190 137.9 179.5 150.8 179.6C161.176 179.685 187.392 187.554 195 190"/>\n<path class="nose-outline" d="M198.5 213.5V190.435C198.5 183.385 197.47 176.464 195.252 169.772C182.801 132.214 136.97 2 100 2C63.0303 2 17.199 132.214 4.7484 169.772C2.53029 176.464 1.5 183.385 1.5 190.435V213.5" />\n<path class="nose-windows" d="M143 102.9L138.8 118.7C149.8 122 160 126.4 160 126.4C160 126 151 111.4 147.6 107.2C146.4 105.7 145 104.3 143 102.9Z" fill="white"/>\n<path class="nose-windows" d="M140.4 101.2C137.9 99.9 134.6 98.6 130 97.3C118.8 94.1 101 94 101 94V114.4C101 114.4 120.9 114.4 130 116.4C131.9 116.8 133.9 117.3 135.9 117.9L140.4 101.2Z" fill="white"/>\n<path class="nose-windows" d="M57 102.9C55 104.3 53.7 105.7 52.4 107.2C49 111.4 40 126 40 126.4C40 126.4 50.2 122 61.2 118.7L57 102.9Z" fill="white"/>\n<path class="nose-windows" d="M70.0001 97.3C65.4001 98.6 62.1001 99.9 59.6001 101.2L64.1001 117.8C66.1001 117.2 68.1001 116.7 70.0001 116.3C79.1001 114.3 98.0001 114.3 98.0001 114.3V94C98.0001 94 81.2001 94.1 70.0001 97.3Z" fill="white"/>\n</svg>\n`)(
+      p
+    ),
+    C = !1,
+    u = t || !0,
+    f = null == l || !l.isHorizontal || (null != l && l.rightToLeft) ? u : C,
+    k = null == l || !l.isHorizontal || (null != l && l.rightToLeft) ? C : u,
+    v = {
+      transform: `${null == l || !l.isHorizontal || (null != l && l.rightToLeft) ? '' : 'rotate(180deg)'} scale(${
+        (o + (1.5 - 0.5 * g) * (l.innerWidth / 200) * 0.5) / o
+      })`,
+      fill: c,
+      marginTop: k ? '-16px' : '',
+      marginBottom: f ? '-16px' : '',
+    };
+  return r.default.createElement('div', {
+    className: 'jets-nose ' + (t ? '' : 'cut'),
+    style: v,
+    ref: a,
+    dangerouslySetInnerHTML: { __html: m },
+  });
+};
+jt(
+  '.jets-not-init{align-items:center;display:flex;font-size:18px;font-weight:700;height:100%;height:100vh;justify-content:center;width:100%}.jets-not-init--spinner{height:50px;width:50px}.lds-roller{display:inline-block;height:80px;position:relative;width:80px}.lds-roller div{animation:lds-roller 1.2s cubic-bezier(.5,0,.5,1) infinite;transform-origin:40px 40px}.lds-roller div:after{background:#000;border-radius:50%;content:" ";display:block;height:7px;margin:-4px 0 0 -4px;position:absolute;width:7px}.lds-roller div:first-child{animation-delay:-36ms}.lds-roller div:first-child:after{left:63px;top:63px}.lds-roller div:nth-child(2){animation-delay:-72ms}.lds-roller div:nth-child(2):after{left:56px;top:68px}.lds-roller div:nth-child(3){animation-delay:-.108s}.lds-roller div:nth-child(3):after{left:48px;top:71px}.lds-roller div:nth-child(4){animation-delay:-.144s}.lds-roller div:nth-child(4):after{left:40px;top:72px}.lds-roller div:nth-child(5){animation-delay:-.18s}.lds-roller div:nth-child(5):after{left:32px;top:71px}.lds-roller div:nth-child(6){animation-delay:-.216s}.lds-roller div:nth-child(6):after{left:24px;top:68px}.lds-roller div:nth-child(7){animation-delay:-.252s}.lds-roller div:nth-child(7):after{left:17px;top:63px}.lds-roller div:nth-child(8){animation-delay:-.288s}.lds-roller div:nth-child(8):after{left:12px;top:56px}@keyframes lds-roller{0%{transform:rotate(0deg)}to{transform:rotate(1turn)}}'
+);
+const gr = () =>
+  r.default.createElement(
+    'div',
+    { className: 'jets-not-init' },
+    r.default.createElement(
+      'div',
+      { className: 'lds-roller jets-not-init--spinner' },
+      r.default.createElement('div', null),
+      r.default.createElement('div', null),
+      r.default.createElement('div', null),
+      r.default.createElement('div', null),
+      r.default.createElement('div', null),
+      r.default.createElement('div', null),
+      r.default.createElement('div', null),
+      r.default.createElement('div', null)
+    )
+  );
+jt('.jets-deck-separator{mix-blend-mode:screen;position:relative;width:100%}');
+const pr = ({ width: t }) => {
+  const { params: l, colorTheme: i } = e.useContext(xe),
+    o = e.useRef(null),
+    s = { height: i.deckSeparation, background: i.fuselageFillColor };
+  return r.default.createElement('div', { className: 'jets-deck-separator', style: s, ref: o });
+};
+jt('.jets-tail{position:relative}.jets-tail:not(.cut) .tail-dotted-line,.tail-dotted-line{stroke:none}');
+const mr = ({ isFull: t }) => {
+  const { params: l, colorTheme: i } = e.useContext(xe),
+    [o, s] = e.useState(0),
+    a = e.useRef(null),
+    { fuselageFillColor: n, fuselageStrokeColor: c, floorColor: d } = i,
+    h = i.fuselageStrokeWidth / (l.innerWidth / 200),
+    g = { hullColor: n, outlineColor: c, straightFillColor: t ? n : d, strokeWidth: h };
+  e.useLayoutEffect(() => {
+    s(a.current.getBoundingClientRect().width);
+  }, []);
+  const p = (e =>
+      `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"viewBox="0 0 200 240">\n<style type="text/css">\n\t.tail-filling-straight{fill:${e.straightFillColor};stroke:${e.outlineColor};stroke-width:${e.strokeWidth};stroke-miterlimit:10;}\n\t.tail-filling{fill:${e.hullColor};}\n\t.tail-outline{fill:none;stroke:${e.outlineColor};stroke-width:${e.strokeWidth};stroke-miterlimit:10;}\n\t.tail-dotted-line{fill:none;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:0.9808,5.8847;}\n</style>\n<path class="tail-filling-straight" d="M2.3764 38.4678C1.77473 34.9207 1.5 31.332 1.5 27.7342V0H198.5V27.4086C198.5 31.2224 198.193 35.0136 197.521 38.7678C195.33 51.0122 189.575 81.2872 181.452 110.102C182.301 112.913 184.9 118.976 188.5 120.732C192.1 122.488 196.333 122.927 198 122.927V218.049L130.887 214.175C120.953 227.148 110.019 237.073 99.7 237.073C89.3766 237.073 78.4376 227.148 68.5 214.175L1.5 218.049V122.927C3.5 123.171 8.3 123.073 11.5 120.732C14.7 118.39 17.1667 112.669 18 110.102C9.94364 81.049 4.41928 50.5116 2.3764 38.4678Z"/>\n<path class="tail-filling" fill-rule="evenodd" clip-rule="evenodd" d="M124.773 31.1309C115.407 34.9612 106.068 38.7806 99.7 38.7806C93.0698 38.7806 83.4079 34.9465 73.7369 31.1086C64.0079 27.2479 54.2698 23.3834 47.6 23.4153C37.9662 23.5188 14.2876 27.4678 5.61475 28.9143C5.40053 28.95 5.19547 28.9842 5 29.0168H1.5V33.1388C1.5 33.1388 7.66764 72.8413 18 110.102C17.1667 112.669 14.7 118.39 11.5 120.732C8.3 123.073 3.5 123.171 1.5 122.927V218.049L68.5 214.175C78.4376 227.148 89.3766 237.073 99.7 237.073C110.019 237.073 120.953 227.148 130.887 214.175L198 218.049V122.927C196.333 122.927 192.1 122.488 188.5 120.732C184.9 118.976 182.301 112.913 181.452 110.102C191.956 72.8413 198.5 33.1388 198.5 33.1388V29.0168H194.897L194.408 28.9387C185.443 27.5034 160.229 23.4668 150.2 23.4147C143.718 23.383 134.232 27.2625 124.773 31.1309Z"/>\n<path class="tail-dotted-line" d="M5 29.0168C13.1094 27.6652 37.7283 23.5213 47.6 23.4152C60.9 23.3518 86.4 38.7806 99.7 38.7806C112.5 38.7806 137.3 23.3514 150.2 23.4147C160.417 23.4679 186.396 27.6566 194.897 29.0168" />\n<path class="tail-outline" d="M1.5 0V27.7342C1.5 31.332 1.77473 34.9207 2.3764 38.4678C4.41928 50.5116 9.94364 81.049 18 110.102M18 110.102C22.7259 127.145 28.3231 143.676 34.6 155.665C38.0428 162.218 51.8691 192.465 68.5 214.175M18 110.102C17.1667 112.669 14.7 118.39 11.5 120.732C8.3 123.073 3.5 123.171 1.5 122.927V218.049L68.5 214.175M198.5 0V27.4086C198.5 31.2224 198.193 35.0136 197.521 38.7678C195.33 51.0122 189.575 81.2872 181.452 110.102M181.452 110.102C176.647 127.145 171.014 143.676 164.8 155.665C161.356 162.18 147.524 192.451 130.887 214.175M181.452 110.102C182.301 112.913 184.9 118.976 188.5 120.732C192.1 122.488 196.833 122.927 198.5 122.927V218.049L130.887 214.175M68.5 214.175C78.4376 227.148 89.3766 237.073 99.7 237.073C110.019 237.073 120.953 227.148 130.887 214.175"/>\n</svg>`)(
+      g
+    ),
+    m = t || !0,
+    C = !1,
+    u = null == l || !l.isHorizontal || (null != l && l.rightToLeft) ? C : m,
+    f = null == l || !l.isHorizontal || (null != l && l.rightToLeft) ? m : C,
+    k = {
+      transform: `${null == l || !l.isHorizontal || (null != l && l.rightToLeft) ? '' : 'rotate(180deg)'} scale(${
+        (o + (1.5 - 0.5 * h) * (l.innerWidth / 200) * 0.5) / o
+      })`,
+      fill: c,
+      marginTop: f ? '-16px' : '',
+      marginBottom: u ? '-8px' : '',
+    };
+  return r.default.createElement('div', {
+    className: 'jets-tail ' + (t ? '' : 'cut'),
+    style: k,
+    ref: a,
+    dangerouslySetInnerHTML: { __html: p },
+  });
+};
+jt(
+  '.jets-wings{box-sizing:border-box;overflow:hidden;position:absolute;transform:translateZ(-10px)}.jets-wings-alignment-wrapper{align-items:center;display:flex;flex-direction:column;position:absolute;width:100%;z-index:-1}.jets-wings .wing{height:100%;position:absolute;transform-origin:top center;width:50%}.jets-wings .wing.left{left:0}.jets-wings .wing.right{right:0}.jets-wings .wing-leading{height:30px;overflow:hidden;position:absolute;z-index:1}.jets-wings .wing-leading.left{clip-path:polygon(100% 10%,0 100%,0 0)}.jets-wings .wing-leading.right{clip-path:polygon(100% 0,100% 100%,-10% 0)}'
+);
+const Cr = ({ wingsInfo: t }) => {
+  var l, i;
+  const { isWingLeadingVisible: o, style: s } = (t => {
+    const { colorTheme: r, params: l } = e.useContext(xe),
+      i = () => {
+        if (null == r || !r.wingsWidth) return;
+        const e = {
+          width: `${(null == r ? void 0 : r.wingsWidth) + 8}px`,
+          top: '-3px',
+          background: (null == r ? void 0 : r.seatMapBackgroundColor) || '#fff',
+        };
+        return { left: { ...e, left: '-4px' }, right: { ...e, right: '-4px' } };
       },
-    });
-    var h;
+      o = e.useMemo(
+        () => ({
+          wrapper: { top: t.start },
+          container: { height: t.length, width: l.innerWidth },
+          wing: { background: `${null == r ? void 0 : r.fuselageWingsColor}` },
+          leading: i(),
+        }),
+        [l, r, t]
+      );
+    return {
+      isWingLeadingVisible: Boolean(
+        (null == l ? void 0 : l.visibleWings) && (null == t ? void 0 : t.visibleWingsLeadings) && o.leading
+      ),
+      style: o,
+    };
+  })(t);
+  return r.default.createElement(
+    'div',
+    { className: 'jets-wings-alignment-wrapper', style: s.wrapper },
+    r.default.createElement(
+      'div',
+      { className: 'jets-wings', style: s.container },
+      o &&
+        r.default.createElement(
+          r.default.Fragment,
+          null,
+          r.default.createElement('div', {
+            className: 'wing-leading left',
+            style: null === (l = s.leading) || void 0 === l ? void 0 : l.left,
+          }),
+          r.default.createElement('div', {
+            className: 'wing-leading right',
+            style: null === (i = s.leading) || void 0 === i ? void 0 : i.right,
+          })
+        ),
+      r.default.createElement('div', { className: 'wing left', style: s.wing }),
+      r.default.createElement('div', { className: 'wing right', style: s.wing })
+    )
+  );
+};
+jt(
+  '.jets-plane-body{margin:0 auto}.jets-deck-wrapper{z-index:1}.deck-floor,.jets-deck-wrapper{position:relative;transform-style:preserve-3d}'
+);
+const ur = ({ activeDeck: t, content: l, exits: i, bulks: o, isSeatMapInited: s, config: a, showOneDeck: n }) => {
+    var c;
+    const { params: d, colorTheme: h, componentOverrides: g } = e.useContext(xe),
+      p = e.useRef(new Array()),
+      m = null !== (c = null == g ? void 0 : g.JetsNotInit) && void 0 !== c ? c : gr,
+      { lang: C, visibleFuselage: u } = a,
+      {
+        deckHeightSpacing: f,
+        fuselageStrokeWidth: k,
+        fuselageStrokeColor: v,
+        floorColor: w,
+        wingsWidth: L,
+        fuselageFillColor: b,
+        cabinTitlesWidth: x,
+      } = h,
+      M = {
+        borderLeft: `${k}px solid ${v}`,
+        borderRight: `${k}px solid ${v}`,
+        transform: null != d && d.isHorizontal && !d.rightToLeft ? 'rotate(180deg)' : '',
+      },
+      z = { backgroundColor: w, padding: `${f}px 0`, borderLeft: `solid ${b}`, borderRight: `solid ${b}` },
+      y = l ? [...l] : [];
+    let S = t;
+    null == a || !a.horizontal || (null != a && a.rightToLeft) || (y.reverse(), (S = y.length - 1 - S));
+    const T = (null == d ? void 0 : d.isHorizontal) && !(null != d && d.rightToLeft),
+      E = null != d && d.visibleWings ? 2 * L : 0,
+      H = null != d && d.visibleCabinTitles ? 2 * x : 0,
+      _ = ((null == d ? void 0 : d.innerWidth) || 0) - Math.max(E, H),
+      $ = { width: _ || a.width },
+      A = !0,
+      V = !0,
+      O = 1 == (null == y ? void 0 : y.length);
+    return r.default.createElement(
+      'div',
+      { className: 'jets-plane-body', style: $ },
+      u && null != y && y.length
+        ? T
+          ? r.default.createElement(mr, { isFull: A })
+          : r.default.createElement(hr, { isFull: V })
+        : null,
+      null != y && y.length
+        ? r.default.createElement(
+            'div',
+            { className: 'jets-deck-wrapper', style: M },
+            null == y
+              ? void 0
+              : y.map((e, t) =>
+                  n && t != S
+                    ? null
+                    : r.default.createElement(
+                        r.default.Fragment,
+                        { key: e.uniqId + t },
+                        r.default.createElement(
+                          'div',
+                          {
+                            ref: e => {
+                              p.current[t] = e;
+                            },
+                            className: 'deck-floor tooltip-holder',
+                            style: {
+                              ...z,
+                              height: e.height + f,
+                              borderWidth: `${Math.max(0.5 * (d.innerWidth - e.width) - k, k)}px`,
+                            },
+                          },
+                          r.default.createElement(nr, {
+                            deck: e,
+                            lang: C,
+                            key: e.uniqId,
+                            exits: i[e.number - 1],
+                            bulks: o[e.number - 1],
+                            style: { position: 'absolute' },
+                            isSingleDeck: O,
+                          })
+                        ),
+                        (null == d ? void 0 : d.visibleWings) &&
+                          r.default.createElement(Cr, { wingsInfo: null == e ? void 0 : e.wingsInfo }),
+                        t < y.length - 1 && !n && r.default.createElement(pr, { key: t, width: _ })
+                      )
+                )
+          )
+        : s
+        ? r.default.createElement(dr, null)
+        : r.default.createElement(m, null),
+      u && null != y && y.length
+        ? T
+          ? r.default.createElement(hr, { isFull: V })
+          : r.default.createElement(mr, { isFull: A })
+        : null
+    );
   },
-  dr = [
+  fr = [
     'AR',
     'CN',
     'CS',
@@ -3590,13 +3845,13 @@ const cr = ({ direction: t }) => {
     'UK',
     'SV',
   ];
-class hr extends Le {
-  constructor(e, t, r, i = null, o = E) {
-    super(e, t, r, i, o),
-      l(this, 'getPlaneFeatures', async (e, t = z, r = S) => {
-        const l = { flight: e, lang: dr.includes(t) ? t : z, units: r },
+class kr extends be {
+  constructor(e, t, r, i = null, o = E, s) {
+    super(e, t, r, i, o, s),
+      l(this, 'getPlaneFeatures', async (e, t = y, r = S) => {
+        const l = { flight: e, lang: fr.includes(t) ? t : y, units: r },
           i = 'availabilityData',
-          o = await this.postData('api/v1/seatmap', l),
+          o = await this.postData('api/v1/seatmap_v2', l),
           s = { seatDetails: null },
           a = ['F', 'B', 'P', 'E'];
         for (const t of o)
@@ -3624,7 +3879,7 @@ class hr extends Le {
       });
   }
 }
-class gr {
+class vr {
   constructor(e) {
     l(this, 'getSeatMapData', async (e, t, r, l) => {
       const { lang: i, units: o } = l,
@@ -3662,7 +3917,7 @@ class gr {
         return { data: this.setPassengersHandler(e, l), passengers: l };
       }),
       l(this, 'setAvailabilityHandler', (e, t) => {
-        const { selected: r, available: l, unavailable: i } = b,
+        const { selected: r, available: l, unavailable: i } = L,
           o = null == t ? void 0 : t.find(e => '*' === e.label);
         return (
           e &&
@@ -3681,24 +3936,24 @@ class gr {
                       (e.price = `${a} ${n}` || ''),
                       (e.cost = n),
                       (e.currency = a),
-                      (e.passengerTypes = s.onlyForPassengerType || (null == o ? void 0 : o.onlyForPassengerType) || P),
+                      (e.passengerTypes = s.onlyForPassengerType || (null == o ? void 0 : o.onlyForPassengerType) || R),
                       (e.additionalProps = [
                         ...((null == s ? void 0 : s.additionalProps) || []),
                         ...((null == o ? void 0 : o.additionalProps) || []),
                       ]),
-                      (e.color = ye.validateColor(
+                      (e.color = ze.validateColor(
                         (null == s ? void 0 : s.color) || (null == o ? void 0 : o.color),
                         null == e ? void 0 : e.originalColor
                       )))
-                    : e.type === L.seat &&
+                    : e.type === b.seat &&
                       ((e.status = o ? l : i),
                       (e.price = o ? `${a} ${n}` : null),
                       (e.cost = n),
                       (e.currency = a),
                       (e.passenger = null),
-                      (e.passengerTypes = (null == o ? void 0 : o.onlyForPassengerType) || P),
+                      (e.passengerTypes = (null == o ? void 0 : o.onlyForPassengerType) || R),
                       (e.additionalProps = (null == o ? void 0 : o.additionalProps) || []),
-                      (e.color = ye.validateColor(
+                      (e.color = ze.validateColor(
                         null == o ? void 0 : o.color,
                         this._colorTheme.notAvailableSeatsColor
                       ))),
@@ -3713,7 +3968,7 @@ class gr {
         );
       }),
       l(this, 'setPassengersHandler', (e, t) => {
-        const { selected: r, available: l, unavailable: i } = b;
+        const { selected: r, available: l, unavailable: i } = L;
         return e.map(e => {
           const o = e.rows.map(e => {
             const o = e.seats.map(e => {
@@ -3805,7 +4060,7 @@ class gr {
                   return null == e || null === (t = e.seats) || void 0 === t
                     ? void 0
                     : t
-                        .filter(e => (null == e ? void 0 : e.type) === L.seat)
+                        .filter(e => (null == e ? void 0 : e.type) === b.seat)
                         .map(e => {
                           var t;
                           return null == e || null === (t = e.number) || void 0 === t ? void 0 : t.toUpperCase();
@@ -3817,272 +4072,18 @@ class gr {
           nonExistingSeatLabels: [],
         });
       });
-    const { apiUrl: t, apiAppId: r, apiKey: i, colorTheme: o, apiAuthorizationScheme: s } = e,
-      a = new $e();
-    (this._api = new hr(r, i, t, a, s)), (this._preparer = new He()), (this._colorTheme = o), (this._configuration = e);
+    const { apiUrl: t, apiAppId: r, apiKey: i, colorTheme: o, apiAuthorizationScheme: s, request: a } = e,
+      n = new Ae();
+    (this._api = new kr(r, i, t, n, s, a)),
+      (this._preparer = new He()),
+      (this._colorTheme = o),
+      (this._configuration = e);
   }
 }
-Ft(
-  '.jets-seat-map{font-family:sans-serif;font-weight:400;height:100%;position:relative;width:100%}.jets-seat-map.scale.vertical *{-webkit-font-smoothing:subpixel-antialiased;filter:blur(0);-webkit-filter:blur(0)}'
+jt(
+  '.jets-seat-map{font-weight:400;height:100%;position:relative;width:100%}.jets-seat-map.scale.vertical *{-webkit-font-smoothing:subpixel-antialiased;filter:blur(0);-webkit-filter:blur(0)}'
 );
-Ft('.jets-deck-separator{mix-blend-mode:screen;position:relative;width:100%}');
-const pr = ({ width: t }) => {
-  const { params: l, colorTheme: i } = e.useContext(xe),
-    o = e.useRef(null),
-    s = { height: i.deckSeparation, background: i.fuselageFillColor };
-  return r.default.createElement('div', { className: 'jets-deck-separator', style: s, ref: o });
-};
-Ft('.jets-tail{position:relative}.jets-tail:not(.cut) .tail-dotted-line,.tail-dotted-line{stroke:none}');
-const mr = ({ isFull: t }) => {
-  const { params: l, colorTheme: i } = e.useContext(xe),
-    [o, s] = e.useState(0),
-    a = e.useRef(null),
-    { fuselageFillColor: n, fuselageStrokeColor: c, floorColor: d } = i,
-    h = i.fuselageStrokeWidth / (l.innerWidth / 200),
-    g = { hullColor: n, outlineColor: c, straightFillColor: t ? n : d, strokeWidth: h };
-  e.useLayoutEffect(() => {
-    s(a.current.getBoundingClientRect().width);
-  }, []);
-  const p = (e =>
-      `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"viewBox="0 0 200 240">\n<style type="text/css">\n\t.tail-filling-straight{fill:${e.straightFillColor};stroke:${e.outlineColor};stroke-width:${e.strokeWidth};stroke-miterlimit:10;}\n\t.tail-filling{fill:${e.hullColor};}\n\t.tail-outline{fill:none;stroke:${e.outlineColor};stroke-width:${e.strokeWidth};stroke-miterlimit:10;}\n\t.tail-dotted-line{fill:none;stroke:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:0.9808,5.8847;}\n</style>\n<path class="tail-filling-straight" d="M2.3764 38.4678C1.77473 34.9207 1.5 31.332 1.5 27.7342V0H198.5V27.4086C198.5 31.2224 198.193 35.0136 197.521 38.7678C195.33 51.0122 189.575 81.2872 181.452 110.102C182.301 112.913 184.9 118.976 188.5 120.732C192.1 122.488 196.333 122.927 198 122.927V218.049L130.887 214.175C120.953 227.148 110.019 237.073 99.7 237.073C89.3766 237.073 78.4376 227.148 68.5 214.175L1.5 218.049V122.927C3.5 123.171 8.3 123.073 11.5 120.732C14.7 118.39 17.1667 112.669 18 110.102C9.94364 81.049 4.41928 50.5116 2.3764 38.4678Z"/>\n<path class="tail-filling" fill-rule="evenodd" clip-rule="evenodd" d="M124.773 31.1309C115.407 34.9612 106.068 38.7806 99.7 38.7806C93.0698 38.7806 83.4079 34.9465 73.7369 31.1086C64.0079 27.2479 54.2698 23.3834 47.6 23.4153C37.9662 23.5188 14.2876 27.4678 5.61475 28.9143C5.40053 28.95 5.19547 28.9842 5 29.0168H1.5V33.1388C1.5 33.1388 7.66764 72.8413 18 110.102C17.1667 112.669 14.7 118.39 11.5 120.732C8.3 123.073 3.5 123.171 1.5 122.927V218.049L68.5 214.175C78.4376 227.148 89.3766 237.073 99.7 237.073C110.019 237.073 120.953 227.148 130.887 214.175L198 218.049V122.927C196.333 122.927 192.1 122.488 188.5 120.732C184.9 118.976 182.301 112.913 181.452 110.102C191.956 72.8413 198.5 33.1388 198.5 33.1388V29.0168H194.897L194.408 28.9387C185.443 27.5034 160.229 23.4668 150.2 23.4147C143.718 23.383 134.232 27.2625 124.773 31.1309Z"/>\n<path class="tail-dotted-line" d="M5 29.0168C13.1094 27.6652 37.7283 23.5213 47.6 23.4152C60.9 23.3518 86.4 38.7806 99.7 38.7806C112.5 38.7806 137.3 23.3514 150.2 23.4147C160.417 23.4679 186.396 27.6566 194.897 29.0168" />\n<path class="tail-outline" d="M1.5 0V27.7342C1.5 31.332 1.77473 34.9207 2.3764 38.4678C4.41928 50.5116 9.94364 81.049 18 110.102M18 110.102C22.7259 127.145 28.3231 143.676 34.6 155.665C38.0428 162.218 51.8691 192.465 68.5 214.175M18 110.102C17.1667 112.669 14.7 118.39 11.5 120.732C8.3 123.073 3.5 123.171 1.5 122.927V218.049L68.5 214.175M198.5 0V27.4086C198.5 31.2224 198.193 35.0136 197.521 38.7678C195.33 51.0122 189.575 81.2872 181.452 110.102M181.452 110.102C176.647 127.145 171.014 143.676 164.8 155.665C161.356 162.18 147.524 192.451 130.887 214.175M181.452 110.102C182.301 112.913 184.9 118.976 188.5 120.732C192.1 122.488 196.833 122.927 198.5 122.927V218.049L130.887 214.175M68.5 214.175C78.4376 227.148 89.3766 237.073 99.7 237.073C110.019 237.073 120.953 227.148 130.887 214.175"/>\n</svg>`)(
-      g
-    ),
-    m = t || !0,
-    C = !1,
-    u = null == l || !l.isHorizontal || (null != l && l.rightToLeft) ? C : m,
-    f = null == l || !l.isHorizontal || (null != l && l.rightToLeft) ? m : C,
-    k = {
-      transform: `${null == l || !l.isHorizontal || (null != l && l.rightToLeft) ? '' : 'rotate(180deg)'} scale(${
-        (o + (1.5 - 0.5 * h) * (l.innerWidth / 200) * 0.5) / o
-      })`,
-      fill: c,
-      marginTop: f ? '-16px' : '',
-      marginBottom: u ? '-8px' : '',
-    };
-  return r.default.createElement('div', {
-    className: 'jets-tail ' + (t ? '' : 'cut'),
-    style: k,
-    ref: a,
-    dangerouslySetInnerHTML: { __html: p },
-  });
-};
-Ft('.jets-nose{position:relative}.jets-nose:not(.cut) .nose-dotted-line,.nose-dotted-line{stroke:none}');
-const Cr = ({ isFull: t }) => {
-  const { params: l, colorTheme: i } = e.useContext(xe),
-    [o, s] = e.useState(0),
-    a = e.useRef(null),
-    { fuselageFillColor: n, fuselageStrokeColor: c, fuselageWindowsColor: d, floorColor: h } = i,
-    g = i.fuselageStrokeWidth / (l.innerWidth / 200),
-    p = { hullColor: n, windowColor: d, outlineColor: c, straightFillColor: t ? n : h, strokeWidth: g };
-  e.useLayoutEffect(() => {
-    s(a.current.getBoundingClientRect().width);
-  }, []);
-  const m = (e =>
-      `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="200" height="214" viewBox="0 0 200 214">\n\n<style type="text/css">\n\t.nose-filling-straight{fill:${e.straightFillColor};}\n\t.nose-filling{fill:${e.hullColor};}\n\t.nose-outline{fill:none;stroke:${e.outlineColor};stroke-width:${e.strokeWidth};stroke-linejoin:round;stroke-miterlimit:10;}\n\t.nose-windows{fill:${e.windowColor};}\n\t.nose-dotted-line{fill:none;stroke:none;stroke-width:${e.strokeWidth};stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:0.9715,5.8292;}\n</style>\n\t\n<path class="nose-filling-straight" d="M1.5 213.5H198.5L198.3 189.5V189.5C198.432 183.009 197.551 176.63 195.513 170.466C183.455 134.002 137.233 2 100 2C62.7343 2.08626 16.4645 134.331 4.45578 170.661C2.43787 176.766 1.5 183.07 1.5 189.5V189.5L1.5 213.5Z" />\n<path class="nose-filling" d="M1.5 191C1.5 191 2.03703 191.308 3 191C9.75537 188.837 37.4722 179.675 47.8 179.5C61.1 179.4 86.8 190 100.1 190C113 190 137.9 179.5 150.8 179.6C163 179.7 197.1 191 197.1 191H198.5V189.4V189.4C198.5 182.97 197.562 176.666 195.544 170.561C183.535 134.232 137.266 2 100 2C62.7343 2.08626 16.4645 134.331 4.45578 170.661C2.43787 176.766 1.5 183.07 1.5 189.5V189.5V191Z" />\n<path class="nose-dotted-line" d="M5 190C14.0715 187.075 38.297 179.661 47.8 179.5C61.1 179.4 86.8 190 100.1 190C113 190 137.9 179.5 150.8 179.6C161.176 179.685 187.392 187.554 195 190"/>\n<path class="nose-outline" d="M198.5 213.5V190.435C198.5 183.385 197.47 176.464 195.252 169.772C182.801 132.214 136.97 2 100 2C63.0303 2 17.199 132.214 4.7484 169.772C2.53029 176.464 1.5 183.385 1.5 190.435V213.5" />\n<path class="nose-windows" d="M143 102.9L138.8 118.7C149.8 122 160 126.4 160 126.4C160 126 151 111.4 147.6 107.2C146.4 105.7 145 104.3 143 102.9Z" fill="white"/>\n<path class="nose-windows" d="M140.4 101.2C137.9 99.9 134.6 98.6 130 97.3C118.8 94.1 101 94 101 94V114.4C101 114.4 120.9 114.4 130 116.4C131.9 116.8 133.9 117.3 135.9 117.9L140.4 101.2Z" fill="white"/>\n<path class="nose-windows" d="M57 102.9C55 104.3 53.7 105.7 52.4 107.2C49 111.4 40 126 40 126.4C40 126.4 50.2 122 61.2 118.7L57 102.9Z" fill="white"/>\n<path class="nose-windows" d="M70.0001 97.3C65.4001 98.6 62.1001 99.9 59.6001 101.2L64.1001 117.8C66.1001 117.2 68.1001 116.7 70.0001 116.3C79.1001 114.3 98.0001 114.3 98.0001 114.3V94C98.0001 94 81.2001 94.1 70.0001 97.3Z" fill="white"/>\n</svg>\n`)(
-      p
-    ),
-    C = !1,
-    u = t || !0,
-    f = null == l || !l.isHorizontal || (null != l && l.rightToLeft) ? u : C,
-    k = null == l || !l.isHorizontal || (null != l && l.rightToLeft) ? C : u,
-    v = {
-      transform: `${null == l || !l.isHorizontal || (null != l && l.rightToLeft) ? '' : 'rotate(180deg)'} scale(${
-        (o + (1.5 - 0.5 * g) * (l.innerWidth / 200) * 0.5) / o
-      })`,
-      fill: c,
-      marginTop: k ? '-16px' : '',
-      marginBottom: f ? '-16px' : '',
-    };
-  return r.default.createElement('div', {
-    className: 'jets-nose ' + (t ? '' : 'cut'),
-    style: v,
-    ref: a,
-    dangerouslySetInnerHTML: { __html: m },
-  });
-};
-Ft(
-  '.jets-no-data{align-items:center;display:flex;font-size:18px;font-weight:700;height:100%;height:100vh;justify-content:center;width:100%}'
-);
-const ur = () => {
-  const { params: t } = e.useContext(xe),
-    l = { transform: `scale(${null == t ? void 0 : t.antiScale})` };
-  return r.default.createElement(
-    'div',
-    { style: l, className: 'jets-no-data' },
-    'Seat map is not found for the flight'
-  );
-};
-Ft(
-  '.jets-not-init{align-items:center;display:flex;font-size:18px;font-weight:700;height:100%;height:100vh;justify-content:center;width:100%}.jets-not-init--spinner{height:50px;width:50px}.lds-roller{display:inline-block;height:80px;position:relative;width:80px}.lds-roller div{animation:lds-roller 1.2s cubic-bezier(.5,0,.5,1) infinite;transform-origin:40px 40px}.lds-roller div:after{background:#000;border-radius:50%;content:" ";display:block;height:7px;margin:-4px 0 0 -4px;position:absolute;width:7px}.lds-roller div:first-child{animation-delay:-36ms}.lds-roller div:first-child:after{left:63px;top:63px}.lds-roller div:nth-child(2){animation-delay:-72ms}.lds-roller div:nth-child(2):after{left:56px;top:68px}.lds-roller div:nth-child(3){animation-delay:-.108s}.lds-roller div:nth-child(3):after{left:48px;top:71px}.lds-roller div:nth-child(4){animation-delay:-.144s}.lds-roller div:nth-child(4):after{left:40px;top:72px}.lds-roller div:nth-child(5){animation-delay:-.18s}.lds-roller div:nth-child(5):after{left:32px;top:71px}.lds-roller div:nth-child(6){animation-delay:-.216s}.lds-roller div:nth-child(6):after{left:24px;top:68px}.lds-roller div:nth-child(7){animation-delay:-.252s}.lds-roller div:nth-child(7):after{left:17px;top:63px}.lds-roller div:nth-child(8){animation-delay:-.288s}.lds-roller div:nth-child(8):after{left:12px;top:56px}@keyframes lds-roller{0%{transform:rotate(0deg)}to{transform:rotate(1turn)}}'
-);
-const fr = () =>
-  r.default.createElement(
-    'div',
-    { className: 'jets-not-init' },
-    r.default.createElement(
-      'div',
-      { className: 'lds-roller jets-not-init--spinner' },
-      r.default.createElement('div', null),
-      r.default.createElement('div', null),
-      r.default.createElement('div', null),
-      r.default.createElement('div', null),
-      r.default.createElement('div', null),
-      r.default.createElement('div', null),
-      r.default.createElement('div', null),
-      r.default.createElement('div', null)
-    )
-  );
-Ft(
-  '.jets-wings{box-sizing:border-box;overflow:hidden;position:absolute;transform:translateZ(-10px)}.jets-wings-alignment-wrapper{align-items:center;display:flex;flex-direction:column;position:absolute;width:100%;z-index:-1}.jets-wings .wing{height:100%;position:absolute;transform-origin:top center;width:50%}.jets-wings .wing.left{left:0}.jets-wings .wing.right{right:0}.jets-wings .wing-leading{height:30px;overflow:hidden;position:absolute;z-index:1}.jets-wings .wing-leading.left{clip-path:polygon(100% 10%,0 100%,0 0)}.jets-wings .wing-leading.right{clip-path:polygon(100% 0,100% 100%,-10% 0)}'
-);
-const kr = ({ wingsInfo: t }) => {
-  var l, i;
-  const { isWingLeadingVisible: o, style: s } = (t => {
-    const { colorTheme: r, params: l } = e.useContext(xe),
-      i = () => {
-        if (null == r || !r.wingsWidth) return;
-        const e = {
-          width: `${(null == r ? void 0 : r.wingsWidth) + 8}px`,
-          top: '-3px',
-          background: (null == r ? void 0 : r.seatMapBackgroundColor) || '#fff',
-        };
-        return { left: { ...e, left: '-4px' }, right: { ...e, right: '-4px' } };
-      },
-      o = e.useMemo(
-        () => ({
-          wrapper: { top: t.start },
-          container: { height: t.length, width: l.innerWidth },
-          wing: { background: `${null == r ? void 0 : r.fuselageWingsColor}` },
-          leading: i(),
-        }),
-        [l, r, t]
-      );
-    return {
-      isWingLeadingVisible: Boolean(
-        (null == l ? void 0 : l.visibleWings) && (null == t ? void 0 : t.visibleWingsLeadings) && o.leading
-      ),
-      style: o,
-    };
-  })(t);
-  return r.default.createElement(
-    'div',
-    { className: 'jets-wings-alignment-wrapper', style: s.wrapper },
-    r.default.createElement(
-      'div',
-      { className: 'jets-wings', style: s.container },
-      o &&
-        r.default.createElement(
-          r.default.Fragment,
-          null,
-          r.default.createElement('div', {
-            className: 'wing-leading left',
-            style: null === (l = s.leading) || void 0 === l ? void 0 : l.left,
-          }),
-          r.default.createElement('div', {
-            className: 'wing-leading right',
-            style: null === (i = s.leading) || void 0 === i ? void 0 : i.right,
-          })
-        ),
-      r.default.createElement('div', { className: 'wing left', style: s.wing }),
-      r.default.createElement('div', { className: 'wing right', style: s.wing })
-    )
-  );
-};
-Ft(
-  '.jets-plane-body{margin:0 auto}.jets-deck-wrapper{z-index:1}.deck-floor,.jets-deck-wrapper{position:relative;transform-style:preserve-3d}'
-);
-const vr = ({ activeDeck: t, content: l, exits: i, bulks: o, isSeatMapInited: s, config: a, showOneDeck: n }) => {
-  var c;
-  const { params: d, colorTheme: h, componentOverrides: g } = e.useContext(xe),
-    p = e.useRef(new Array()),
-    m = null !== (c = null == g ? void 0 : g.JetsNotInit) && void 0 !== c ? c : fr,
-    { lang: C, visibleFuselage: u } = a,
-    {
-      deckHeightSpacing: f,
-      fuselageStrokeWidth: k,
-      fuselageStrokeColor: v,
-      floorColor: w,
-      wingsWidth: b,
-      fuselageFillColor: L,
-      cabinTitlesWidth: x,
-    } = h,
-    M = {
-      borderLeft: `${k}px solid ${v}`,
-      borderRight: `${k}px solid ${v}`,
-      transform: null != d && d.isHorizontal && !d.rightToLeft ? 'rotate(180deg)' : '',
-    },
-    y = { backgroundColor: w, padding: `${f}px 0`, borderLeft: `solid ${L}`, borderRight: `solid ${L}` },
-    z = l ? [...l] : [];
-  let S = t;
-  null == a || !a.horizontal || (null != a && a.rightToLeft) || (z.reverse(), (S = z.length - 1 - S));
-  const T = (null == d ? void 0 : d.isHorizontal) && !(null != d && d.rightToLeft),
-    E = null != d && d.visibleWings ? 2 * b : 0,
-    H = null != d && d.visibleCabinTitles ? 2 * x : 0,
-    A = ((null == d ? void 0 : d.innerWidth) || 0) - Math.max(E, H),
-    _ = { width: A || a.width },
-    $ = !0,
-    V = !0,
-    O = 1 == (null == z ? void 0 : z.length);
-  return r.default.createElement(
-    'div',
-    { className: 'jets-plane-body', style: _ },
-    u && null != z && z.length
-      ? T
-        ? r.default.createElement(mr, { isFull: $ })
-        : r.default.createElement(Cr, { isFull: V })
-      : null,
-    null != z && z.length
-      ? r.default.createElement(
-          'div',
-          { className: 'jets-deck-wrapper', style: M },
-          null == z
-            ? void 0
-            : z.map((e, t) =>
-                n && t != S
-                  ? null
-                  : r.default.createElement(
-                      r.default.Fragment,
-                      { key: e.uniqId + t },
-                      r.default.createElement(
-                        'div',
-                        {
-                          ref: e => {
-                            p.current[t] = e;
-                          },
-                          className: 'deck-floor tooltip-holder',
-                          style: {
-                            ...y,
-                            height: e.height + f,
-                            borderWidth: `${Math.max(0.5 * (d.innerWidth - e.width) - k, k)}px`,
-                          },
-                        },
-                        r.default.createElement(nr, {
-                          deck: e,
-                          lang: C,
-                          key: e.uniqId,
-                          exits: i[e.number - 1],
-                          bulks: o[e.number - 1],
-                          style: { position: 'absolute' },
-                          isSingleDeck: O,
-                        })
-                      ),
-                      (null == d ? void 0 : d.visibleWings) &&
-                        r.default.createElement(kr, { wingsInfo: null == e ? void 0 : e.wingsInfo }),
-                      t < z.length - 1 && !n && r.default.createElement(pr, { key: t, width: A })
-                    )
-              )
-        )
-      : s
-      ? r.default.createElement(ur, null)
-      : r.default.createElement(m, null),
-    u && null != z && z.length
-      ? T
-        ? r.default.createElement(Cr, { isFull: V })
-        : r.default.createElement(mr, { isFull: $ })
-      : null
-  );
-};
-Ft(
+jt(
   '.jets-tooltip{background:#fff;border-radius:2px;box-shadow:0 0 0 1px #c0cad5,0 0 4px 0 rgb(0 0 0/8%),0 8px 8px 0 rgb(0 0 0/8%),0 16px 16px 0 rgb(0 0 0/8%);box-sizing:border-box;font-size:12px;max-width:100%;outline:0;position:absolute;z-index:200}.jets-tooltip--content{padding:16px 16px 0}.jets-tooltip--body.no-buttons .jets-tooltip--content{padding:16px}.jets-tooltip--body.no-buttons .jets-tooltip--btns-block{display:none}.jets-tooltip--header{display:flex;font-size:16px;font-weight:700;justify-content:space-between;margin-bottom:8px;width:100%}.jets-tooltip--passenger-name{font-size:15px;font-weight:700;margin-bottom:8px}.jets-tooltip--features>ul{list-style:none;margin:0;padding:0;width:100%}.jets-tooltip--feature img{height:18px;width:18px}.jets-tooltip--feature .svg_span{height:18px;min-height:18px;min-width:18px;width:18px}.jets-tooltip--feature>span{display:block}.jets-tooltip--features>ul>li{align-items:center;color:#4f6f8f;display:flex;font-size:13px;line-height:1.4;margin-bottom:.6rem;width:100%}.jets-tooltip--features>ul>li>div{margin:0 5px}.jets-tooltip--btns-block{display:flex;width:100%}.jets-tooltip--btn{-webkit-font-smoothing:antialiased;border-radius:2px;border-style:solid;border-width:0;cursor:pointer;display:inline-block;font-family:inherit;font-size:14px;font-weight:700;line-height:1.5;margin:1%;padding:9.5px 18px;text-align:center;text-decoration:none;vertical-align:middle;width:48%}.jets-tooltip--arrow-pointer{border-color:#fff transparent transparent;border-style:solid;border-width:14px 16px 0;height:0;margin:0 0 0 -16px;position:absolute;transform-origin:top;width:0}.jets-tooltip--arrow-pointer-horizontal{border-color:#fff transparent transparent;border-style:solid;border-width:16px 14px 16px 0;height:0;margin:-16px 0 0 -14px;position:absolute;transform-origin:right;width:0}.jets-tooltip--measurements{grid-column-gap:3%;display:grid;grid-auto-columns:minmax(0,1fr);grid-auto-flow:column;margin:10px 0}.jets-tooltip--measurement{backface-visibility:hidden;border:1px solid #4f6f8f;border-radius:6px;box-sizing:border-box;padding:10px;transform:translateZ(0);transform-style:preserve-3d}.jets-tooltip--measurement svg{display:block;height:40px}.jets-tooltip--measurement-value{color:#4f6f8f;margin-top:10px;text-align:center}.horizontal .jets-tooltip--measurement{align-items:center;display:flex;justify-content:space-evenly}.horizontal .jets-tooltip--features{-moz-column-count:2;-webkit-column-count:2;column-count:2;-moz-column-gap:20px;-webkit-column-gap:20px;column-gap:20px}.horizontal .jets-tooltip--features>ul>li:nth-child(6){-webkit-column-break-after:always;break-after:always}.horizontal .jets-tooltip--measurements .svg_span{display:inline-block}.horizontal .jets-tooltip--measurement-value{display:inline-block;margin:0 4px}.horizontal .jets-tooltip--measurement svg{height:30px}'
 );
 const wr = ({ data: t }) => {
@@ -4103,49 +4104,49 @@ const wr = ({ data: t }) => {
       {
         tooltipBackgroundColor: k,
         tooltipHeaderColor: v,
-        tooltipBorderColor: b,
-        tooltipFontColor: L,
+        tooltipBorderColor: L,
+        tooltipFontColor: b,
         tooltipIconColor: x,
         tooltipIconBorderColor: M,
-        tooltipIconBackgroundColor: z,
+        tooltipIconBackgroundColor: y,
         tooltipSelectButtonTextColor: S,
         tooltipSelectButtonBackgroundColor: T,
         tooltipCancelButtonTextColor: E,
         tooltipCancelButtonBackgroundColor: H,
       } = n,
       {
-        number: A,
-        classType: _,
-        top: $,
+        number: _,
+        classType: $,
+        top: A,
         left: V,
         features: O,
-        measurements: I,
-        price: B,
-        passenger: N,
-        nextPassenger: W,
-        passengerTypes: D,
-        lang: R,
-        rowName: j,
-        antiScale: F,
+        measurements: B,
+        price: I,
+        passenger: W,
+        nextPassenger: P,
+        passengerTypes: N,
+        lang: D,
+        rowName: F,
+        antiScale: j,
         scaleType: Z,
         width: U,
         seatmapHeight: G,
         seatmapWidth: K,
-        seatmapElement: J,
-        seatNode: q,
-        additionalProps: Y,
+        seatmapElement: q,
+        seatNode: Y,
+        additionalProps: J,
       } = t,
-      X = t.size.height / F,
-      Q = (t.size.width / F - 16 - 8) / 2,
-      ee = q.closest('.jets-row').getBoundingClientRect(),
-      te = q.getBoundingClientRect(),
-      re = J.getBoundingClientRect(),
-      le = J.parentElement.getBoundingClientRect();
+      X = t.size.height / j,
+      Q = (t.size.width / j - 16 - 8) / 2,
+      ee = Y.closest('.jets-row').getBoundingClientRect(),
+      te = Y.getBoundingClientRect(),
+      re = q.getBoundingClientRect(),
+      le = q.parentElement.getBoundingClientRect();
     let ie = te.top - re.top,
       oe = te.left - re.left,
       se = te.top - le.top;
     if (d) {
-      const e = Z === w.ZOOM ? F : 1;
+      const e = Z === w.ZOOM ? j : 1;
       (ie = te.top / e - re.top), (oe = te.left / e - re.left), (se = te.top / e - le.top);
     }
     const ae = null != c && c.isHorizontal ? 'left' : 'top',
@@ -4167,22 +4168,22 @@ const wr = ({ data: t }) => {
         top: null != c && c.isHorizontal ? `calc(${V} - ${Ce}px)` : ke,
         left: null != c && c.isHorizontal ? fe : V,
         background: k,
-        borderColor: b,
+        borderColor: L,
         borderStyle: 'solid',
-        color: L,
+        color: b,
       },
       we = {
         top: ge * g,
         left: oe + Q,
         transform: `rotate(${180 * (1 - ge)}deg)`,
-        borderColor: `${b} transparent transparent transparent`,
+        borderColor: `${L} transparent transparent transparent`,
         display: null != c && c.isHorizontal ? 'none' : '',
       },
-      be = {
+      Le = {
         left: 100 * pe + '%',
         top: ue,
         transform: `rotate(${180 * pe}deg)`,
-        borderColor: `transparent ${b} transparent transparent`,
+        borderColor: `transparent ${L} transparent transparent`,
         display: null != c && c.isHorizontal ? '' : 'none',
       };
     e.useLayoutEffect(() => {
@@ -4190,19 +4191,19 @@ const wr = ({ data: t }) => {
         p(h.current.clientHeight),
         C(h.current.clientWidth);
     }, [t, g]);
-    const Le = { color: v, direction: c.rightToLeft ? 'rtl' : 'ltr' },
+    const be = { color: v, direction: c.rightToLeft ? 'rtl' : 'ltr' },
       Me = { direction: c.rightToLeft ? 'rtl' : 'ltr' },
-      ye = (null == c ? void 0 : c.tooltipOnHover) && !(null != c && c.isTouchDevice);
-    let ze = '';
-    N && (ze = (null == N ? void 0 : N.passengerLabel) || `${y[R].passenger} ${null == N ? void 0 : N.id}`);
+      ze = (null == c ? void 0 : c.tooltipOnHover) && !(null != c && c.isTouchDevice);
+    let ye = '';
+    W && (ye = (null == W ? void 0 : W.passengerLabel) || `${z[D].passenger} ${null == W ? void 0 : W.id}`);
     let Se = '';
-    if (D) {
-      const e = P,
-        t = D.filter(t => e.includes(t));
-      let r = t.map(e => y[R][e]);
-      Se = t.length < e.length ? `${y[R].seatRestrictions}: ${r.join(', ')}` : '';
+    if (N) {
+      const e = R,
+        t = N.filter(t => e.includes(t));
+      let r = t.map(e => z[D][e]);
+      Se = t.length < e.length ? `${z[D].seatRestrictions}: ${r.join(', ')}` : '';
     }
-    const Te = [...(O || []).filter(e => !c.hiddenSeatFeatures.includes(e.key)), ...(Y || [])].slice(0, 12);
+    const Te = [...(O || []).filter(e => !c.hiddenSeatFeatures.includes(e.key)), ...(J || [])].slice(0, 12);
     return r.default.createElement(
       'div',
       {
@@ -4212,20 +4213,20 @@ const wr = ({ data: t }) => {
         onMouseLeave: c.tooltipOnHover ? e => o(null, null, e) : null,
       },
       r.default.createElement('div', { className: 'jets-tooltip--arrow-pointer', style: we }),
-      r.default.createElement('div', { className: 'jets-tooltip--arrow-pointer-horizontal', style: be }),
+      r.default.createElement('div', { className: 'jets-tooltip--arrow-pointer-horizontal', style: Le }),
       r.default.createElement(
         'div',
-        { className: 'jets-tooltip--body ' + (ye ? 'no-buttons' : '') },
+        { className: 'jets-tooltip--body ' + (ze ? 'no-buttons' : '') },
         r.default.createElement(
           'div',
           { className: 'jets-tooltip--content' },
           r.default.createElement(
             'div',
-            { className: 'jets-tooltip--header', style: Le },
-            r.default.createElement('div', { className: 'jets-tooltip--header-title' }, j || _, ' ', A),
-            r.default.createElement('div', { className: 'jets-tooltip--header-price' }, B)
+            { className: 'jets-tooltip--header', style: be },
+            r.default.createElement('div', { className: 'jets-tooltip--header-title' }, F || $, ' ', _),
+            r.default.createElement('div', { className: 'jets-tooltip--header-price' }, I)
           ),
-          r.default.createElement('div', { className: 'jets-tooltip--passenger-name', style: Me }, ze.length ? ze : Se),
+          r.default.createElement('div', { className: 'jets-tooltip--passenger-name', style: Me }, ye.length ? ye : Se),
           r.default.createElement(
             'div',
             { className: 'jets-tooltip--features', style: Me },
@@ -4244,7 +4245,7 @@ const wr = ({ data: t }) => {
                     : r.default.createElement('span', null, t),
                   r.default.createElement(
                     'div',
-                    { className: '' + (o ? o + '-label' : ''), style: o ? {} : { color: L } },
+                    { className: '' + (o ? o + '-label' : ''), style: o ? {} : { color: b } },
                     i
                   )
                 )
@@ -4255,10 +4256,10 @@ const wr = ({ data: t }) => {
           r.default.createElement(
             'div',
             { className: 'jets-tooltip--measurements' },
-            I.map(({ uniqId: e, title: t, icon: l, value: i }) =>
+            B.map(({ uniqId: e, title: t, icon: l, value: i }) =>
               r.default.createElement(
                 'div',
-                { style: { borderColor: M, background: z }, className: 'jets-tooltip--measurement', key: e },
+                { style: { borderColor: M, background: y }, className: 'jets-tooltip--measurement', key: e },
                 l
                   ? r.default.createElement('span', {
                       className: 'svg_span',
@@ -4281,22 +4282,22 @@ const wr = ({ data: t }) => {
           { className: 'jets-tooltip--btns-block' },
           r.default.createElement(Gt, {
             onClick: e => o(null, null, e),
-            content: y[R].cancel,
+            content: z[D].cancel,
             className: 'jets-btn jets-tooltip--btn',
             style: { color: E, backgroundColor: H },
           }),
-          N
+          W
             ? r.default.createElement(Gt, {
                 disabled: null == t || null === (l = t.passenger) || void 0 === l ? void 0 : l.readOnly,
                 onClick: () => a(t),
-                content: y[R].unselect,
+                content: z[D].unselect,
                 className: 'jets-btn jets-tooltip--btn ',
                 style: { color: S, backgroundColor: T },
               })
             : r.default.createElement(Gt, {
                 disabled: i(t),
                 onClick: () => s(t),
-                content: y[R].select,
+                content: z[D].select,
                 className: 'jets-btn jets-tooltip--btn ',
                 style: { color: S, backgroundColor: T },
               })
@@ -4304,7 +4305,7 @@ const wr = ({ data: t }) => {
       )
     );
   },
-  br = ({
+  Lr = ({
     flight: t,
     availability: l,
     passengers: i,
@@ -4322,25 +4323,25 @@ const wr = ({ data: t }) => {
     componentOverrides: u,
   }) => {
     const { isFirefox: f } = Oe(),
-      k = ye.mergeColorThemeWithConstraints(br.defaultProps.config.colorTheme, o.colorTheme);
-    (o.colorTheme = k), (o.lang = ye.validateLanguage(o.lang));
-    const v = { ...br.defaultProps.config, ...o };
+      k = ze.mergeColorThemeWithConstraints(Lr.defaultProps.config.colorTheme, o.colorTheme);
+    (o.colorTheme = k), (o.lang = ze.validateLanguage(o.lang));
+    const v = { ...Lr.defaultProps.config, ...o };
     f && (v.scaleType = w.SCALE);
     const [x, M] = e.useState([]),
-      [y, z] = e.useState(!1),
+      [z, y] = e.useState(!1),
       [S, T] = e.useState([]),
       [E, H] = e.useState(null),
-      [A, _] = e.useState(null),
-      [$, V] = e.useState(!1),
-      [O, I] = e.useState(0),
-      [B, N] = e.useState(null),
-      [W, P] = e.useState([]),
-      [D, R] = e.useState([]),
-      j = e.useRef(!1),
-      F = e.useRef(),
-      Z = new gr(v),
-      U = (null == B ? void 0 : B.singleDeckMode) && x.length > 1,
-      G = (null == B ? void 0 : B.builtInDeckSelector) && U;
+      [_, $] = e.useState(null),
+      [A, V] = e.useState(!1),
+      [O, B] = e.useState(0),
+      [I, W] = e.useState(null),
+      [P, R] = e.useState([]),
+      [N, D] = e.useState([]),
+      F = e.useRef(!1),
+      j = e.useRef(),
+      Z = new vr(v),
+      U = (null == I ? void 0 : I.singleDeckMode) && x.length > 1,
+      G = (null == I ? void 0 : I.builtInDeckSelector) && U;
     e.useEffect(() => {
       let e = !0;
       return (
@@ -4350,11 +4351,11 @@ const wr = ({ data: t }) => {
             .then(t => {
               var r, l, i, o, s, a, c, d;
               e &&
-                (N(t.params),
+                (W(t.params),
                 M(t.content),
-                P(t.exits),
-                R(t.bulks),
-                z(!0),
+                R(t.exits),
+                D(t.bulks),
+                y(!0),
                 n({
                   heightInPx:
                     null !== (r = t.params) && void 0 !== r && r.isHorizontal
@@ -4377,7 +4378,7 @@ const wr = ({ data: t }) => {
                   currentDeckIndex: O,
                   availabilityData: null == t ? void 0 : t.availabilityData,
                 }),
-                (j.current = !1));
+                (F.current = !1));
             })
             .catch(t => {
               e &&
@@ -4406,50 +4407,50 @@ const wr = ({ data: t }) => {
         X(), H(null);
       }, [i]),
       e.useEffect(() => {
-        !j.current && B && ((j.current = !0), Y(s), q(), Q());
-      }, [B]),
+        !F.current && I && ((F.current = !0), J(s), Y(), Q());
+      }, [I]),
       e.useEffect(() => {
-        q(), Q();
+        Y(), Q();
       }, [O]),
       e.useEffect(() => {
-        Y(s);
+        J(s);
       }, [s]),
       e.useEffect(() => {
         var e;
         if (!a || null == x || !x.length) return;
         const t = null == a || null === (e = a.seatLabel) || void 0 === e ? void 0 : e.toString().trim().toUpperCase(),
           { nonExistingSeatLabels: r } = Z.compareWithDecksSeatsInfo([t], x);
-        if (r.includes(t)) return H(null), void J();
+        if (r.includes(t)) return H(null), void q();
         const l = Z.getDeckIndexBySeatLabel(t, x);
-        l !== O && Y(l), _(t);
+        l !== O && J(l), $(t);
       }, [a]);
     const K = e.useMemo(
         () =>
-          `jets-seat-map ${null != B && B.isHorizontal ? 'horizontal' : 'vertical'} ${
+          `jets-seat-map ${null != I && I.isHorizontal ? 'horizontal' : 'vertical'} ${
             v.scaleType === w.SCALE ? 'scale' : 'zoom'
           }`,
-        [B, v]
+        [I, v]
       ),
-      J = () => {
-        _(null);
-      },
       q = () => {
-        null != B &&
-          B.isHorizontal &&
-          null != B &&
-          B.rightToLeft &&
-          (F.current.parentElement.scrollLeft = B.totalDecksHeight);
+        $(null);
       },
-      Y = e => {
+      Y = () => {
+        null != I &&
+          I.isHorizontal &&
+          null != I &&
+          I.rightToLeft &&
+          (j.current.parentElement.scrollLeft = I.totalDecksHeight);
+      },
+      J = e => {
         if (!U || x.length < 2) return;
         let t = (O + 1) % x.length;
         if (void 0 !== e) {
           if (e < 0 || e > x.length - 1) return;
           t = e;
         }
-        const r = (null == B ? void 0 : B.separateDeckHeights[t]) * (B.scale || 1) + 'px',
-          l = null == B ? void 0 : B.separateDeckHeights[t];
-        N({ ...B, scaledTotalDecksHeight: r, totalDecksHeight: l }), I(t), H(null);
+        const r = (null == I ? void 0 : I.separateDeckHeights[t]) * (I.scale || 1) + 'px',
+          l = null == I ? void 0 : I.separateDeckHeights[t];
+        W({ ...I, scaledTotalDecksHeight: r, totalDecksHeight: l }), B(t), H(null);
       },
       X = () => {
         i = Z.addAbbrToPassengers(i);
@@ -4457,13 +4458,13 @@ const wr = ({ data: t }) => {
         M(e), T(i);
       },
       Q = () => {
-        if (!B) return;
-        const e = null == B ? void 0 : B.separateDeckHeights[O],
-          t = U ? e : null == B ? void 0 : B.totalDecksHeight,
+        if (!I) return;
+        const e = null == I ? void 0 : I.separateDeckHeights[O],
+          t = U ? e : null == I ? void 0 : I.totalDecksHeight,
           r = {
-            heightInPx: null != B && B.isHorizontal ? (null == B ? void 0 : B.innerWidth) : t,
-            widthInPx: null != B && B.isHorizontal ? t : null == B ? void 0 : B.innerWidth,
-            scaleFactor: null == B ? void 0 : B.scale,
+            heightInPx: null != I && I.isHorizontal ? (null == I ? void 0 : I.innerWidth) : t,
+            widthInPx: null != I && I.isHorizontal ? t : null == I ? void 0 : I.innerWidth,
+            scaleFactor: null == I ? void 0 : I.scale,
             decksCount: null == x ? void 0 : x.length,
             currentDeckIndex: O,
           };
@@ -4475,17 +4476,17 @@ const wr = ({ data: t }) => {
       },
       te = (e, t, r) => {
         const l = ee(e);
-        if ((h({ seat: l, element: t.current, event: r.nativeEvent }), !B.builtInTooltip)) return;
-        if (e.type !== L.seat || (e.status !== b.available && e.status !== b.selected)) return;
+        if ((h({ seat: l, element: t.current, event: r.nativeEvent }), !I.builtInTooltip)) return;
+        if (e.type !== b.seat || (e.status !== L.available && e.status !== L.selected)) return;
         const i = Z.getNextPassenger(S),
           o = Z.calculateTooltipData(
             e,
             t.current,
-            F.current,
-            null == B ? void 0 : B.antiScale,
-            null == B ? void 0 : B.isHorizontal
+            j.current,
+            null == I ? void 0 : I.antiScale,
+            null == I ? void 0 : I.isHorizontal
           );
-        V(!!i), H({ ...o, nextPassenger: i, lang: v.lang, scaleType: v.scaleType, seatmapElement: F.current });
+        V(!!i), H({ ...o, nextPassenger: i, lang: v.lang, scaleType: v.scaleType, seatmapElement: j.current });
       },
       re = e => {
         const { data: t, passengers: r } = Z.selectSeatHandler(x, e, S);
@@ -4506,24 +4507,24 @@ const wr = ({ data: t }) => {
         );
       },
       oe = {
-        transform: ` ${null == B ? void 0 : B.rotation} ${null == B ? void 0 : B.offset} scale(${
-          null == B ? void 0 : B.scale
+        transform: ` ${null == I ? void 0 : I.rotation} ${null == I ? void 0 : I.offset} scale(${
+          null == I ? void 0 : I.scale
         })`,
         transformOrigin: 'top left',
-        width: null == B ? void 0 : B.innerWidth,
-        height: null == B ? void 0 : B.scaledTotalDecksHeight,
+        width: null == I ? void 0 : I.innerWidth,
+        height: null == I ? void 0 : I.scaledTotalDecksHeight,
       },
       se = {
-        transform: ` ${null == B ? void 0 : B.rotation} ${null == B ? void 0 : B.offset}`,
+        transform: ` ${null == I ? void 0 : I.rotation} ${null == I ? void 0 : I.offset}`,
         transformOrigin: 'top left',
-        zoom: null == B ? void 0 : B.scale,
-        width: null == B ? void 0 : B.innerWidth,
-        height: null == B ? void 0 : B.scaledTotalDecksHeight,
+        zoom: null == I ? void 0 : I.scale,
+        width: null == I ? void 0 : I.innerWidth,
+        height: null == I ? void 0 : I.scaledTotalDecksHeight,
       },
       ae = {
         onSeatClick: (e, t, r) => {
-          if ((null == B ? void 0 : B.tooltipOnHover) && !(null != B && B.isTouchDevice)) {
-            if (B.externalPassengerManagement) {
+          if ((null == I ? void 0 : I.tooltipOnHover) && !(null != I && I.isTouchDevice)) {
+            if (I.externalPassengerManagement) {
               const l = ee(e);
               return void m({ seat: l, element: t.current, event: r.nativeEvent });
             }
@@ -4548,13 +4549,13 @@ const wr = ({ data: t }) => {
         onSeatSelect: re,
         onSeatUnselect: le,
         isSeatSelectDisabled: ie,
-        switchDeck: Y,
-        resetSeatJumpTo: J,
-        params: B,
+        switchDeck: J,
+        resetSeatJumpTo: q,
+        params: I,
         config: v,
         colorTheme: k,
         activeTooltip: E,
-        seatLabelJumpTo: A,
+        seatLabelJumpTo: _,
         componentOverrides: u,
       };
     return r.default.createElement(
@@ -4563,11 +4564,11 @@ const wr = ({ data: t }) => {
       r.default.createElement(
         'div',
         {
-          ref: F,
+          ref: j,
           className: K,
           style: {
-            width: v.horizontal ? (null == B ? void 0 : B.scaledTotalDecksHeight) : v.width,
-            height: v.horizontal ? v.width : null == B ? void 0 : B.scaledTotalDecksHeight,
+            width: v.horizontal ? (null == I ? void 0 : I.scaledTotalDecksHeight) : v.width,
+            height: v.horizontal ? v.width : null == I ? void 0 : I.scaledTotalDecksHeight,
             fontFamily: k.fontFamily,
             background: k.seatMapBackgroundColor,
           },
@@ -4577,47 +4578,48 @@ const wr = ({ data: t }) => {
         r.default.createElement(
           'div',
           { style: v.scaleType === w.SCALE ? oe : se },
-          r.default.createElement(vr, {
+          r.default.createElement(ur, {
             showOneDeck: U,
             activeDeck: O,
             content: x,
-            exits: W,
-            bulks: D,
-            isSeatMapInited: y,
+            exits: P,
+            bulks: N,
+            isSeatMapInited: z,
             config: v,
           })
         )
       )
     );
   };
-br.defaultProps = {
+(Lr.defaultProps = {
   config: {
     width: 350,
     horizontal: H,
-    rightToLeft: W,
-    visibleFuselage: A,
-    visibleWings: _,
-    visibleCabinTitles: $,
+    rightToLeft: P,
+    visibleFuselage: _,
+    visibleWings: $,
+    visibleCabinTitles: A,
     builtInTooltip: V,
     externalPassengerManagement: O,
-    builtInDeckSelector: I,
-    singleDeckMode: B,
-    tooltipOnHover: N,
-    lang: z,
+    builtInDeckSelector: B,
+    singleDeckMode: I,
+    tooltipOnHover: W,
+    lang: y,
     units: S,
     scaleType: T,
+    request: window.fetch,
     apiAuthorizationScheme: E,
     hiddenSeatFeatures: [],
     colorTheme: {
       seatMapBackgroundColor: Z,
       deckLabelTitleColor: U,
-      floorColor: F,
+      floorColor: j,
       seatLabelColor: G,
-      seatStrokeColor: J,
+      seatStrokeColor: q,
       seatStrokeWidth: 1,
       seatArmrestColor: K,
-      notAvailableSeatsColor: q,
-      bulkBaseColor: Y,
+      notAvailableSeatsColor: Y,
+      bulkBaseColor: J,
       bulkCutColor: X,
       bulkIconColor: Q,
       fuselageFillColor: ee,
@@ -4675,125 +4677,10 @@ br.defaultProps = {
   onAvailabilityApplied: e => {
     console.log('Availability applied: ', e);
   },
-};
-const Lr = {
-    id: '1111',
-    airlineCode: 'EK',
-    flightNo: '2',
-    departureDate: '2025-07-19',
-    departure: 'LHR',
-    arrival: 'DXB',
-    cabinClass: 'A',
-    passengerType: 'ADT',
-  },
-  xr = [
-    {
-      currency: 'USD',
-      label: '20A',
-      price: 33,
-      onlyForPassengerType: ['ADT', 'CHD', 'INF'],
-      additionalProps: [
-        { label: 'Test prop for all', icon: null },
-        { label: 'Another test prop for all', icon: 'wifi' },
-      ],
-      color: 'green',
-    },
-    {
-      currency: 'USD',
-      label: '20E',
-      price: 33,
-      onlyForPassengerType: ['ADT', 'CHD', 'INF'],
-      additionalProps: [
-        { label: 'Clear air', icon: null, cssClass: 'clear-air-style' },
-        { label: 'USB plug', icon: 'power' },
-      ],
-      color: 'red',
-    },
-    { currency: 'USD', label: '20K', price: 33, onlyForPassengerType: ['ADT', 'CHD', 'INF'], color: 'magenta' },
-    { currency: 'USD', label: '21F', price: 13, onlyForPassengerType: ['ADT', 'CHD', 'INF'] },
-    { currency: 'USD', label: '21J', price: 13, onlyForPassengerType: ['CHD', 'INF'] },
-    { currency: 'USD', label: '35K', price: 137, onlyForPassengerType: ['CHD', 'INF'] },
-    { currency: 'EUR', label: '70E', price: 133399 },
-  ],
-  Mr = [
-    { passengerType: 'ADT', id: '1', seat: null },
-    {
-      id: '2',
-      seat: { price: 0, seatLabel: '21F' },
-      passengerLabel: 'Alex Test',
-      passengerColor: 'brown',
-      readOnly: !0,
-    },
-    { id: '4', seat: { price: 0, seatLabel: '21J' }, passengerLabel: 'Big Lebowski', passengerColor: 'green' },
-    { id: '3', passengerType: 'CHD', seat: null, passengerLabel: 'John Snow', passengerColor: 'orange' },
-  ],
-  yr = {
-    width: 400,
-    horizontal: !1,
-    rightToLeft: !1,
-    visibleFuselage: !0,
-    visibleWings: !0,
-    visibleCabinTitles: !0,
-    customCabinTitles: { F: 'First', B: 'Business', P: 'Premium', E: 'Economy' },
-    builtInDeckSelector: !0,
-    singleDeckMode: !0,
-    builtInTooltip: !0,
-    externalPassengerManagement: !1,
-    tooltipOnHover: !1,
-    lang: 'EN',
-    apiUrl: void 0,
-    apiAppId: void 0,
-    apiKey: void 0,
-    scaleType: 'zoom',
-    visibleSeatPriceLabels: !1,
-    currencySign: '$',
-    colorTheme: {
-      seatMapBackgroundColor: '#fff',
-      deckLabelTitleColor: 'black',
-      deckHeightSpacing: 0,
-      wingsWidth: 85,
-      deckSeparation: 0,
-      floorColor: '#595959',
-      seatLabelColor: 'black',
-      seatStrokeColor: 'rgb(230, 230, 230)',
-      seatStrokeWidth: 1,
-      seatArmrestColor: '#cccccc',
-      notAvailableSeatsColor: 'dimgrey',
-      bulkBaseColor: 'dimgrey',
-      bulkCutColor: 'lightgrey',
-      bulkIconColor: 'darkslategray',
-      defaultPassengerBadgeColor: 'darkred',
-      fontFamily: 'Montserrat, sans-serif',
-      tooltipBackgroundColor: 'rgb(255,255,255)',
-      tooltipHeaderColor: '#4f6f8f',
-      tooltipBorderColor: 'rgb(255,255,255)',
-      tooltipFontColor: '#4f6f8f',
-      tooltipIconColor: '#4f6f8f',
-      tooltipIconBorderColor: '#4f6f8f',
-      tooltipIconBackgroundColor: '#fff',
-      tooltipSelectButtonTextColor: '#fff',
-      tooltipSelectButtonBackgroundColor: 'rgb(42, 85, 128)',
-      tooltipCancelButtonTextColor: '#fff',
-      tooltipCancelButtonBackgroundColor: 'rgb(55, 55, 55)',
-      deckSelectorStrokeColor: '#fff',
-      deckSelectorFillColor: 'rgba(55, 55, 55, 0.5)',
-      deckSelectorSize: 30,
-      fuselageStrokeWidth: 10,
-      fuselageFillColor: 'lightgrey',
-      fuselageStrokeColor: 'darkgrey',
-      fuselageWindowsColor: 'darkgrey',
-      fuselageWingsColor: 'rgba(55, 55, 55, 0.5)',
-      exitIconUrlLeft: 'https://panorama.quicket.io/icons/exit-left.svg',
-      exitIconUrlRight: 'https://panorama.quicket.io/icons/exit-right.svg',
-      cabinTitlesWidth: 85,
-    },
-  };
-Ft(
-  '@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400");.jets-demo{display:flex;height:95vh;width:100%}.jets-demo>div{height:100%}.jets-demo--seat-map::-webkit-scrollbar{-webkit-appearance:none}.jets-demo--seat-map::-webkit-scrollbar-thumb{background-color:rgba(0,0,0,.5);border:2px solid #fff;border-radius:8px}.jets-demo--seat-map::-webkit-scrollbar-track{background-color:#fff;border-radius:8px}.jets-demo--seat-map{border:1px solid gray;overflow:scroll;width:70%}.jets-demo--seat-map>div{height:100%}.jets-demo--controllers{display:flex;flex-direction:column;margin-right:50px;width:35%}.jets-demo--controller{display:flex;height:250px;margin-bottom:10px;width:100%}.jets-demo--controller>textarea{font-family:monospace;font-size:13px;resize:none;width:75%}.jets-demo--btn{height:100%;width:25%}.jets-demo--btn,a{font-family:Montserrat,monospace}a{padding-bottom:15px}.deck-exit__image{height:72px;width:72px}.clear-air-style-icon>svg>path{fill:#ff8c00}.clear-air-style-label{color:#ff8c00;font-weight:700}'
-);
-(exports.BULK_TEMPLATE_MAP = Ie),
+}),
+  (exports.BULK_TEMPLATE_MAP = Be),
   (exports.CLASS_CODE_MAP = M),
-  (exports.DECK_ITEM_ALIGN_MAP = R),
+  (exports.DECK_ITEM_ALIGN_MAP = D),
   (exports.DECK_LOCALE_KEY = ar),
   (exports.DEFAULT_AUTHORIZATION_SCHEME = E),
   (exports.DEFAULT_BUILT_IN_TOOLTIP = V),
@@ -4803,207 +4690,52 @@ Ft(
   (exports.DEFAULT_FEATURES_RENDER_LIMIT = 12),
   (exports.DEFAULT_HORIZONTAL_LAYOUT = H),
   (exports.DEFAULT_INDEX_ROW_HEIGHT = 120),
-  (exports.DEFAULT_LANG = z),
-  (exports.DEFAULT_RTL = W),
+  (exports.DEFAULT_LANG = y),
+  (exports.DEFAULT_RTL = P),
   (exports.DEFAULT_SCALE_TYPE = T),
   (exports.DEFAULT_SEAT_CLASS = 'E'),
   (exports.DEFAULT_SEAT_MAP_WIDTH = 350),
   (exports.DEFAULT_SEAT_MARGIN = 3),
-  (exports.DEFAULT_SEAT_PASSENGER_TYPES = P),
+  (exports.DEFAULT_SEAT_PASSENGER_TYPES = R),
   (exports.DEFAULT_SEAT_SIZE = { width: 86, height: 100 }),
-  (exports.DEFAULT_SHOW_DECK_SELECTOR = I),
-  (exports.DEFAULT_SINGLE_DECK_MODE = B),
-  (exports.DEFAULT_STYLE_POSITION = j),
-  (exports.DEFAULT_TOOLTIP_ON_HOVER = N),
+  (exports.DEFAULT_SHOW_DECK_SELECTOR = B),
+  (exports.DEFAULT_SINGLE_DECK_MODE = I),
+  (exports.DEFAULT_STYLE_POSITION = F),
+  (exports.DEFAULT_TOOLTIP_ON_HOVER = W),
   (exports.DEFAULT_TOOLTIP_WIDTH = 260),
   (exports.DEFAULT_UNITS = S),
-  (exports.DEFAULT_VISIBLE_CABIN_TITLES = $),
-  (exports.DEFAULT_VISIBLE_HULL = A),
-  (exports.DEFAULT_VISIBLE_WINGS = _),
-  (exports.DemoComponent = () => {
-    const t = () => {
-        const e = { ...yr };
-        return delete e.apiAppId, delete e.apiKey, delete e.apiUrl, e;
-      },
-      [l, i] = e.useState(t()),
-      [o, s] = e.useState(null),
-      [a, n] = e.useState(null),
-      [c, d] = e.useState(null),
-      [h, g] = e.useState(JSON.stringify(t(), null, 2)),
-      [p, m] = e.useState(JSON.stringify(Lr, null, 2)),
-      [C, u] = e.useState(JSON.stringify(xr, null, 2)),
-      [f, k] = e.useState(JSON.stringify(Mr, null, 2)),
-      [v, w] = e.useState(0),
-      [b, L] = e.useState(0),
-      [x, M] = e.useState(JSON.stringify({ seatLabel: '41A' })),
-      [y, z] = e.useState(null);
-    return r.default.createElement(
-      'div',
-      { className: 'jets-demo' },
-      r.default.createElement(
-        'div',
-        { className: 'jets-demo--controllers' },
-        r.default.createElement(
-          'a',
-          {
-            href: 'https://github.com/Kwiket/jets-seatmap-react-lib-pub/blob/version-3/SEATMAP-INTEGRATION.md',
-            target: '_blank',
-          },
-          'REACT LIB SEATMAP INTEGRATION DOCUMENTATION'
-        ),
-        r.default.createElement(
-          'div',
-          { className: 'jets-demo--controller' },
-          r.default.createElement('textarea', {
-            onChange: e =>
-              (e => {
-                g(e.target.value);
-              })(e),
-            defaultValue: h,
-          }),
-          r.default.createElement(Gt, {
-            className: 'jets-btn jets-demo--btn',
-            content: '1.INIT SEAT MAP',
-            onClick: () => {
-              const e = JSON.parse(h);
-              i({ ...e, apiUrl: void 0, apiAppId: void 0, apiKey: void 0 });
-            },
-          })
-        ),
-        r.default.createElement(
-          'div',
-          { className: 'jets-demo--controller' },
-          r.default.createElement('textarea', {
-            onChange: e =>
-              (e => {
-                m(e.target.value);
-              })(e),
-            defaultValue: p,
-          }),
-          r.default.createElement(Gt, {
-            className: 'jets-btn jets-demo--btn',
-            content: '2.SET FLIGHT',
-            onClick: () => {
-              s(JSON.parse(p));
-            },
-          })
-        ),
-        r.default.createElement(
-          'div',
-          { className: 'jets-demo--controller' },
-          r.default.createElement('textarea', {
-            onChange: e =>
-              (e => {
-                u(e.target.value);
-              })(e),
-            defaultValue: C,
-          }),
-          r.default.createElement(Gt, {
-            className: 'jets-btn jets-demo--btn',
-            content: '3.SET AVAILABILITY',
-            onClick: () => {
-              n(JSON.parse(C));
-            },
-          })
-        ),
-        r.default.createElement(
-          'div',
-          { className: 'jets-demo--controller' },
-          r.default.createElement('textarea', {
-            onChange: e =>
-              (e => {
-                k(e.target.value);
-              })(e),
-            defaultValue: f,
-          }),
-          r.default.createElement(Gt, {
-            className: 'jets-btn jets-demo--btn',
-            content: '4.SET PASSENGERS',
-            onClick: () => {
-              d(JSON.parse(f));
-            },
-          })
-        ),
-        r.default.createElement(
-          'div',
-          { className: 'jets-demo--controller' },
-          r.default.createElement('textarea', {
-            onChange: e =>
-              (e => {
-                w(e.target.value);
-              })(e),
-            defaultValue: 0,
-          }),
-          r.default.createElement(Gt, {
-            className: 'jets-btn jets-demo--btn',
-            content: '5.SET DECK',
-            onClick: () => {
-              L(v);
-            },
-          })
-        ),
-        r.default.createElement(
-          'div',
-          { className: 'jets-demo--controller' },
-          r.default.createElement('textarea', {
-            onChange: e =>
-              (e => {
-                M(e.target.value);
-              })(e),
-            defaultValue: x,
-          }),
-          r.default.createElement(Gt, {
-            className: 'jets-btn jets-demo--btn',
-            content: '6.SEAT JUMP TO',
-            onClick: () => {
-              z(JSON.parse(x));
-            },
-          })
-        )
-      ),
-      r.default.createElement(
-        'div',
-        { className: 'jets-demo--seat-map' },
-        r.default.createElement(br, {
-          flight: o,
-          config: l,
-          availability: a,
-          passengers: c,
-          currentDeckIndex: b,
-          seatJumpTo: y,
-        })
-      )
-    );
-  }),
+  (exports.DEFAULT_VISIBLE_CABIN_TITLES = A),
+  (exports.DEFAULT_VISIBLE_HULL = _),
+  (exports.DEFAULT_VISIBLE_WINGS = $),
   (exports.ENTITY_SCHEME_MAP = x),
-  (exports.ENTITY_STATUS_MAP = b),
-  (exports.ENTITY_TYPE_MAP = L),
-  (exports.ERROR_LOAD_DATA_MESSAGE = _e),
-  (exports.ERROR_SAVE_DATA_MESSAGE = Ae),
+  (exports.ENTITY_STATUS_MAP = L),
+  (exports.ENTITY_TYPE_MAP = b),
+  (exports.ERROR_LOAD_DATA_MESSAGE = $e),
+  (exports.ERROR_SAVE_DATA_MESSAGE = _e),
   (exports.FUSELAGE_HEIGHT_TO_WIDTH_RATIO = 2.4),
-  (exports.JetsApiService = Le),
+  (exports.JetsApiService = be),
   (exports.JetsBulk = Ut),
   (exports.JetsButton = Gt),
   (exports.JetsContentPreparer = He),
   (exports.JetsContext = xe),
-  (exports.JetsDataHelper = ye),
+  (exports.JetsDataHelper = ze),
   (exports.JetsDeck = nr),
   (exports.JetsDeckExit = Kt),
   (exports.JetsDeckSelector = cr),
-  (exports.JetsLocalStorageService = $e),
-  (exports.JetsNoData = ur),
-  (exports.JetsNose = Cr),
-  (exports.JetsNotInit = fr),
-  (exports.JetsPlaneBody = vr),
+  (exports.JetsLocalStorageService = Ae),
+  (exports.JetsNoData = dr),
+  (exports.JetsNose = hr),
+  (exports.JetsNotInit = gr),
+  (exports.JetsPlaneBody = ur),
   (exports.JetsRow = or),
   (exports.JetsSeat = ir),
-  (exports.JetsSeatMap = br),
-  (exports.JetsSeatMapApiService = hr),
-  (exports.JetsSeatMapService = gr),
+  (exports.JetsSeatMap = Lr),
+  (exports.JetsSeatMapApiService = kr),
+  (exports.JetsSeatMapService = vr),
   (exports.JetsTail = mr),
   (exports.JetsTooltipGlobal = wr),
-  (exports.JetsWing = kr),
-  (exports.LOCALES_MAP = y),
+  (exports.JetsWing = Cr),
+  (exports.LOCALES_MAP = z),
   (exports.LOCALE_AR = h),
   (exports.LOCALE_CN = c),
   (exports.LOCALE_CS = g),
@@ -5021,12 +4753,12 @@ Ft(
   (exports.LOCALE_UK = u),
   (exports.SCALE_TYPES = w),
   (exports.SEAT_FEATURES_ICONS = Te),
-  (exports.SEAT_SIZE_BY_TYPE = D),
-  (exports.STICKER_TEMPLATE_MAP = Be),
+  (exports.SEAT_SIZE_BY_TYPE = N),
+  (exports.STICKER_TEMPLATE_MAP = Ie),
   (exports.SeatIcon = rr),
-  (exports.Sticker = jt),
+  (exports.Sticker = Ft),
   (exports.THEME_BACKGROUND_COLOR = Z),
-  (exports.THEME_BULK_BASE_COLOR = Y),
+  (exports.THEME_BULK_BASE_COLOR = J),
   (exports.THEME_BULK_CUT_COLOR = X),
   (exports.THEME_BULK_ICON_COLOR = Q),
   (exports.THEME_CABIN_TITLES_HIGHLIGHT_COLORS = we),
@@ -5040,16 +4772,16 @@ Ft(
   (exports.THEME_DECK_SEPARATION = 50),
   (exports.THEME_DEFAULT_FONT_FAMILY = oe),
   (exports.THEME_DEFAULT_PASSENGER_BADGE_COLOR = ie),
-  (exports.THEME_FLOOR_COLOR = F),
+  (exports.THEME_FLOOR_COLOR = j),
   (exports.THEME_FUSELAGE_FILL_COLOR = ee),
   (exports.THEME_FUSELAGE_OUTLINE_COLOR = te),
   (exports.THEME_FUSELAGE_OUTLINE_WIDTH = 12),
   (exports.THEME_FUSELAGE_WINDOWS_COLOR = re),
   (exports.THEME_FUSELAGE_WINGS_COLOR = le),
-  (exports.THEME_NOT_AVAILABLE_SEATS_COLOR = q),
+  (exports.THEME_NOT_AVAILABLE_SEATS_COLOR = Y),
   (exports.THEME_SEAT_ARMREST_COLOR = K),
   (exports.THEME_SEAT_LABEL_COLOR = G),
-  (exports.THEME_SEAT_STROKE_COLOR = J),
+  (exports.THEME_SEAT_STROKE_COLOR = q),
   (exports.THEME_SEAT_STROKE_WIDTH = 1),
   (exports.THEME_TOOLTIP_BACKGROUND_COLOR = se),
   (exports.THEME_TOOLTIP_BORDER_COLOR = ne),
@@ -5064,5 +4796,5 @@ Ft(
   (exports.THEME_TOOLTIP_SELECT_BUTTON_TEXT_COLOR = pe),
   (exports.THEME_WINGS_WIDTH = 30),
   (exports.Utils = Se),
-  (exports.seatTemplateService = qt),
+  (exports.seatTemplateService = Yt),
   (exports.useEnvironmentInfo = Oe);

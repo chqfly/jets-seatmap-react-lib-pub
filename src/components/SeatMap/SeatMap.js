@@ -475,6 +475,7 @@ JetsSeatMap.defaultProps = {
     lang: DEFAULT_LANG,
     units: DEFAULT_UNITS,
     scaleType: DEFAULT_SCALE_TYPE,
+    request: window.fetch,
 
     apiAuthorizationScheme: DEFAULT_AUTHORIZATION_SCHEME,
 
